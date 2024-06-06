@@ -1,0 +1,12 @@
+D:\work\Rervationsystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.deps.json
+D:\work\Rervationsystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.dll
+D:\work\Rervationsystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.pdb
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.AssemblyInfoInputs.cache
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.AssemblyInfo.cs
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.csproj.CoreCompileInputs.cache
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.dll
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\refint\ReservationSystem.Domain.dll
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.pdb
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ref\ReservationSystem.Domain.dll
+D:\work\Rervationsystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.csproj.AssemblyReference.cache
