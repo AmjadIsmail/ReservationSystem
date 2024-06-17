@@ -1,0 +1,255 @@
+{
+  "data": {
+    "type": "flight-order",
+    "flightOffers": [
+      {
+        "type": "flight-offer",
+        "id": "1",
+        "source": "GDS",
+        "instantTicketingRequired": false,
+        "nonHomogeneous": false,
+        "paymentCardRequired": false,
+        "lastTicketingDate": "2024-08-02",
+        "itineraries": [
+          {
+            "segments": [
+              {
+                "departure": {
+                  "iataCode": "SYD",
+                  "terminal": "1",
+                  "at": "2024-08-02T11:25:00"
+                },
+                "arrival": {
+                  "iataCode": "XMN",
+                  "terminal": "3",
+                  "at": "2024-08-02T18:50:00"
+                },
+                "carrierCode": "MF",
+                "number": "802",
+                "aircraft": {
+                  "code": "789"
+                },
+                "operating": {
+                  "carrierCode": "MF"
+                },
+                "duration": "PT9H25M",
+                "id": "3",
+                "numberOfStops": 0,
+                "co2Emissions": [
+                  {
+                    "weight": 388,
+                    "weightUnit": "KG",
+                    "cabin": "ECONOMY"
+                  }
+                ]
+              },
+              {
+                "departure": {
+                  "iataCode": "XMN",
+                  "terminal": "3",
+                  "at": "2024-08-03T08:40:00"
+                },
+                "arrival": {
+                  "iataCode": "BKK",
+                  "at": "2024-08-03T11:15:00"
+                },
+                "carrierCode": "MF",
+                "number": "853",
+                "aircraft": {
+                  "code": "738"
+                },
+                "operating": {
+                  "carrierCode": "MF"
+                },
+                "duration": "PT3H35M",
+                "id": "4",
+                "numberOfStops": 0,
+                "co2Emissions": [
+                  {
+                    "weight": 162,
+                    "weightUnit": "KG",
+                    "cabin": "ECONOMY"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "price": {
+          "currency": "GBP",
+          "total": "207.50",
+          "base": "79.00",
+          "fees": [
+            {
+              "amount": "0.00",
+              "type": "SUPPLIER"
+            },
+            {
+              "amount": "0.00",
+              "type": "TICKETING"
+            },
+            {
+              "amount": "0.00",
+              "type": "FORM_OF_PAYMENT"
+            }
+          ],
+          "grandTotal": "207.50",
+          "billingCurrency": "GBP"
+        },
+        "pricingOptions": {
+          "fareType": [
+            "PUBLISHED"
+          ],
+          "includedCheckedBagsOnly": true
+        },
+        "validatingAirlineCodes": [
+          "MF"
+        ],
+        "travelerPricings": [
+          {
+            "travelerId": "1",
+            "fareOption": "STANDARD",
+            "travelerType": "ADULT",
+            "price": {
+              "currency": "GBP",
+              "total": "207.50",
+              "base": "79.00",
+              "taxes": [
+                {
+                  "amount": "0.30",
+                  "code": "G8"
+                },
+                {
+                  "amount": "26.30",
+                  "code": "WY"
+                },
+                {
+                  "amount": "0.80",
+                  "code": "E7"
+                },
+                {
+                  "amount": "31.20",
+                  "code": "AU"
+                },
+                {
+                  "amount": "6.20",
+                  "code": "YQ"
+                },
+                {
+                  "amount": "54.00",
+                  "code": "YR"
+                },
+                {
+                  "amount": "9.70",
+                  "code": "CN"
+                }
+              ],
+              "refundableTaxes": "128.50"
+            },
+            "fareDetailsBySegment": [
+              {
+                "segmentId": "3",
+                "cabin": "ECONOMY",
+                "fareBasis": "SOW6AAUS",
+                "brandedFare": "YSTANDARD",
+                "class": "S",
+                "includedCheckedBags": {
+                  "quantity": 1
+                }
+              },
+              {
+                "segmentId": "4",
+                "cabin": "ECONOMY",
+                "fareBasis": "SOW6AAUS",
+                "brandedFare": "YSTANDARD",
+                "class": "S",
+                "includedCheckedBags": {
+                  "quantity": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "travelers": [
+      {
+      "id": "1",
+      "dateOfBirth": "1982-01-16",
+      "name": {
+        "firstName": "JORGE",
+        "lastName": "GONZALES"
+      },
+    "gender": "MALE",
+    "contact": {
+      "emailAddress": "amjad.rahimo@live.com",
+      "phones": [
+        {
+          "deviceType": "MOBILE",
+          "countryCallingCode": "34",
+          "number": "480080076"
+        }
+      ]
+    },
+    "documents": [
+      {
+        "documentType": "PASSPORT",
+        "birthPlace": "Madrid",
+        "issuanceLocation": "Madrid",
+        "issuanceDate": "2023-04-14",
+        "number": "00000000",
+        "expiryDate": "2025-04-14",
+        "issuanceCountry": "ES",
+        "validityCountry": "ES",
+        "nationality": "ES",
+        "holder": true
+      }
+    ]
+  }
+    
+],
+    "remarks": {
+        "general": [
+          {
+            "subType": "GENERAL_MISCELLANEOUS",
+            "text": "ONLINE BOOKING FROM INCREIBLE VIAJES"
+          }
+        ]
+  },
+  "ticketingAgreement": {
+  "option": "DELAY_TO_CANCEL",
+  "delay": "6D"
+},
+  "contacts": [
+  {
+    "addresseeName": {
+      "firstName": "PABLO",
+      "lastName": "RODRIGUEZ"
+    },
+    "companyName": "INCREIBLE VIAJES",
+    "purpose": "STANDARD",
+    "phones": [
+      {
+        "deviceType": "LANDLINE",
+        "countryCallingCode": "34",
+        "number": "480080071"
+      },
+      {
+        "deviceType": "MOBILE",
+        "countryCallingCode": "33",
+        "number": "480080072"
+      }
+    ],
+    "emailAddress": "support@increibleviajes.es",
+    "address": {
+      "lines": [
+        "Calle Prado, 16"
+      ],
+      "postalCode": "28014",
+      "cityName": "Madrid",
+      "countryCode": "ES"
+    }
+  }
+]
+  }
+}

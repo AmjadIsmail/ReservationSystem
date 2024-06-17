@@ -2,8 +2,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
 using ReservationApi.DBContext;
 using ReservationSystem.Domain.Models;
+using ReservationSystem.Domain.Repositories;
+using ReservationSystem.Infrastructure.Repositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -15,7 +18,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IAvailability, Availability>();
+builder.Services.AddScoped<IFlightPrice, FlightPrice>();
+builder.Services.AddScoped<IFlightOrder, FlightOrder>();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMemoryCache();
+builder.Services.AddResponseCompression();
 builder.Services.AddDbContext<EF_DataContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAuthentication(options =>
@@ -38,6 +46,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 builder.Services.AddAuthorization();
+builder.Services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -83,6 +96,7 @@ app.MapPost("/security/createToken",
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
+app.UseResponseCompression();
 app.MapControllers();
 
 app.Run();
