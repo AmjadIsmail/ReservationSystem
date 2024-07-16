@@ -1,0 +1,13 @@
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\bin\Release\net8.0\ReservationSystem.Common.deps.json
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\bin\Release\net8.0\ReservationSystem.Common.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\bin\Release\net8.0\ReservationSystem.Common.pdb
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.csproj.AssemblyReference.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.AssemblyInfoInputs.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.AssemblyInfo.cs
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.csproj.CoreCompileInputs.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.sourcelink.json
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\refint\ReservationSystem.Common.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ReservationSystem.Common.pdb
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Common\obj\Release\net8.0\ref\ReservationSystem.Common.dll
