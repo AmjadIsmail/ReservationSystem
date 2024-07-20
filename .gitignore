@@ -1,0 +1,23 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Infrastructure.pdb
+/ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Domain.dll
+/ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Domain.pdb
+/ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Infrastructure.dll
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ref/ReservationSystem.Infrastructure.dll
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/refint/ReservationSystem.Infrastructure.dll
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.AssemblyInfo.cs
+/ReservationSystem.Infrastructure/obj/project.assets.json
+/ReservationSystem.Infrastructure/obj/project.nuget.cache
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.csproj.AssemblyReference.cache
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.csproj.CoreCompileInputs.cache
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.dll
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.AssemblyInfoInputs.cache
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.assets.cache
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.csproj.FileListAbsolute.txt
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.pdb
+/ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.sourcelink.json
+/ReservationSystem.Infrastructure/obj/ReservationSystem.Infrastructure.csproj.nuget.dgspec.json
