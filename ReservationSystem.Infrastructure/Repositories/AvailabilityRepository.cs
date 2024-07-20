@@ -12,6 +12,8 @@ using ReservationSystem.Domain.Models.Availability;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using ReservationSystem.Domain.Service;
+using ReservationSystem.Domain.DB_Models;
 
 
 namespace ReservationSystem.Infrastructure.Repositories
@@ -19,18 +21,20 @@ namespace ReservationSystem.Infrastructure.Repositories
     public class AvailabilityRepository  : IAvailabilityRepository
     {
         private readonly IConfiguration configuration;
-        private readonly IMemoryCache _cache;
-        public AvailabilityRepository(IConfiguration _configuration , IMemoryCache cache)
+       // private readonly IMemoryCache _cache;
+        private readonly ICacheService _cacheService;
+        public AvailabilityRepository(IConfiguration _configuration ,  ICacheService cacheService)
         {
             configuration = _configuration;
-            _cache = cache;
+            _cacheService = cacheService;
         }
         public async Task<string> getToken()
         {
             try
             {
                 string token;
-                if (!_cache.TryGetValue("amadeusToken", out token))
+                token =  _cacheService.Get<string>("amadeusToken");
+                if (token == null)
                 {
                     string returnStr = "";
                     using (var httpClient = new HttpClient())
@@ -65,7 +69,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string accessToken = jsonResponse.access_token;
                             returnStr = accessToken;
                             var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                            _cache.Set("amadeusToken", accessToken, cacheEntryOptions);
+                           // _cache.Set("amadeusToken", accessToken, cacheEntryOptions);
+                            _cacheService.Set("amadeusToken" , accessToken, TimeSpan.FromMinutes(15));
                             Console.WriteLine("Response: " + responseContent);
                         }
                         else
@@ -80,6 +85,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             catch( Exception ex)
             {
+                _cacheService.Remove("amadeusToken");
                 return "";
             }
           
@@ -89,7 +95,9 @@ namespace ReservationSystem.Infrastructure.Repositories
         {
             string amadeusRequest = generateRequest(requestModel);
             AvailabilityModel availabilities = new AvailabilityModel();
-            if (!_cache.TryGetValue("amadeusRequest"+ amadeusRequest, out availabilities))
+            List<FlightMarkup> flightsDictionary = _cacheService.GetFlightsMarkup();
+            var availabilityModel = _cacheService.Get<AvailabilityModel>("amadeusRequest" + amadeusRequest);
+            if (availabilityModel == null)
             {
                 availabilities = new AvailabilityModel();
                 using (var httpClient = new HttpClient())
@@ -102,14 +110,14 @@ namespace ReservationSystem.Infrastructure.Repositories
                     if (response.IsSuccessStatusCode)
                     {
                         var responseContent = await response.Content.ReadAsStringAsync();
-                       // responseContent = responseContent.ToString().Replace("\"base\":", "\"base_amount\":");
                      
                         AvailabilityResult result = JsonConvert.DeserializeObject<AvailabilityResult>(responseContent);
                         availabilities.data = result.data;
                         if (result.data.Count > 0)
                         {
-                            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                            _cache.Set("amadeusRequest" + amadeusRequest, availabilities, cacheEntryOptions);
+                           
+                            result.data = applyMarkup(result.data, flightsDictionary);
+                            _cacheService.Set("amadeusRequest" + amadeusRequest, availabilities, TimeSpan.FromMinutes(15));
                         }
                         
                         Console.WriteLine("Response: " + responseContent);
@@ -121,7 +129,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         availabilities.amadeusError.errorCode = 400;
                         if(response.StatusCode.ToString() == "Unauthorized")
                         {
-                            _cache.Remove("amadeusToken");
+                            _cacheService.Remove("amadeusToken");
                             availabilities.amadeusError.errorCode = 401;
                         }                     
                         var error = await response.Content.ReadAsStringAsync();
@@ -132,6 +140,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                         Console.WriteLine("Error: " + response.StatusCode);
                     }
                 }
+            }
+            else
+            {
+                availabilities = availabilityModel;
             }
                
             return availabilities;
@@ -185,6 +197,66 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             return res;
         }        
+
+        private List<FlightOffer> applyMarkup (List<FlightOffer> offers , List<FlightMarkup> dictionary)
+        {
+            try
+            {
+                var adultpp = dictionary.FirstOrDefault().adult_markup;
+                var childpp = dictionary.FirstOrDefault().child_markup;
+                var infantpp = dictionary.FirstOrDefault().infant_markup;
+
+                foreach (var item in offers)
+                {
+                    foreach( var item2 in item.travelerPricings)
+                    {
+                        var travelerType = item2?.travelerType;
+                        if (travelerType != null)
+                        {
+                            switch (travelerType)
+                            {
+                                case "ADULT":
+                                    item.price.markup = adultpp.Value;
+                                    item.price.total = (Convert.ToDecimal(item?.price?.total) + adultpp.Value).ToString();
+                                    item.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal) + adultpp.Value).ToString();
+                                    item2.price.markup = adultpp.Value;
+                                    item2.price.total = (Convert.ToDecimal(item2?.price?.total) + adultpp.Value).ToString();
+                                    item2.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal)).ToString();
+                                    break;
+                                case "CHILD":
+                                    item.price.markup = childpp.Value;
+                                    item.price.total = (Convert.ToDecimal(item?.price?.total) + childpp.Value).ToString();
+                                    item.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal) + childpp.Value).ToString();
+                                    item2.price.markup = childpp.Value;
+                                    item2.price.total = (Convert.ToDecimal(item2?.price?.total) + childpp.Value).ToString();
+                                    item2.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal)).ToString();
+                                    break;
+                                case "INFANT":
+                                    item.price.markup = infantpp.Value;
+                                    item.price.total = (Convert.ToDecimal(item?.price?.total) + infantpp.Value).ToString();
+                                    item.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal) + infantpp.Value).ToString();
+                                    item2.price.markup = infantpp.Value;
+                                    item2.price.total = (Convert.ToDecimal(item2?.price?.total) + infantpp.Value).ToString();
+                                    item2.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal)).ToString();
+                                    break;
+                            }
+                        }
+                    }
+                   
+                }
+            }
+            catch( Exception ex)
+            {
+
+            }          
+            return offers;
+        }
+
+        public async Task ClearCache()
+        {
+             _cacheService.RemoveAll();
+            _cacheService.ResetCacheData();
+        }
     }
 
 }

@@ -6,6 +6,7 @@ using ReservationApi.Model;
 using ReservationSystem.Domain.Models;
 using ReservationSystem.Domain.Models.Availability;
 using ReservationSystem.Domain.Repositories;
+using ReservationSystem.Domain.Service;
 using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,11 +18,13 @@ namespace ReservationApi.Controllers
     public class AvailabilityController : ControllerBase
     {
         private IAvailabilityRepository _availability;
+        private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public AvailabilityController(IAvailabilityRepository availability,IMemoryCache memoryCache)
+        public AvailabilityController(IAvailabilityRepository availability,IMemoryCache memoryCache,ICacheService cacheService)
         {
             _availability = availability;
             _cache = memoryCache;
+            _cacheService = cacheService;
         }
               
         //[Authorize]
@@ -57,8 +60,19 @@ namespace ReservationApi.Controllers
 
         }
 
-       
+        [HttpGet("clearCache")]
+        public async Task<IActionResult> Get()
+        {
+           
+            ApiResponse res = new ApiResponse();
+            await _availability.ClearCache();
+            res.IsSuccessful = true;
+            res.StatusCode = 200;
+            res.Data = "Clear Success"; 
+            return Ok(res);
 
-       
+        }
+
+
     }
 }

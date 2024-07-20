@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
 using ReservationSystem.Domain.DBContext;
 using ReservationSystem.Domain.Models;
 using ReservationSystem.Domain.Repositories;
+using ReservationSystem.Domain.Service;
 using ReservationSystem.Infrastructure.Repositories;
+using ReservationSystem.Infrastructure.Service;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -17,16 +20,26 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
 builder.Services.AddScoped<IFlightPriceRepository, FlightPriceRepository>();
 builder.Services.AddScoped<IFlightOrderRepository, FlightOrderRepository>();
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<IDBRepository, DBRepository>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Services.AddResponseCompression();
-builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IEmailService,EmailService>(provider =>
+{
+    var configuration = builder.Configuration.GetSection("EmailSettings");
+    var smtpServer = builder.Configuration["EmailSettings:SmtpServer"];
+    var smtpPort = int.Parse(builder.Configuration["EmailSettings:SmtpPort"]);
+    var smtpUser = builder.Configuration["EmailSettings:SmtpUser"];
+    var smtpPass = "";//builder.Configuration["EmailSettings:SmtpPass"];
+    return new EmailService(smtpServer, smtpPort, smtpUser, smtpPass);
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -71,6 +84,8 @@ builder.Services.AddControllers()
                 {
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 });
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -124,4 +139,19 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
 });
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var cacheService = services.GetRequiredService<ICacheService>();
+        cacheService.LoadDataIntoCache();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while loading cache data.");
+    }
+}
 app.Run();

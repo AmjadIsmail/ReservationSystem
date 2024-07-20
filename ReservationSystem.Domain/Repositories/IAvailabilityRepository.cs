@@ -12,5 +12,7 @@ namespace ReservationSystem.Domain.Repositories
     {
         public Task<string> getToken();
         public Task<AvailabilityModel> GetAvailability(string token , AvailabilityRequest request);
+
+        public Task ClearCache();
     }
 }

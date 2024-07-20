@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="EFCore\" />
     <Folder Include="Entities\" />
-    <Folder Include="Service\" />
   </ItemGroup>
 
   <ItemGroup>

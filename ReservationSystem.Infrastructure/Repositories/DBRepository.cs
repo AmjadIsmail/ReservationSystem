@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReservationSystem.Domain.DB_Models;
 using ReservationSystem.Domain.DBContext;
@@ -41,6 +42,23 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
           
            
+        }
+
+        public async Task<List<FlightMarkup>?> GetFlightMarkup()
+        {
+            try
+            {
+
+                return await _context.flightMarkups.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+             
+                _logger.LogError($"Error return flights markup Result {ex.Message.ToString()}");
+                return null;
+            }
+
+
         }
     }
 }

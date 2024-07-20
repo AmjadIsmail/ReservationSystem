@@ -22,5 +22,6 @@ namespace ReservationSystem.Domain.DBContext
         }
 
         public DbSet<SearchAvailabilityResults> availabilityResults { get; set; }
+        public DbSet<FlightMarkup> flightMarkups { get; set; }
     }
 }
