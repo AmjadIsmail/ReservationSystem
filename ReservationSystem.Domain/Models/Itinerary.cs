@@ -8,7 +8,9 @@ namespace ReservationSystem.Domain.Models
 {
     public class Itinerary
     {
+        public string ? flightProposal_ref { get; set; }
         public string? duration { get; set; }
         public List<Segment>? segments { get; set; }
+        public string? segment_type { get; set; }
     }
 }

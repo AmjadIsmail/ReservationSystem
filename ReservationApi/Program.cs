@@ -20,9 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
+builder.Services.AddScoped<ITravelBoardSearchRepository, TravelBoardSearchRepository>();
 builder.Services.AddScoped<IFlightPriceRepository, FlightPriceRepository>();
 builder.Services.AddScoped<IFlightOrderRepository, FlightOrderRepository>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
@@ -54,7 +55,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigin",
         builder => builder
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5273")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -85,7 +86,7 @@ builder.Services.AddControllers()
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 });
 
-
+builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -29,12 +29,13 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 var Res = new SearchAvailabilityResults();
-                Res.created_on = DateTime.Now;
-                Res.request = JsonDocument.Parse(requset).ToString();
-                Res.response = JsonDocument.Parse(response).ToString();
+                Res.created_on = DateTime.Now.ToUniversalTime();
+                Res.request = requset;
+                Res.response = response;
                 Res.total_results = totlResults;
                 Res.user_id = 0;
                 await _context.availabilityResults.AddAsync(Res);
+                await _context.SaveChangesAsync();
             }
             catch(Exception ex)
             {

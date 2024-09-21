@@ -17,10 +17,10 @@ namespace ReservationApi.Controllers
     [ApiController]
     public class AvailabilityController : ControllerBase
     {
-        private IAvailabilityRepository _availability;
+        private ITravelBoardSearchRepository  _availability;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public AvailabilityController(IAvailabilityRepository availability,IMemoryCache memoryCache,ICacheService cacheService)
+        public AvailabilityController(ITravelBoardSearchRepository availability,IMemoryCache memoryCache,ICacheService cacheService)
         {
             _availability = availability;
             _cache = memoryCache;
@@ -31,11 +31,10 @@ namespace ReservationApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AvailabilityRequest availabilityRequest)
         {           
-            string Token = await _availability.getToken();
+           // string Token = await _availability.getToken();
             ApiResponse res = new ApiResponse();
-            if (Token != "")
-            {
-                var data = await _availability.GetAvailability(Token, availabilityRequest);
+             
+                var data = await _availability.GetAvailability( availabilityRequest);
               
                 res.IsSuccessful = true;
                 res.StatusCode = 200;
@@ -48,14 +47,7 @@ namespace ReservationApi.Controllers
                 {
                     res.Data = data.data;
                 }               
-            }
-            else
-            {
-                res.Data = "";
-                res.IsSuccessful = false;
-                res.Message = "getting token error";
-                
-            }
+            
             return Ok(res);
 
         }

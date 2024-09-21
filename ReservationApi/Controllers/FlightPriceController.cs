@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using ReservationApi.Model;
 using ReservationSystem.Domain.Models;
 using ReservationSystem.Domain.Models.FlightPrice;
+using ReservationSystem.Domain.Models.Soap.FlightPrice;
 using ReservationSystem.Domain.Repositories;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -24,13 +25,10 @@ namespace ReservationApi.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] FlightOffer? flightofferRequst)
+        public async Task<IActionResult> Post([FromBody] FlightPriceMoelSoap? flightPriceRequest)
         {
-            FlightPriceModel flightPriceRequest = new FlightPriceModel();
-            flightPriceRequest.flightOffers = new FlightOffer();
-            flightPriceRequest.flightOffers = flightofferRequst;
-            string Token = await _availability.getToken();
-            var data = await _flightprice.GetFlightPrice(Token, flightPriceRequest);
+            FlightPriceModel returnModel = new FlightPriceModel();           
+            var data = await _flightprice.GetFlightPrice(flightPriceRequest);
             ApiResponse res = new ApiResponse();
             res.IsSuccessful = true;
             res.StatusCode = 200;

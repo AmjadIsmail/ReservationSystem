@@ -21,3 +21,17 @@
 /ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.pdb
 /ReservationSystem.Infrastructure/obj/Debug/net8.0/ReservationSystem.Infrastructure.sourcelink.json
 /ReservationSystem.Infrastructure/obj/ReservationSystem.Infrastructure.csproj.nuget.dgspec.json
+ReservationApi/.vs/ProjectEvaluation/reservationapi.metadata.v8.bin
+ReservationApi/.vs/ProjectEvaluation/reservationapi.metadata.v8.bin
+*.bin
+*.config
+*.config
+*.v2
+*.vsidx
+*.json
+ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.assets.cache
+ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.csproj.CoreCompileInputs.cache
+ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.csproj.FileListAbsolute.txt
+ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.dll
+ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+ReservationSystem.Domain/obj/project.nuget.cache

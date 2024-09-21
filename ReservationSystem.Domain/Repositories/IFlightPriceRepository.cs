@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReservationSystem.Domain.Models.FlightPrice;
+using ReservationSystem.Domain.Models.Soap.FlightPrice;
 
 namespace ReservationSystem.Domain.Repositories
 {
     public interface IFlightPriceRepository
     {
-        public Task<FlightPriceModelReturn> GetFlightPrice(string token, FlightPriceModel request);
+        public Task<FlightPriceModelReturn> GetFlightPrice(FlightPriceMoelSoap request);
     }
 }
