@@ -22,6 +22,49 @@ namespace ReservationSystem.Domain.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("ReservationSystem.Domain.DB_Models.FlightMarkup", b =>
+                {
+                    b.Property<long>("markup_id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("markup_id"));
+
+                    b.Property<decimal?>("adult_markup")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("airline")
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("apply_airline_discount")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("apply_markup")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("child_markup")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("created_on")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("discount_on_airline")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("discount_on_meta")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal?>("infant_markup")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("meta")
+                        .HasColumnType("text");
+
+                    b.HasKey("markup_id");
+
+                    b.ToTable("flight_markup");
+                });
+
             modelBuilder.Entity("ReservationSystem.Domain.DB_Models.SearchAvailabilityResults", b =>
                 {
                     b.Property<long>("result_id")

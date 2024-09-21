@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ReservationSystem.Domain.DB_Models;
 using ReservationSystem.Domain.DBContext;
@@ -28,12 +29,13 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 var Res = new SearchAvailabilityResults();
-                Res.created_on = DateTime.Now;
-                Res.request = JsonDocument.Parse(requset).ToString();
-                Res.response = JsonDocument.Parse(response).ToString();
+                Res.created_on = DateTime.Now.ToUniversalTime();
+                Res.request = requset;
+                Res.response = response;
                 Res.total_results = totlResults;
                 Res.user_id = 0;
                 await _context.availabilityResults.AddAsync(Res);
+                await _context.SaveChangesAsync();
             }
             catch(Exception ex)
             {
@@ -41,6 +43,23 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
           
            
+        }
+
+        public async Task<List<FlightMarkup>?> GetFlightMarkup()
+        {
+            try
+            {
+
+                return await _context.flightMarkups.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+             
+                _logger.LogError($"Error return flights markup Result {ex.Message.ToString()}");
+                return null;
+            }
+
+
         }
     }
 }

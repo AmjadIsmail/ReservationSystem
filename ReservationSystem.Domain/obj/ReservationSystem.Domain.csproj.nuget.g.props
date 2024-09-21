@@ -15,5 +15,9 @@
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)microsoft.entityframeworkcore\8.0.0\buildTransitive\net8.0\Microsoft.EntityFrameworkCore.props" Condition="Exists('$(NuGetPackageRoot)microsoft.entityframeworkcore\8.0.0\buildTransitive\net8.0\Microsoft.EntityFrameworkCore.props')" />
+    <Import Project="$(NuGetPackageRoot)codaxy.xsd2\0.10.0\build\Codaxy.Xsd2.props" Condition="Exists('$(NuGetPackageRoot)codaxy.xsd2\0.10.0\build\Codaxy.Xsd2.props')" />
   </ImportGroup>
+  <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <PkgCodaxy_Xsd2 Condition=" '$(PkgCodaxy_Xsd2)' == '' ">C:\Users\HP\.nuget\packages\codaxy.xsd2\0.10.0</PkgCodaxy_Xsd2>
+  </PropertyGroup>
 </Project>

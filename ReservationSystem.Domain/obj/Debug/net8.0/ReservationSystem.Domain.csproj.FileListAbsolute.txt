@@ -23,3 +23,16 @@ D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Deb
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\refint\ReservationSystem.Domain.dll
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.pdb
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ref\ReservationSystem.Domain.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.deps.json
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\bin\Debug\net8.0\ReservationSystem.Domain.pdb
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.csproj.AssemblyReference.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.AssemblyInfoInputs.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.AssemblyInfo.cs
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.csproj.CoreCompileInputs.cache
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.sourcelink.json
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\refint\ReservationSystem.Domain.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ReservationSystem.Domain.pdb
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationSystem.Domain\obj\Debug\net8.0\ref\ReservationSystem.Domain.dll

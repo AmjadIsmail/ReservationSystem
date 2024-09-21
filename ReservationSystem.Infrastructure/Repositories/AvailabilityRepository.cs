@@ -12,6 +12,9 @@ using ReservationSystem.Domain.Models.Availability;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
+using ReservationSystem.Domain.Service;
+using ReservationSystem.Domain.DB_Models;
+
 
 
 namespace ReservationSystem.Infrastructure.Repositories
@@ -19,18 +22,22 @@ namespace ReservationSystem.Infrastructure.Repositories
     public class AvailabilityRepository  : IAvailabilityRepository
     {
         private readonly IConfiguration configuration;
-        private readonly IMemoryCache _cache;
-        public AvailabilityRepository(IConfiguration _configuration , IMemoryCache cache)
+       // private readonly IMemoryCache _cache;
+        private readonly ICacheService _cacheService;
+        private readonly IDBRepository _dbRepository;
+        public AvailabilityRepository(IConfiguration _configuration ,  ICacheService cacheService , IDBRepository dBRepository)
         {
             configuration = _configuration;
-            _cache = cache;
+            _cacheService = cacheService;
+            _dbRepository = dBRepository;
         }
         public async Task<string> getToken()
         {
             try
             {
                 string token;
-                if (!_cache.TryGetValue("amadeusToken", out token))
+                token =  _cacheService.Get<string>("amadeusToken");
+                if (token == null)
                 {
                     string returnStr = "";
                     using (var httpClient = new HttpClient())
@@ -64,8 +71,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             // 7. Extract the access_token
                             string accessToken = jsonResponse.access_token;
                             returnStr = accessToken;
-                            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                            _cache.Set("amadeusToken", accessToken, cacheEntryOptions);
+                          //  var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
+                           // _cache.Set("amadeusToken", accessToken, cacheEntryOptions);
+                            _cacheService.Set("amadeusToken" , accessToken, TimeSpan.FromMinutes(15));
                             Console.WriteLine("Response: " + responseContent);
                         }
                         else
@@ -80,16 +88,19 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             catch( Exception ex)
             {
+                _cacheService.Remove("amadeusToken");
                 return "";
             }
           
         }
 
-        public async Task<AvailabilityModel> GetAvailability(string token , AvailabilityRequest requestModel)
+        public async Task<AvailabilityModel> GetAvailability(string token, AvailabilityRequest requestModel)
         {
             string amadeusRequest = generateRequest(requestModel);
             AvailabilityModel availabilities = new AvailabilityModel();
-            if (!_cache.TryGetValue("amadeusRequest"+ amadeusRequest, out availabilities))
+            List<FlightMarkup> flightsDictionary = _cacheService.GetFlightsMarkup();
+            var availabilityModel = _cacheService.Get<AvailabilityModel>("amadeusRequest" + amadeusRequest);
+            if (availabilityModel == null)
             {
                 availabilities = new AvailabilityModel();
                 using (var httpClient = new HttpClient())
@@ -102,16 +113,24 @@ namespace ReservationSystem.Infrastructure.Repositories
                     if (response.IsSuccessStatusCode)
                     {
                         var responseContent = await response.Content.ReadAsStringAsync();
-                       // responseContent = responseContent.ToString().Replace("\"base\":", "\"base_amount\":");
-                     
+
                         AvailabilityResult result = JsonConvert.DeserializeObject<AvailabilityResult>(responseContent);
+                        string ResToSave = JsonConvert.SerializeObject(result, Formatting.Indented);
                         availabilities.data = result.data;
                         if (result.data.Count > 0)
                         {
-                            var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                            _cache.Set("amadeusRequest" + amadeusRequest, availabilities, cacheEntryOptions);
+                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault().apply_markup == true)
+                            {
+                                result.data = applyMarkup(result.data, flightsDictionary);
+                            }
+                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault().apply_airline_discount == true)
+                            {
+                                result.data = applyDiscount(result.data, flightsDictionary);
+                            }
+                            _cacheService.Set("amadeusRequest" + amadeusRequest, availabilities, TimeSpan.FromMinutes(15));
+                            _dbRepository.SaveAvailabilityResult(amadeusRequest, ResToSave.ToString(), result.data.Count);
                         }
-                        
+
                         Console.WriteLine("Response: " + responseContent);
                     }
                     else
@@ -119,11 +138,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                         availabilities.amadeusError = new AmadeusResponseError();
                         availabilities.amadeusError.error = response.StatusCode.ToString();
                         availabilities.amadeusError.errorCode = 400;
-                        if(response.StatusCode.ToString() == "Unauthorized")
+                        if (response.StatusCode.ToString() == "Unauthorized")
                         {
-                            _cache.Remove("amadeusToken");
+                            _cacheService.Remove("amadeusToken");
                             availabilities.amadeusError.errorCode = 401;
-                        }                     
+                        }
                         var error = await response.Content.ReadAsStringAsync();
                         ErrorResponseAmadeus errorResponse = JsonConvert.DeserializeObject<ErrorResponseAmadeus>(error);
 
@@ -133,9 +152,15 @@ namespace ReservationSystem.Infrastructure.Repositories
                     }
                 }
             }
-               
+            else
+            {
+                availabilities = availabilityModel;
+            }
+
             return availabilities;
         }
+
+       
         private string generateRequest(AvailabilityRequest request)
         {
             string res = string.Empty;
@@ -185,6 +210,103 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             return res;
         }        
+
+        private List<FlightOffer> applyMarkup (List<FlightOffer> offers , List<FlightMarkup> dictionary)
+        {
+            try
+            {
+                var adultpp = dictionary.FirstOrDefault()?.adult_markup != null ? dictionary.FirstOrDefault()?.adult_markup : 0;
+                var childpp = dictionary.FirstOrDefault()?.child_markup != null ? dictionary.FirstOrDefault()?.child_markup : 0;
+                var infantpp = dictionary.FirstOrDefault()?.infant_markup != null ? dictionary.FirstOrDefault()?.infant_markup : 0;
+
+                
+
+                #region Apply Markup
+                foreach (var item in offers)
+                {
+                    childpp = item.travelerPricings.Where(e => e.travelerType == "CHILD").Any() ? childpp : 0;
+                    infantpp = item.travelerPricings.Where(e => e.travelerType == "HELD_INFANT").Any() ? infantpp : 0;
+                    foreach (var item2 in item.travelerPricings)
+                    {
+                        var travelerType = item2?.travelerType;
+                        if (travelerType != null)
+                        {
+                            switch (travelerType)
+                            {
+                                case "ADULT":
+                                    item.price.markup = adultpp + childpp  + infantpp ;
+                                    item.price.total = (Convert.ToDecimal(item?.price?.total) + adultpp + childpp + infantpp ).ToString();
+                                    item.price.grandTotal = (Convert.ToDecimal(item?.price?.grandTotal) + adultpp + childpp + infantpp).ToString();
+                                    item2.price.markup = adultpp;                                   
+                                    item2.price.grandTotal = (Convert.ToDecimal(item2?.price?.total) + adultpp).ToString();
+                                    break;
+                                case "CHILD":
+                                   
+                                    item2.price.markup = childpp;
+                                    item2.price.grandTotal = (Convert.ToDecimal(item2?.price?.total) + childpp).ToString();
+                                    break;
+                                case "HELD_INFANT":
+                                    item2.price.markup = infantpp;
+                                    item2.price.grandTotal = (Convert.ToDecimal(item2?.price?.total) + infantpp).ToString();
+                                    break;
+                            }
+                        }
+                    }
+
+                }
+                #endregion
+
+
+            }
+            catch( Exception ex)
+            {
+
+            }          
+            return offers;
+        }
+
+        private List<FlightOffer> applyDiscount(List<FlightOffer> offers, List<FlightMarkup> dictionary)
+        {
+            try
+            {            
+
+                #region Apply Airline Discount
+                var applyAirlineDis = dictionary.FirstOrDefault().apply_airline_discount;
+                if (applyAirlineDis != null && applyAirlineDis == true)
+                {
+                    var airline = dictionary.FirstOrDefault().airline;
+                    var airlineDiscount = dictionary.FirstOrDefault().discount_on_airline;
+                    string[] stringArray = airline.Split(',');
+                    foreach (var item in stringArray)
+                    {
+                        var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.carrierCode == item))).ToList();
+
+
+                        foreach (var flight in offer)
+                        {
+                            flight.price.discount = airlineDiscount.Value;
+                            flight.price.total = (Convert.ToDecimal(flight?.price?.total) - airlineDiscount.Value).ToString();
+                            flight.price.grandTotal = (Convert.ToDecimal(flight?.price?.grandTotal) - airlineDiscount.Value).ToString();
+                        }
+                    }
+                }
+                #endregion
+
+                
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return offers;
+        }
+        public async Task ClearCache()
+        {
+             _cacheService.RemoveAll();
+            _cacheService.ResetCacheData();
+        }
     }
 
 }

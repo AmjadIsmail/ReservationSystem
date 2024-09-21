@@ -18,5 +18,8 @@ namespace ReservationSystem.Domain.Models
         public string? grandTotal { get; set; }
         public string? billingCurrency { get; set; }
         public string? refundableTaxes { get; set; }
+        public decimal? markup { get; set; }
+        public decimal? discount { get; set;
+        }
     }
 }
