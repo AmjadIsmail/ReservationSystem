@@ -61,18 +61,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                         request.Content = new FormUrlEncodedContent(formData);
 
                         var response = await httpClient.SendAsync(request);
-
-                        // 6. Handle the response
+                      
                         if (response.IsSuccessStatusCode)
                         {
                             var responseContent = await response.Content.ReadAsStringAsync();
-                            dynamic jsonResponse = JsonConvert.DeserializeObject(responseContent);
-
-                            // 7. Extract the access_token
+                            dynamic jsonResponse = JsonConvert.DeserializeObject(responseContent);                           
                             string accessToken = jsonResponse.access_token;
-                            returnStr = accessToken;
-                          //  var cacheEntryOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromMinutes(15));
-                           // _cache.Set("amadeusToken", accessToken, cacheEntryOptions);
+                            returnStr = accessToken;                         
                             _cacheService.Set("amadeusToken" , accessToken, TimeSpan.FromMinutes(15));
                             Console.WriteLine("Response: " + responseContent);
                         }
