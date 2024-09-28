@@ -19,5 +19,14 @@ namespace ReservationSystem.Domain.Models
         public int? numberOfStops { get; set; }
         public List<Co2Emissions>? co2Emissions { get; set; }
         public bool? blacklistedInEU { get; set; }
+        public BaggageAllowance? baggage_allowence { get; set; }
+        public string? cabin_class { get; set; }
+        public string? cabin_status { get; set; }
+    }
+
+    public class BaggageAllowance
+    {
+        public string? free_allowance { get; set; }
+        public string? quantity_code { get; set; }
     }
 }
