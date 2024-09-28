@@ -117,10 +117,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 OmitXmlDeclaration = false,  
                                 Encoding = System.Text.Encoding.UTF8
                             };
-                            using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\TbSearchResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
+                            try
                             {
-                                xmlDoc.Save(writer);  
+                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\TbSearchResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
+                                {
+                                    xmlDoc.Save(writer);
+                                }
                             }
+                            catch
+                            {
+
+                            }
+                           
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
