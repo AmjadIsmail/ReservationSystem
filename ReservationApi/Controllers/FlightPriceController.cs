@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using Microsoft.Extensions.Caching.Memory;
 using ReservationApi.Model;
 using ReservationSystem.Domain.Models;
@@ -23,7 +24,12 @@ namespace ReservationApi.Controllers
             _cache = memoryCache;
             _availability = availability;
         }
-        
+
+        [HttpGet]
+        public string getvalues()
+        {
+            return "ok";
+        }
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] FlightPriceMoelSoap? flightPriceRequest)
         {
