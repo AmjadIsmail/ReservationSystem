@@ -10,13 +10,13 @@ namespace ReservationSystem.Domain.Models.Soap.FlightPrice
     public class FlightPriceMoelSoap
     {
         [Required(ErrorMessage = "The Number of passengers are required.")]
-        public int? Adults { get; set; }
-        public int? Child { get; set; }  
-        public int? Infant { get; set; }
+        public int? adults { get; set; }
+        public int? child { get; set; }  
+        public int? infant { get; set; }
         public string? pricingOptionKey { get; set; }
 
-        public FlightSegmentSoap Outbound { get; set; }
-        public FlightSegmentSoap Inbound { get; set; }
+        public FlightSegmentSoap outbound { get; set; }
+        public FlightSegmentSoap inbound { get; set; }
     }
     public class FlightSegmentSoap
     {
