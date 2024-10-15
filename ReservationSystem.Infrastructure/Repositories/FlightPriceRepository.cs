@@ -241,21 +241,21 @@ namespace ReservationSystem.Infrastructure.Repositories
                 group = $@"<segmentGroup>
             <segmentInformation>
                <flightDate>
-                  <departureDate>{model.Outbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.Outbound.departure_time.Replace(":", "")}</departureTime>
+                  <departureDate>{model.outbound.departure_date.Replace("-", "")}</departureDate>
+                  <departureTime>{model.outbound.departure_time.Replace(":", "")}</departureTime>
                </flightDate>
                <boardPointDetails>
-                  <trueLocationId>{model.Outbound.airport_from.Replace("-", "")}</trueLocationId>
+                  <trueLocationId>{model.outbound.airport_from.Replace("-", "")}</trueLocationId>
                </boardPointDetails>
                <offpointDetails>
-                  <trueLocationId>{model.Outbound.airport_to.Replace("-", "")}</trueLocationId>
+                  <trueLocationId>{model.outbound.airport_to.Replace("-", "")}</trueLocationId>
                </offpointDetails>
                <companyDetails>
-                  <marketingCompany>{model.Outbound.marketing_company}</marketingCompany>
+                  <marketingCompany>{model.outbound.marketing_company}</marketingCompany>
                </companyDetails>
                <flightIdentification>
-                  <flightNumber>{model.Outbound.flight_number}</flightNumber>
-                  <bookingClass>{model.Outbound.booking_class}</bookingClass>
+                  <flightNumber>{model.outbound.flight_number}</flightNumber>
+                  <bookingClass>{model.outbound.booking_class}</bookingClass>
                </flightIdentification>
                <flightTypeDetails>
                   <flightIndicator>1</flightIndicator>
@@ -266,21 +266,21 @@ namespace ReservationSystem.Infrastructure.Repositories
             <segmentGroup>
             <segmentInformation>
                <flightDate>
-                  <departureDate>{model.Inbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.Inbound.departure_time.Replace(":", "")}</departureTime>
+                  <departureDate>{model.inbound.departure_date.Replace("-", "")}</departureDate>
+                  <departureTime>{model.inbound.departure_time.Replace(":", "")}</departureTime>
                </flightDate>
                <boardPointDetails>
-                  <trueLocationId>{model.Inbound.airport_from}</trueLocationId>
+                  <trueLocationId>{model.inbound.airport_from}</trueLocationId>
                </boardPointDetails>
                <offpointDetails>
-                  <trueLocationId>{model.Inbound.airport_to}</trueLocationId>
+                  <trueLocationId>{model.inbound.airport_to}</trueLocationId>
                </offpointDetails>
                <companyDetails>
-                  <marketingCompany>{model.Inbound.marketing_company}</marketingCompany>
+                  <marketingCompany>{model.inbound.marketing_company}</marketingCompany>
                </companyDetails>
                <flightIdentification>
-                  <flightNumber>{model.Inbound.flight_number}</flightNumber>
-                  <bookingClass>{model.Inbound.booking_class}</bookingClass>
+                  <flightNumber>{model.inbound.flight_number}</flightNumber>
+                  <bookingClass>{model.inbound.booking_class}</bookingClass>
                </flightIdentification>
                <flightTypeDetails>
                   <flightIndicator>2</flightIndicator>
@@ -309,8 +309,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             string requesterType = amadeusSettings["requestorType"];
             string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
             string pos_type = amadeusSettings["POS_Type"];
-            requestModel.Child = requestModel?.Child != null ? requestModel.Child : 0;
-            requestModel.Infant = requestModel?.Infant != null ? requestModel.Infant : 0;
+            requestModel.child = requestModel?.child != null ? requestModel.child : 0;
+            requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
 
             string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
    <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
@@ -331,7 +331,7 @@ namespace ReservationSystem.Infrastructure.Repositories
    </soapenv:Header>
    <soapenv:Body>
       <Fare_InformativePricingWithoutPNR>
-       {GeneratePassengerGroup(requestModel.Adults.Value, requestModel.Child.Value, requestModel.Infant.Value)}
+       {GeneratePassengerGroup(requestModel.adults.Value, requestModel.child.Value, requestModel.infant.Value)}
         {GenerateSegmentGroup(requestModel)}
          {GeneratePricingOptionsGroup(requestModel.pricingOptionKey)}
       </Fare_InformativePricingWithoutPNR>
