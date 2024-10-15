@@ -132,7 +132,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            XNamespace fareNS = "http://xml.amadeus.com/FMPTBR_24_1_1A";
+                            var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
+                            if ( errorInfo != null)
+                            {
+                                var errorText = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "errorMessageText").Descendants(fareNS + "description")?.FirstOrDefault()?.Value;
+                                var errorCode = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "applicationError").Descendants(fareNS + "applicationErrorDetail").Descendants(fareNS + "error")?.FirstOrDefault()?.Value;
+                                returnModel.amadeusError = new AmadeusResponseError();
+                                returnModel.amadeusError.error = errorText;
+                                returnModel.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                return returnModel;
 
+                            }
                             var res = ConvertXmlToModel(xmlDoc);
                             returnModel.data = res.data;
 
@@ -170,26 +181,29 @@ namespace ReservationSystem.Infrastructure.Repositories
            
             StringBuilder sb = new StringBuilder();
             sb.Append("<paxReference>");
-            for(int i = 1; i<= adults; i++)
+            sb.Append("<ptc>ADT</ptc>");
+            for (int i = 1; i<= adults; i++)
             {
-                sb.Append("<ptc>ADT</ptc>\r\n    <traveller>\r\n      <ref>").Append(i.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                sb.Append("\r\n    <traveller>\r\n      <ref>").Append(i.ToString()).Append("</ref>\r\n    </traveller>\r\n");
             }
             sb.Append("</paxReference>");
             if(child > 0)
             {
                 sb.Append("<paxReference>");
+                sb.Append("<ptc>CNN</ptc>");
                 for (int c = 1; c <= child; c++)
                 {
-                    sb.Append("<ptc>CNN</ptc>\r\n    <traveller>\r\n      <ref>").Append(c.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append(c.ToString()).Append("</ref>\r\n    </traveller>\r\n");
                 }
                 sb.Append("</paxReference>");
             }
             if(infant > 0)
             {
                 sb.Append("<paxReference>");
+                sb.Append("<ptc>INF</ptc>");
                 for (int d = 1; d <= infant; d++)
                 {
-                    sb.Append("<ptc>INF</ptc>\r\n    <traveller>\r\n      <ref>").Append(d.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append(d.ToString()).Append("</ref>\r\n    </traveller>\r\n");
                 }
                 sb.Append("</paxReference>");
             }

@@ -10,7 +10,7 @@ namespace ReservationSystem.Domain.Models.FareCheck
     
     public class FareCheckReturnModel
     {
-        public List<FlightOffer> data { get; set; }
+        public FareCheckRulesReply data { get; set; }
         public AmadeusResponseError? amadeusError { get; set; }
     }
 }

@@ -11,5 +11,7 @@ namespace ReservationSystem.Domain.Repositories
     public interface IFareCheckRepository
     {
         public Task<FareCheckReturnModel> FareCheckRequest(FareCheckModel fareCheckRequest);
+
+        public Task<bool> Security_Signout();
     }
 }

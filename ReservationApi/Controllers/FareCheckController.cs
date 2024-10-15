@@ -15,10 +15,10 @@ namespace ReservationApi.Controllers
     [ApiController]
     public class FareCheckController : ControllerBase
     {
-        private FareCheckRepository _fareCheck;
+        private IFareCheckRepository _fareCheck;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public FareCheckController(FareCheckRepository fareCheck, IMemoryCache memoryCache, ICacheService cacheService)
+        public FareCheckController(IFareCheckRepository fareCheck, IMemoryCache memoryCache, ICacheService cacheService)
         {
             _fareCheck = fareCheck;
             _cache = memoryCache;
@@ -44,6 +44,8 @@ namespace ReservationApi.Controllers
             else
             {
                 res.Data = data.data;
+                res.Response = "Success";
+                res.Message = "Total Records found :" + data.data.FlightDetails.Count();
             }
 
             return Ok(res);
