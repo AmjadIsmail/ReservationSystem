@@ -84,7 +84,7 @@ namespace ReservationSystem.Infrastructure.Repositories
           
             try
             {
-               // string pwdDigest = await generatePassword();
+               
                 var amadeusSettings = configuration.GetSection("AmadeusSoap");
                 string action = amadeusSettings["travelBoardSearchAction"];                 
                 var _url = amadeusSettings["ApiUrl"]; // "https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY";
@@ -96,6 +96,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 request.ContentType = "text/xml;charset=\"utf-8\"";
                 request.Accept = "text/xml";
                 request.Method = "POST";
+                XNamespace fareNS = "http://xml.amadeus.com/FMPTBR_24_1_1A";
 
                 using (Stream stream = request.GetRequestStream())
                 {
@@ -132,7 +133,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            XNamespace fareNS = "http://xml.amadeus.com/FMPTBR_24_1_1A";
+                            
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if ( errorInfo != null)
                             {
@@ -155,8 +156,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                     using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         Result = rd.ReadToEnd();
+                        XDocument Errordoc = XDocument.Parse(Result);
+                        XNamespace soapenvNs = "http://schemas.xmlsoap.org/soap/envelope/";
+                        var errorInfo = Errordoc.Descendants(soapenvNs + "Fault")?.FirstOrDefault ().Value;
                         returnModel.amadeusError = new AmadeusResponseError();
-                        returnModel.amadeusError.error = Result;
+                        returnModel.amadeusError.error = errorInfo;
                         returnModel.amadeusError.errorCode = 0;
                         return returnModel;
 
@@ -193,7 +197,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 sb.Append("<ptc>CNN</ptc>");
                 for (int c = 1; c <= child; c++)
                 {
-                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append(c.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append((adults+c).ToString()).Append("</ref>\r\n    </traveller>\r\n");
                 }
                 sb.Append("</paxReference>");
             }
@@ -204,6 +208,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 for (int d = 1; d <= infant; d++)
                 {
                     sb.Append("\r\n    <traveller>\r\n      <ref>").Append(d.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                    sb.Append("\r\n <infantIndicator>1</infantIndicator>");
                 }
                 sb.Append("</paxReference>");
             }
@@ -557,9 +562,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                     totalTax = item.Descendants(amadeus + "paxFareProduct").Elements(amadeus + "paxFareDetail").Elements(amadeus + "totalTaxAmount")?.FirstOrDefault()?.Value;
                     var paxReferece = item.Descendants(amadeus + "paxFareProduct").Elements(amadeus + "paxReference").ToList();
                     var companylist = item.Descendants(amadeus + "paxFareProduct").Elements(amadeus + "paxFareDetail").Elements(amadeus + "codeShareDetails").ToList();
+                    companyname = string.Empty;
                     foreach (var company in companylist)
                     {
-                        companyname = companyname + " " + company.Descendants(amadeus + "company")?.FirstOrDefault()?.Value;
+                        if (companyname == string.Empty)
+                        {
+                            companyname =  company.Descendants(amadeus + "company")?.FirstOrDefault()?.Value;
+                        }
+                        else
+                        {
+                            companyname = companyname + " " + company.Descendants(amadeus + "company")?.FirstOrDefault()?.Value;
+                        }
+                        
                     }
                     var fare = item.Descendants(amadeus + "fare").ToList();
                     string faretype = "";
@@ -589,12 +603,22 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                     if (fareDetailsGroupOfFare != null)
                     {
+                        cabinProduct = string.Empty;
                         foreach (var productInfo in fareDetailsGroupOfFare)
                         {
                             var cabinP = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "cabinProduct").ToList();
+                            cabinProduct = string.Empty;
                             foreach (var itemcabinp in cabinP)
                             {
-                                cabinProduct = cabinProduct + "," + itemcabinp.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                                if(cabinProduct == string.Empty) 
+                                { 
+                                    cabinProduct += itemcabinp.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                                }
+                                else
+                                {
+                                    cabinProduct = cabinProduct + "," + itemcabinp.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                                }
+                               
                             }
                             var fbasis = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "fareProductDetail").ToList();
                             foreach (var f in fbasis)

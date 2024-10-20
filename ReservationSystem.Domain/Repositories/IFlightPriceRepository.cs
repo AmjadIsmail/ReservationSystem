@@ -11,6 +11,6 @@ namespace ReservationSystem.Domain.Repositories
 {
     public interface IFlightPriceRepository
     {
-        public Task<AvailabilityModel> GetFlightPrice(FlightPriceMoelSoap request);
+        public Task<FlightPriceReturnModel> GetFlightPrice(FlightPriceMoelSoap request);
     }
 }

@@ -14,6 +14,7 @@ namespace ReservationSystem.Domain.Models
         [JsonProperty("base")]
         public string? base_amount { get; set; }
         public List<Taxes>? taxes { get; set; }
+        public List<taxDetails>? taxDetails { get; set; }
         public List<Fee>? fees { get; set; }
         public string? grandTotal { get; set; }
         public string? billingCurrency { get; set; }

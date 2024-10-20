@@ -83,19 +83,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);                          
                             XNamespace fareNS = "http://xml.amadeus.com/FARQNR_07_1_1A";                         
                             var errorInfo = xmlDoc.Descendants(fareNS+ "errorInfo").FirstOrDefault();
-                            //if (errorInfo != null)
-                            //{
-                            //    // Extract error details
-                            //    var errorCode = errorInfo.Descendants(fareNS+ "rejectErrorCode").Descendants(fareNS+ "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
-                            //    var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS+ "freeText").FirstOrDefault()?.Value;
-                            //    fareCheck.amadeusError = new AmadeusResponseError();
-                            //    fareCheck.amadeusError.error = errorText;
-                            //    fareCheck.amadeusError.errorCode = Convert.ToInt16( errorCode);
-                            //    return fareCheck;
+                            if (errorInfo != null)
+                            {
+                              // Extract error details
+                                var errorCode = errorInfo.Descendants(fareNS+ "rejectErrorCode").Descendants(fareNS+ "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
+                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS+ "freeText").FirstOrDefault()?.Value;
+                                fareCheck.amadeusError = new AmadeusResponseError();
+                                fareCheck.amadeusError.error = errorText;
+                                fareCheck.amadeusError.errorCode = Convert.ToInt16( errorCode);
+                                return fareCheck;
                               
-                            //}
-                            //else
-                            //{
+                            }
+                            else
+                            {
                                 string xmlString = @"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3"" xmlns:wsa=""http://www.w3.org/2005/08/addressing"">
    <soapenv:Header>
       <wsa:To>http://www.w3.org/2005/08/addressing/anonymous</wsa:To>
@@ -252,7 +252,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 XDocument xdoctest = XDocument.Parse(xmlString);                               
                                 var res = ConvertXmlToModel(xdoctest, fareNS.NamespaceName);
                                 fareCheck.data = res;
-                            //}
+                            }
 
                             
 
@@ -468,6 +468,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     result +=
                         "<itemNumberDetails>" +
                         "<number>" + itemNumber[i] + "</number>" +
+                        " <type>FC</type>"+
                         "</itemNumberDetails>";
                 }
                 result += "</itemNumber>";
