@@ -33,4 +33,9 @@ namespace ReservationSystem.Domain.Models.FlightPrice
         public BookingRequirements BookingRequirements { get; set; }
     }
    
+    public class FlightPriceReturnModel
+    {
+        public List<FlightOfferForFlightPrice> data { get; set; }
+        public AmadeusResponseError? amadeusError { get; set; }
+    }
 }
