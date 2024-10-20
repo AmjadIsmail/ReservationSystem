@@ -1,7 +1,7 @@
 ﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
-
+/ReservationSystem.ReservationApi/bin/Debug/net8.0/appsettings.json
 /ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Infrastructure.pdb
 /ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Domain.dll
 /ReservationSystem.Infrastructure/bin/Debug/net8.0/ReservationSystem.Domain.pdb
@@ -35,3 +35,9 @@ ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.csproj.FileLi
 ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.dll
 ReservationSystem.Domain/obj/Debug/net8.0/ReservationSystem.Domain.GeneratedMSBuildEditorConfig.editorconfig
 ReservationSystem.Domain/obj/project.nuget.cache
+# Ignore Visual Studio folder
+.vs/
+
+# Ignore bin directories
+bin/
+

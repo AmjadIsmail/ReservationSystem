@@ -30,7 +30,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<AvailabilityModel> GetAirSellRecommendation(AirSellFromRecommendationRequest requestModel)
         {
             AvailabilityModel flightPrice = new AvailabilityModel();
-            //  flightPrice.data = new FligthPriceData();
+           
             try
             {
 
@@ -67,7 +67,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             };
                             try
                             {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\FlightPriceResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
+                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\AirSellResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
                                 {
                                     xmlDoc.Save(writer);
                                 }

@@ -36,8 +36,8 @@ namespace ReservationApi.Controllers
             FlightPriceModel returnModel = new FlightPriceModel();           
             var data = await _flightprice.GetFlightPrice(flightPriceRequest);
             ApiResponse res = new ApiResponse();
-            res.IsSuccessful = true;
-            res.StatusCode = 200;
+            res.IsSuccessful = data.amadeusError == null;
+            res.StatusCode = data.amadeusError == null ? 200 : 500;
             if (data.amadeusError != null)
             {
                 res.Data = data.amadeusError;
@@ -45,8 +45,10 @@ namespace ReservationApi.Controllers
             }
             else
             {
-                res.Data = data;
+                res.Data = data.data;
             }
+            res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.data.ToList().Count() : "Error";
+            res.Response = data?.amadeusError == null ? "Success" : "Failed";
             return Ok(res);
         }
 
