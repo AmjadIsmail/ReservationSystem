@@ -28,6 +28,7 @@ builder.Services.AddScoped<IFlightPriceRepository, FlightPriceRepository>();
 builder.Services.AddScoped<IFlightOrderRepository, FlightOrderRepository>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<IFareCheckRepository, FareCheckRepository>();
+builder.Services.AddScoped<IAirSellRepository, AirsellRepository>();
 builder.Services.AddScoped<IDBRepository, DBRepository>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();

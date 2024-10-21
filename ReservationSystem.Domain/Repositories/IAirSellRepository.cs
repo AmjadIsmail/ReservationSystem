@@ -11,6 +11,6 @@ namespace ReservationSystem.Domain.Repositories
 {
     public interface IAirSellRepository
     {
-        public Task<AvailabilityModel> GetAirSellRecommendation(AirSellFromRecommendationRequest requestModel);
+        public Task<AirSellFromRecResponseModel> GetAirSellRecommendation(AirSellFromRecommendationRequest requestModel);
     }
 }
