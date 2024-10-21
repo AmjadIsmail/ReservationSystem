@@ -249,8 +249,8 @@ namespace ReservationSystem.Infrastructure.Repositories
       </Fare_CheckRulesReply>
    </soapenv:Body>
 </soapenv:Envelope>";
-                                XDocument xdoctest = XDocument.Parse(xmlString);                               
-                                var res = ConvertXmlToModel(xdoctest, fareNS.NamespaceName);
+                               // XDocument xdoctest = XDocument.Parse(xmlString);                               
+                                var res = ConvertXmlToModel(xmlDoc, fareNS.NamespaceName);
                                 fareCheck.data = res;
                             }
 
@@ -427,7 +427,7 @@ namespace ReservationSystem.Infrastructure.Repositories
    <soapenv:Body>
      <Fare_CheckRules> 
     { messageFunctionDetails(requestModel?.typeQualifier?.ToList())}
-     { itemNumber(requestModel?.itemNumber?.ToList())}
+     { itemNumber(requestModel?.itemNumber?.ToList(),requestModel?.FcType)}
       </Fare_CheckRules>        
    </soapenv:Body>
 </soapenv:Envelope>";
@@ -457,7 +457,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
         }
 
-        private string itemNumber(List<int> itemNumber)
+        private string itemNumber(List<int> itemNumber , string FcType)
         {
             try
             {
@@ -467,9 +467,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                 {
                     result +=
                         "<itemNumberDetails>" +
+                        "<number>" + itemNumber[i] + "</number>" +                       
+                        "</itemNumberDetails>"+
+                        "<itemNumberDetails>" +
                         "<number>" + itemNumber[i] + "</number>" +
-                        " <type>FC</type>"+
-                        "</itemNumberDetails>";
+                        " <type>" + FcType + "</type>" +
+                          "</itemNumberDetails>";
                 }
                 result += "</itemNumber>";
                 return result;

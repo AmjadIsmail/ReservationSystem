@@ -586,7 +586,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var dept = departure?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "departureDate")?.FirstOrDefault()?.Value;
                             if (dept != null)
                             {
-                                outbound.departure.at = DateTime.ParseExact(dept, "ddMMyy", CultureInfo.InvariantCulture);
+                                 outbound.departure.at = DateTime.ParseExact(dept, "ddMMyy", CultureInfo.InvariantCulture);
+                                                            
                             }
                             var fromlocation = departure?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
                             outbound.departure.iataCode = fromlocation != null ? fromlocation : "";

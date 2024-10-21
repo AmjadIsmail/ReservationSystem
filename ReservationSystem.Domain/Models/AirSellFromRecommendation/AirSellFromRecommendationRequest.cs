@@ -17,8 +17,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
     public class ItineraryDetails
     {
         public string? origin { get; set; }
-        public string? destination { get; set; }
-        public string? messageFunction { get; set; }
+        public string? destination { get; set; }       
         public SegmentInformation? segmentInformation { get; set; }
     }
 
@@ -29,11 +28,11 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
     public class travelProductInformation
     {
         public string? departureDate { get; set; }
-        public string? boarding_airport { get; set; }
-        public string? off_airport { get; set; }
-        public string? marketing_company { get; set; }
-        public string? flight_number { get; set; }
-        public string? booking_class { get; set; }
+        public string? fromAirport { get; set; }
+        public string? toAirport { get; set; }
+        public string? marketingCompany { get; set; }
+        public string? flightNumber { get; set; }
+        public string? bookingClass { get; set; }
         public RelatedproductInformation? relatedproductInformation { get; set; }
     }
     public class RelatedproductInformation

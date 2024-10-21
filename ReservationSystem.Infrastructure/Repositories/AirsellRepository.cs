@@ -14,6 +14,7 @@ using System.Net;
 using System.Xml.Linq;
 using System.Xml;
 using System.Security.Cryptography;
+using ReservationSystem.Domain.Models.Availability;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -27,9 +28,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             _cache = cache;
         }
 
-        public async Task<AvailabilityModel> GetAirSellRecommendation(AirSellFromRecommendationRequest requestModel)
+        public async Task<AirSellFromRecResponseModel> GetAirSellRecommendation(AirSellFromRecommendationRequest requestModel)
         {
-            AvailabilityModel flightPrice = new AvailabilityModel();
+            AirSellFromRecResponseModel AirSell = new AirSellFromRecResponseModel();
            
             try
             {
@@ -91,22 +92,22 @@ namespace ReservationSystem.Infrastructure.Repositories
                     using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
                     {
                         Result = rd.ReadToEnd();
-                        //  returnModel.amadeusError = new AmadeusResponseError();
-                        //returnModel.amadeusError.error = Result;
-                        //returnModel.amadeusError.errorCode = 0;
-                        //return returnModel;
+                        AirSell.amadeusError = new AmadeusResponseError();
+                        AirSell.amadeusError.error = Result;
+                        AirSell.amadeusError.errorCode = 0;
+                        return AirSell;
 
                     }
                 }
             }
             catch (Exception ex)
             {
-                //  returnModel.amadeusError = new AmadeusResponseError();
-                //  returnModel.amadeusError.error = ex.Message.ToString();
-                //   returnModel.amadeusError.errorCode = 0;
-                //   return returnModel;
+                AirSell.amadeusError = new AmadeusResponseError();
+                AirSell.amadeusError.error = ex.Message.ToString();
+                AirSell.amadeusError.errorCode = 0;
+                return AirSell;
             }
-            return flightPrice;
+            return AirSell;
         }
 
         public async Task<string> CreateAirSellRecommendationRequest(AirSellFromRecommendationRequest requestModel)
@@ -148,71 +149,71 @@ namespace ReservationSystem.Infrastructure.Repositories
          </messageActionDetails>
          <itineraryDetails>
             <originDestinationDetails>
-               <origin>${{Transfered Properties#S01_L01_boarding_airport}}</origin>
-               <destination>${{Transfered Properties#S01_L01_off_airport}}</destination>
+               <origin>{requestModel.outBound.origin}</origin>
+               <destination>{requestModel.outBound.destination }</destination>
             </originDestinationDetails>
             <message>
                <messageFunctionDetails>
-                  <messageFunction>183</messageFunction>
+                  <messageFunction>{requestModel.messageFunction}</messageFunction>
                </messageFunctionDetails>
             </message>
             <segmentInformation>
                <travelProductInformation>
                   <flightDate>
-                     <departureDate>${{Transfered Properties#S01_L01_departure_date}}</departureDate>
+                     <departureDate>{requestModel.outBound.segmentInformation.travelProductInformation.departureDate}</departureDate>
                   </flightDate>
                   <boardPointDetails>
-                     <trueLocationId>${{Transfered Properties#S01_L01_boarding_airport}}</trueLocationId>
+                     <trueLocationId>{requestModel.outBound.segmentInformation.travelProductInformation.fromAirport}</trueLocationId>
                   </boardPointDetails>
                   <offpointDetails>
-                     <trueLocationId>${{Transfered Properties#S01_L01_off_airport}}</trueLocationId>
+                     <trueLocationId>{requestModel.outBound.segmentInformation.travelProductInformation.toAirport}</trueLocationId>
                   </offpointDetails>
                   <companyDetails>
-                     <marketingCompany>${{Transfered Properties#S01_L01_marketing_company}}</marketingCompany>
+                     <marketingCompany>{requestModel.outBound.segmentInformation.travelProductInformation.marketingCompany}</marketingCompany>
                   </companyDetails>
                   <flightIdentification>
-                     <flightNumber>${{Transfered Properties#S01_L01_flight_number}}</flightNumber>
-                     <bookingClass>${{Transfered Properties#S01_L01_booking_class}}</bookingClass>
+                     <flightNumber>{requestModel.outBound.segmentInformation.travelProductInformation.flightNumber}</flightNumber>
+                     <bookingClass>{requestModel.outBound.segmentInformation.travelProductInformation.bookingClass}</bookingClass>
                   </flightIdentification>
                </travelProductInformation>
                <relatedproductInformation>
-                  <quantity>2</quantity>
-                  <statusCode>NN</statusCode>
+                  <quantity>{requestModel.outBound.segmentInformation.travelProductInformation.relatedproductInformation.quantity}</quantity>
+                  <statusCode>{requestModel.outBound.segmentInformation.travelProductInformation.relatedproductInformation.statusCode}</statusCode>
                </relatedproductInformation>
             </segmentInformation>
          </itineraryDetails>
          <itineraryDetails>
             <originDestinationDetails>
-               <origin>${{Transfered Properties#S02_L01_boarding_airport}}</origin>
-               <destination>${{Transfered Properties#S02_L01_off_airport}}</destination>
+               <origin>{requestModel.inBound.origin}</origin>
+               <destination>{requestModel.inBound.destination}</destination>
             </originDestinationDetails>
             <message>
                <messageFunctionDetails>
-                  <messageFunction>183</messageFunction>
+                  <messageFunction>{requestModel.messageFunction}</messageFunction>
                </messageFunctionDetails>
             </message>
             <segmentInformation>
                <travelProductInformation>
                   <flightDate>
-                     <departureDate>${{Transfered Properties#S02_L01_departure_date}}</departureDate>
+                     <departureDate>{requestModel.inBound.segmentInformation.travelProductInformation.departureDate}</departureDate>
                   </flightDate>
                   <boardPointDetails>
-                     <trueLocationId>${{Transfered Properties#S02_L01_boarding_airport}}</trueLocationId>
+                     <trueLocationId>{requestModel.inBound.segmentInformation.travelProductInformation.fromAirport}</trueLocationId>
                   </boardPointDetails>
                   <offpointDetails>
-                     <trueLocationId>${{Transfered Properties#S02_L01_off_airport}}</trueLocationId>
+                     <trueLocationId>{requestModel.inBound.segmentInformation.travelProductInformation.toAirport}</trueLocationId>
                   </offpointDetails>
                   <companyDetails>
-                     <marketingCompany>${{Transfered Properties#S02_L01_marketing_company}}</marketingCompany>
+                     <marketingCompany>{requestModel.inBound.segmentInformation.travelProductInformation.marketingCompany}</marketingCompany>
                   </companyDetails>
                   <flightIdentification>
-                     <flightNumber>${{Transfered Properties#S02_L01_flight_number}}</flightNumber>
-                     <bookingClass>${{Transfered Properties#S02_L01_booking_class}}</bookingClass>
+                     <flightNumber>{requestModel.inBound.segmentInformation.travelProductInformation.flightNumber}</flightNumber>
+                     <bookingClass>{requestModel.inBound.segmentInformation.travelProductInformation.bookingClass}</bookingClass>
                   </flightIdentification>
                </travelProductInformation>
                <relatedproductInformation>
-                  <quantity>2</quantity>
-                  <statusCode>NN</statusCode>
+                  <quantity>{requestModel.inBound.segmentInformation.travelProductInformation.relatedproductInformation.quantity}</quantity>
+                  <statusCode>{requestModel.inBound.segmentInformation.travelProductInformation.relatedproductInformation.statusCode}</statusCode>
                </relatedproductInformation>
             </segmentInformation>
          </itineraryDetails>
