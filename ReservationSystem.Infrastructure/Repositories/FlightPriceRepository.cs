@@ -687,8 +687,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                     }
                     var price = new Price();
                     price.base_amount = fareAmount_amount;
-                    price.total = fareAmount_amount;
-                    price.grandTotal = fareAmount_amount;
+                    price.total = otherMonetaryDetails_amount;
+                    price.grandTotal = otherMonetaryDetails_amount;
                     price.billingCurrency = fareAmount_currency;
                     price.currency = fareAmount_currency;
                     var taxes = lstTaxdetails;

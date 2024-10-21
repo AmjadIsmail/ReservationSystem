@@ -641,7 +641,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         grandTotal = price
                         ,
                         taxes = taxes,
-                        total = price,
+                        total = (Convert.ToDecimal( price) + Convert.ToDecimal(totalTax)).ToString(),
                         discount = 0,
                         billingCurrency = currency,
                         markup = 0

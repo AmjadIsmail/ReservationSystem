@@ -3,20 +3,23 @@
   "WorkspaceRootPath": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationApi\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\airsellrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\flightpricerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1F337AF7-D584-4A55-BE15-F38D0CC76712}|..\\ReservationSystem.Domain\\ReservationSystem.Domain.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.domain\\repositories\\iairsellrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\travelboardsearchrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{47CCFF23-F4F5-492A-8FFD-224384FA637D}|ReservationApi.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationapi\\controllers\\availabilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{47CCFF23-F4F5-492A-8FFD-224384FA637D}|ReservationApi.csproj|solutionrelative:controllers\\availabilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\farecheckrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\flightpricerepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{6299168A-528D-4197-A79B-38BBEF1986A2}|..\\ReservationSystem.Infrastructure\\ReservationSystem.Infrastructure.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.infrastructure\\repositories\\airsellrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{47CCFF23-F4F5-492A-8FFD-224384FA637D}|ReservationApi.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationapi\\controllers\\availabilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{47CCFF23-F4F5-492A-8FFD-224384FA637D}|ReservationApi.csproj|solutionrelative:controllers\\availabilitycontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1F337AF7-D584-4A55-BE15-F38D0CC76712}|..\\ReservationSystem.Domain\\ReservationSystem.Domain.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationsystem.domain\\repositories\\iairsellrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{47CCFF23-F4F5-492A-8FFD-224384FA637D}|ReservationApi.csproj|d:\\work\\git-reservationsystem\\reservationsystem\\reservationsystem\\reservationapi\\controllers\\airsellfrccontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -40,7 +43,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Bookmark",
@@ -53,6 +56,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "TravelBoardSearchRepository.cs",
+              "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\TravelBoardSearchRepository.cs",
+              "RelativeDocumentMoniker": "..\\ReservationSystem.Infrastructure\\Repositories\\TravelBoardSearchRepository.cs",
+              "ToolTip": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\TravelBoardSearchRepository.cs",
+              "RelativeToolTip": "..\\ReservationSystem.Infrastructure\\Repositories\\TravelBoardSearchRepository.cs",
+              "ViewState": "AQIAAKMAAAAAAAAAAADgv7IAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-21T09:01:58.112Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "IAirSellRepository.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Domain\\Repositories\\IAirSellRepository.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Domain\\Repositories\\IAirSellRepository.cs",
@@ -64,7 +80,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationApi\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -76,7 +92,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "FareCheckModel.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Domain\\Models\\FareCheck\\FareCheckModel.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Domain\\Models\\FareCheck\\FareCheckModel.cs",
@@ -88,19 +104,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "AvailabilityController.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationApi\\Controllers\\AvailabilityController.cs",
               "RelativeDocumentMoniker": "Controllers\\AvailabilityController.cs",
               "ToolTip": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationApi\\Controllers\\AvailabilityController.cs",
               "RelativeToolTip": "Controllers\\AvailabilityController.cs",
-              "ViewState": "AQIAABQAAAAAAAAAAAAQwCQAAAAQAAAA",
+              "ViewState": "AQIAABUAAAAAAAAAAADgvyQAAAAQAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-21T06:28:05.536Z"
+              "WhenOpened": "2024-10-21T06:28:05.536Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "AirSellFRCController.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationApi\\Controllers\\AirSellFRCController.cs",
               "RelativeDocumentMoniker": "Controllers\\AirSellFRCController.cs",
@@ -108,24 +125,25 @@
               "RelativeToolTip": "Controllers\\AirSellFRCController.cs",
               "ViewState": "AQIAABUAAAAAAAAAAAAgwCEAAAA6AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-21T06:28:01.732Z"
+              "WhenOpened": "2024-10-21T06:28:01.732Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "AirsellRepository.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\AirsellRepository.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Infrastructure\\Repositories\\AirsellRepository.cs",
               "ToolTip": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\AirsellRepository.cs",
               "RelativeToolTip": "..\\ReservationSystem.Infrastructure\\Repositories\\AirsellRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAFYAAAAZAAAA",
+              "ViewState": "AQIAAAIAAAAAAAAAAAAAAFYAAAAZAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-10-21T05:03:37.016Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "FareCheckRepository.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\FareCheckRepository.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Infrastructure\\Repositories\\FareCheckRepository.cs",
@@ -133,11 +151,12 @@
               "RelativeToolTip": "..\\ReservationSystem.Infrastructure\\Repositories\\FareCheckRepository.cs",
               "ViewState": "AQIAAEYAAAAAAAAAAADgv1UAAAAcAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-21T04:59:46.629Z"
+              "WhenOpened": "2024-10-21T04:59:46.629Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "Price.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Domain\\Models\\Price.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Domain\\Models\\Price.cs",
@@ -149,15 +168,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "FlightPriceRepository.cs",
               "DocumentMoniker": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs",
               "RelativeDocumentMoniker": "..\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs",
-              "ToolTip": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs",
-              "RelativeToolTip": "..\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs",
-              "ViewState": "AQIAALACAAAAAAAAAADgv78CAAAMAAAA",
+              "ToolTip": "D:\\work\\git-ReservationSystem\\ReservationSystem\\ReservationSystem\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs*",
+              "RelativeToolTip": "..\\ReservationSystem.Infrastructure\\Repositories\\FlightPriceRepository.cs*",
+              "ViewState": "AQIAAGoCAAAAAAAAAADgv7UCAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-10-13T11:23:00.343Z"
+              "WhenOpened": "2024-10-13T11:23:00.343Z",
+              "EditorCaption": ""
             }
           ]
         }

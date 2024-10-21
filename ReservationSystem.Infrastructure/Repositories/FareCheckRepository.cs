@@ -467,12 +467,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                 {
                     result +=
                         "<itemNumberDetails>" +
-                        "<number>" + itemNumber[i] + "</number>" +                       
-                        "</itemNumberDetails>"+
-                        "<itemNumberDetails>" +
                         "<number>" + itemNumber[i] + "</number>" +
-                        " <type>" + FcType + "</type>" +
-                          "</itemNumberDetails>";
+                        "</itemNumberDetails>";
+                       // "<itemNumberDetails>" +
+                       // "<number>" + itemNumber[i] + "</number>" +
+                        //" <type>" + FcType + "</type>" +
+                        //  "</itemNumberDetails>";
                 }
                 result += "</itemNumber>";
                 return result;
