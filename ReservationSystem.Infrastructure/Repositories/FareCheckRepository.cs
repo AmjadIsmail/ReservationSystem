@@ -407,7 +407,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
             string pos_type = amadeusSettings["POS_Type"];
             
-            string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+            string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:fare=""{action}"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
    <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
       <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
       <add:Action>{action}</add:Action>
@@ -419,15 +419,16 @@ namespace ReservationSystem.Infrastructure.Repositories
             <oas:Password Type=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest"">{pwdDigest.Split("|")[0]}</oas:Password>
             <oas1:Created>{pwdDigest.Split("|")[2]}</oas1:Created>
          </oas:UsernameToken>
-      </oas:Security>
-      <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
-         <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
-      </AMA_SecurityHostedUser>
+      </oas:Security> 
+    <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
+    <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
+     <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
+  </AMA_SecurityHostedUser>
    </soapenv:Header>
    <soapenv:Body>
      <Fare_CheckRules> 
     { messageFunctionDetails(requestModel?.typeQualifier?.ToList())}
-     { itemNumber(requestModel?.itemNumber?.ToList(),requestModel?.FcType)}
+     { itemNumber(requestModel?.itemNumber?.ToList(),requestModel?.FcType)}        
       </Fare_CheckRules>        
    </soapenv:Body>
 </soapenv:Envelope>";
@@ -468,11 +469,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                     result +=
                         "<itemNumberDetails>" +
                         "<number>" + itemNumber[i] + "</number>" +
-                        "</itemNumberDetails>";
-                       // "<itemNumberDetails>" +
-                       // "<number>" + itemNumber[i] + "</number>" +
-                        //" <type>" + FcType + "</type>" +
-                        //  "</itemNumberDetails>";
+                        "</itemNumberDetails>"+
+                        "<itemNumberDetails>" +
+                        "<number>" + itemNumber[i] + "</number>" +
+                       " <type>" + FcType + "</type>" +
+                         "</itemNumberDetails>";
                 }
                 result += "</itemNumber>";
                 return result;
