@@ -37,7 +37,7 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                 var amadeusSettings = configuration.GetSection("AmadeusSoap");
                 var _url = amadeusSettings["ApiUrl"]; // "https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY";
-                var _action = amadeusSettings["fareInformativePricingWithoutPNRAction"];
+                var _action = amadeusSettings["Air_SellFromRecommendation"];
                 string Result = string.Empty;
                 string Envelope = await CreateAirSellRecommendationRequest(requestModel);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -138,6 +138,7 @@ namespace ReservationSystem.Infrastructure.Repositories
       <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
          <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
       </AMA_SecurityHostedUser>
+        <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
    </soapenv:Header>
    <soapenv:Body>
       <Air_SellFromRecommendation>
