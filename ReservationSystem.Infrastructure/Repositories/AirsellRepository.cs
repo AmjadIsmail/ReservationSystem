@@ -15,6 +15,8 @@ using System.Xml.Linq;
 using System.Xml;
 using System.Security.Cryptography;
 using ReservationSystem.Domain.Models.Availability;
+using ReservationSystem.Domain.Models.FlightPrice;
+using System.Globalization;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -81,8 +83,22 @@ namespace ReservationSystem.Infrastructure.Repositories
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                           // var res = ConvertXmlToModel(xmlDoc);
-                           // flightPrice.data = res.data;
+                            XNamespace fareNS = "http://xml.amadeus.com/ITARES_05_2_IA";
+                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
+                            if (errorInfo != null)
+                            {
+                                // Extract error details
+                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
+                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
+                                AirSell.amadeusError = new AmadeusResponseError();
+                                AirSell.amadeusError.error = errorText;
+                                AirSell.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                return AirSell;
+
+                            }
+
+                            var res = ConvertXmlToModel(xmlDoc);
+                            AirSell = res;
 
                         }
                     }
@@ -109,7 +125,100 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             return AirSell;
         }
+        public AirSellFromRecResponseModel ConvertXmlToModel(XDocument response)
+        {
+            AirSellFromRecResponseModel ReturnModel = new AirSellFromRecResponseModel();
+            ReturnModel.airSellResponse = new List<AirSellItineraryDetails>();            
+            XDocument doc = response;
 
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                // Extract SessionId, SequenceNumber, and SecurityToken
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                ReturnModel.session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
+
+            XNamespace amadeus = "http://xml.amadeus.com/ITARES_05_2_IA"; 
+            var messegeFunction = doc.Descendants(amadeus + "message")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault().Value;
+            var itineraryDetails = doc.Descendants(amadeus + "itineraryDetails").ToList();
+            if(itineraryDetails != null)
+            {
+                foreach(var item in itineraryDetails)
+                {
+                    AirSellItineraryDetails airSellItinerary = new AirSellItineraryDetails();
+                    airSellItinerary.messageFunction = messegeFunction;
+                    var origin = item.Descendants(amadeus + "originDestination").Elements(amadeus + "origin")?.FirstOrDefault().Value;
+                    var destination = item.Descendants(amadeus + "originDestination").Elements(amadeus + "destination")?.FirstOrDefault().Value;
+                    airSellItinerary.originDestination = new OriginDestination { origin = origin, destination = destination };
+                    AirSellFlightDetails flightDetails = new AirSellFlightDetails();
+                    var departureDate = item.Descendants(amadeus + "segmentInformation")?.Descendants (amadeus + "flightDetails")?.Descendants (amadeus+ "flightDate")?.Elements(amadeus+ "departureDate").FirstOrDefault().Value;
+                    if(departureDate != null)
+                    {
+                        DateTime deptdate = DateTime.ParseExact(departureDate, "ddMMyy", System.Globalization.CultureInfo.InvariantCulture);
+                        flightDetails.departureDate =  DateOnly.FromDateTime(deptdate);
+                    }
+                    var departureTime = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "departureTime").FirstOrDefault().Value;
+                    if (departureTime != null)
+                    {
+                        TimeOnly deptTime = TimeOnly.ParseExact(departureTime, "HHmm");
+                        flightDetails.departureTime = deptTime;
+                    }
+                    var arrivalDate = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "arrivalDate").FirstOrDefault().Value;
+                    if (arrivalDate != null)
+                    {
+                        DateTime date = DateTime.ParseExact(arrivalDate, "ddMMyy", System.Globalization.CultureInfo.InvariantCulture);
+                        flightDetails.arrivalDate = DateOnly.FromDateTime(date);
+                    }
+                    var arrivalTime = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "departureTime").FirstOrDefault().Value;
+                    if (arrivalTime != null)
+                    {
+                        TimeOnly arrTime = TimeOnly.ParseExact(arrivalTime, "HHmm");
+                        flightDetails.arrivalTime = arrTime;
+                    }
+                    var fromAirport = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
+                    var toAirport = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "offpointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
+                    flightDetails.fromAirport = fromAirport;
+                    flightDetails.toAirport = toAirport;
+                    var marketingCompany = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "companyDetails")?.Elements(amadeus + "marketingCompany")?.FirstOrDefault()?.Value;
+                    flightDetails.marketingCompany = marketingCompany;
+                    var flightNumber = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "flightNumber")?.FirstOrDefault()?.Value;
+                    var bookingClass = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "bookingClass")?.FirstOrDefault()?.Value;
+                    flightDetails.flightNumber = flightNumber;
+                    flightDetails.marketingCompany = marketingCompany;
+                    var flightIndicator = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "flightTypeDetails")?.Elements(amadeus + "flightIndicator")?.FirstOrDefault()?.Value;
+                    flightDetails.flightIndicator = flightIndicator;
+                    var specialSegment = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "flightDetails")?.Descendants(amadeus + "specialSegment")?.FirstOrDefault()?.Value;
+                    flightDetails.specialSegment = specialSegment;
+                    var equipment = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "apdSegment")?.Descendants(amadeus+ "legDetails")?.Elements(amadeus + "equipment")?.FirstOrDefault()?.Value;
+                    flightDetails.legdetails = new LegDetails { equipment = equipment };
+                    var deptTerminal = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "apdSegment")?.Descendants(amadeus + "departureStationInfo")?.Elements(amadeus + "terminal")?.FirstOrDefault()?.Value;
+                    var arrivalTerminal = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "apdSegment")?.Descendants(amadeus + "arrivalStationInfo")?.Elements(amadeus + "terminal")?.FirstOrDefault()?.Value;
+                    flightDetails.departureTerminal = deptTerminal;
+                    flightDetails.arrivalTerminal = arrivalTerminal;
+                    var statusCode = item.Descendants(amadeus + "segmentInformation")?.Descendants(amadeus + "actionDetails")?.Elements(amadeus + "statusCode")?.FirstOrDefault()?.Value;
+                    flightDetails.statusCode = statusCode;
+                    airSellItinerary.flightDetails = flightDetails;
+                    ReturnModel.airSellResponse.Add(airSellItinerary);
+
+                }
+            }         
+            return ReturnModel;
+        }
         public async Task<string> CreateAirSellRecommendationRequest(AirSellFromRecommendationRequest requestModel)
         {
             string pwdDigest = await generatePassword();

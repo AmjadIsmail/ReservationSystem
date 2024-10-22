@@ -16,8 +16,7 @@ namespace ReservationSystem.Domain.Models.FlightPrice
     public class FlightPriceModelReturn
     {
         [JsonPropertyName("data")]
-        public FligthPriceData data { get; set; }
-        public Dictionaries? dictionaries { get; set; }
+        public FligthPriceData data { get; set; }       
         public AmadeusResponseError? amadeusError { get; set; }
     }
 
@@ -35,7 +34,9 @@ namespace ReservationSystem.Domain.Models.FlightPrice
    
     public class FlightPriceReturnModel
     {
-        public List<FlightOfferForFlightPrice> data { get; set; }
+        public HeaderSession? Session { get; set; }
+        public List<FlightOfferForFlightPrice> flightPrice { get; set; }
         public AmadeusResponseError? amadeusError { get; set; }
+        
     }
 }
