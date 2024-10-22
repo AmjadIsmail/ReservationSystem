@@ -342,6 +342,7 @@ namespace ReservationSystem.Infrastructure.Repositories
       <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
          <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
       </AMA_SecurityHostedUser>
+ <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
    </soapenv:Header>
    <soapenv:Body>
       <Fare_InformativePricingWithoutPNR>
@@ -500,6 +501,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             string? fareAmount_currency;
             string? otherMonetaryDetails_typeQualifier;
             string? otherMonetaryDetails_amount;
+            decimal totalAmount = 0;
+            decimal totalBase = 0;
             string? otherMonetaryDetails_currency;
             List<TextData> textData = new List<TextData>();
             string uniqueOfferReference = string.Empty;
@@ -517,8 +520,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.itineraries = new List<Itinerary>();
                     Itinerary itinerary = new Itinerary();
                     itinerary.segments = new List<Segment>();
-                    List<taxDetails> lstTaxdetails = new List<taxDetails>();
-                    numberOfPax = item?.Descendants(amadeus + "numberOfPax")?.Descendants(amadeus + "segmentControlDetails")?.Elements(amadeus + "quantity")?.FirstOrDefault()?.Value;
+                    List<taxDetails> lstTaxdetails = new List<taxDetails>();                  
+                    numberOfPax = item?.Descendants(amadeus + "numberOfPax")?.Descendants(amadeus + "segmentControlDetails")?.Elements(amadeus + "numberOfUnits")?.FirstOrDefault()?.Value;
                     passengerid = item?.Descendants(amadeus + "passengersID")?.Descendants(amadeus + "travellerDetails")?.Elements(amadeus + "measurementValue")?.FirstOrDefault()?.Value;
                     pricingIndicators = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "pricingIndicators")?.Descendants(amadeus + "priceTicketDetails")?.Elements(amadeus + "indicators").FirstOrDefault()?.Value;
                     priceTariffType = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "pricingIndicators")?.Elements(amadeus + "priceTariffType")?.FirstOrDefault()?.Value;
@@ -686,7 +689,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                     }
                     var price = new Price();
-                    price.base_amount = fareAmount_amount;
+                    price.baseAmount = "";
                     price.total = otherMonetaryDetails_amount;
                     price.grandTotal = otherMonetaryDetails_amount;
                     price.billingCurrency = fareAmount_currency;

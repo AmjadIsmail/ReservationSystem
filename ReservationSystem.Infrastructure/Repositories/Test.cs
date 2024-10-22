@@ -411,7 +411,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var taxes = new List<Taxes>();
                     Taxes t = new Taxes { amount = totalTax, code = "" };
                     taxes.Add(t);
-                    offer.price = new Price { base_amount = totalFareAmount, currency = currency , grandTotal = price
+                    offer.price = new Price { baseAmount = totalFareAmount, currency = currency , grandTotal = price
                         , taxes = taxes , total = price , discount = 0 , billingCurrency = currency , markup = 0   };
 
                     offer.id = itemNumberId;

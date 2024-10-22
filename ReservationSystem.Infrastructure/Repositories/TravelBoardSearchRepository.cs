@@ -207,8 +207,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                 sb.Append("<ptc>INF</ptc>");
                 for (int d = 1; d <= infant; d++)
                 {
-                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append(d.ToString()).Append("</ref>\r\n    </traveller>\r\n");
+                    sb.Append("\r\n    <traveller>\r\n      <ref>").Append(d.ToString()).Append("</ref>\r\n");
                     sb.Append("\r\n <infantIndicator>1</infantIndicator>");
+                    sb.Append("\r\n    </traveller>\r\n");
                 }
                 sb.Append("</paxReference>");
             }
@@ -264,7 +265,7 @@ namespace ReservationSystem.Infrastructure.Repositories
       <Fare_MasterPricerTravelBoardSearch>
          <numberOfUnit>
             <unitNumberDetail>
-               <numberOfUnits>{requestModel.adults+requestModel.children+requestModel.infant}</numberOfUnits>
+               <numberOfUnits>{requestModel.adults+requestModel.children}</numberOfUnits>
                <typeOfUnit>PX</typeOfUnit>
             </unitNumberDetail>
             <unitNumberDetail>
@@ -498,43 +499,7 @@ namespace ReservationSystem.Infrastructure.Repositories
 
 
             }
-               
-            //if (flightIndexInbound != null)
-            //{
-            //    var flightDetails2 = flightIndexInbound.Descendants(amadeus + "flightDetails").ToList();
-            //    foreach (var flightDetails in flightDetails2)
-            //    { 
-            //    var productDateTime = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "productDateTime");
-            //    var departureDate = productDateTime?.Element(amadeus + "dateOfDeparture")?.Value;
-            //    var departureTime = productDateTime?.Element(amadeus + "timeOfDeparture")?.Value;
-            //    var arrivalDate = productDateTime?.Element(amadeus + "dateOfArrival")?.Value;
-            //    var arrivalTime = productDateTime?.Element(amadeus + "timeOfArrival")?.Value;
-
-            //    var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
-            //        .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-            //    var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
-            //        .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-
-            //    var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
-            //    var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
-
-
-            //    Segment segment = new Segment();
-            //    string dateTimeStr = departureDate + departureTime;
-            //    string format = "ddMMyyHHmm";
-            //    DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
-            //    segment.departure = new Departure { at = departureD, iataCode = departureLocation };
-            //    string arrival = arrivalDate + arrivalTime;
-            //    DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
-            //    segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation };
-            //    segment.carrierCode = marketingCarrier;
-            //    segment.aircraft = new Aircraft { code = flightNumber };
-            //    itinerary1.segments.Add(segment);
-            //    }
-
-
-            //}
-            ////   offer.itineraries.Add(itinerary);
+                          
 
             #region Working For Recemondations
             string id = string.Empty, price = string.Empty, refnumenr = string.Empty, totalFareAmount = string.Empty;
@@ -545,15 +510,52 @@ namespace ReservationSystem.Infrastructure.Repositories
             string cabinProduct = string.Empty;
             string farebasis = string.Empty;
             string companyname = string.Empty;
+            string adultpp = string.Empty;
+            string adulttax = string.Empty;
+            string childpp = string.Empty;
+            string childtax = string.Empty;
+            string infantpp = string.Empty;
+            string infanttax = string.Empty;
+            decimal  totalPrice = 0;
+            int totalAdult = 0;
+            int totalChild = 0;
+            int totalInfant = 0;
             var recommendationList = doc.Descendants(amadeus + "recommendation").ToList();
             if (recommendationList != null)
             {
                 foreach (var item in recommendationList)
                 {
                     FlightOffer offer = new FlightOffer();
-                    offer.itineraries = new List<Itinerary>();
-                    // offer.itineraries.Add(itinerary1);
-                    LastTicketDate = string.Empty;
+                    offer.itineraries = new List<Itinerary>();                   
+                    LastTicketDate = string.Empty;                   
+                    var adultFare = item.Descendants(amadeus + "paxFareProduct").Where(e => e.Element(amadeus + "paxReference")?.Elements(amadeus + "ptc")?.FirstOrDefault().Value == "ADT").FirstOrDefault();
+                    var childFare = item.Descendants(amadeus + "paxFareProduct").Where(e => e.Element(amadeus + "paxReference")?.Elements(amadeus + "ptc")?.FirstOrDefault().Value == "CNN").FirstOrDefault();
+                    var infFare = item.Descendants(amadeus + "paxFareProduct").Where(e => e.Element(amadeus + "paxReference")?.Elements(amadeus + "ptc")?.FirstOrDefault().Value == "INF").FirstOrDefault();
+                    if (adultFare != null)
+                    {
+                        totalAdult = adultFare.Descendants(amadeus + "paxReference").Elements(amadeus+"traveller").ToList().Count();
+                        adultpp = adultFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
+                        adulttax = adultFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
+                        decimal _totAdt = (Convert.ToDecimal ( adultpp) + Convert.ToDecimal( adulttax)) * totalAdult;
+                        totalPrice = _totAdt;
+
+                    }
+                    if (childFare != null)
+                    {
+                        totalChild = childFare.Descendants(amadeus + "paxReference").Elements(amadeus + "traveller").ToList().Count();
+                        childpp = childFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
+                        childtax = childFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
+                        decimal _totChd = (Convert.ToDecimal(childpp) + Convert.ToDecimal(childtax)) * totalChild;
+                        totalPrice = totalPrice + _totChd;
+                    }
+                    if (infFare != null)
+                    {
+                        totalInfant = infFare.Descendants(amadeus + "paxReference").Elements(amadeus + "traveller").ToList().Count();
+                        infantpp = infFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
+                        infanttax = infFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
+                        decimal _totInf = (Convert.ToDecimal(infantpp) + Convert.ToDecimal(infanttax)) * totalInfant;
+                        totalPrice = totalPrice + _totInf;
+                    }
 
                     var itemNumberId = item.Descendants(amadeus + "itemNumber").Elements(amadeus + "itemNumberId")?.FirstOrDefault()?.Value;
                     price = item.Descendants(amadeus + "recPriceInfo").Elements(amadeus + "monetaryDetail").Elements(amadeus + "amount")?.FirstOrDefault()?.Value;
@@ -593,7 +595,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var lstDate = fareitem.Descendants(amadeus + "pricingMessage").Elements(amadeus + "description")?.ToList();
                             foreach (var i in lstDate?.Skip(1)?.Take(1))
                             {
-                                LastTicketDate = LastTicketDate + " " + i.Value;
+                                LastTicketDate = LastTicketDate; //+ " " + i.Value;
                             }
                         }
 
@@ -632,16 +634,34 @@ namespace ReservationSystem.Infrastructure.Repositories
 
 
                     var taxes = new List<Taxes>();
-                    Taxes t = new Taxes { amount = totalTax, code = "" };
-                    taxes.Add(t);
+                    if (adultpp != string.Empty)
+                    {
+                        Taxes t = new Taxes { amount = adulttax, code = "ADT" };
+                        taxes.Add(t);
+                    }
+                    if (childpp != string.Empty)
+                    {
+                        Taxes t = new Taxes { amount = childtax, code = "CNN" };
+                        taxes.Add(t);
+                    }
+                    if (infantpp != string.Empty)
+                    {
+                        Taxes t = new Taxes { amount = infanttax, code = "INF" };
+                        taxes.Add(t);
+                    }
                     offer.price = new Price
                     {
-                        base_amount = totalFareAmount,
+                        adultPP = adultpp,
+                        adultTax = adulttax ,
+                        childPp = childpp,
+                        childTax = childtax,
+                        infantPp = infantpp,
+                        infantTax = infanttax,
+                        baseAmount = "",
                         currency = currency,
-                        grandTotal = price
-                        ,
+                        grandTotal = totalPrice.ToString(),
                         taxes = taxes,
-                        total = (Convert.ToDecimal( price) + Convert.ToDecimal(totalTax)).ToString(),
+                        total = totalPrice.ToString(),
                         discount = 0,
                         billingCurrency = currency,
                         markup = 0
