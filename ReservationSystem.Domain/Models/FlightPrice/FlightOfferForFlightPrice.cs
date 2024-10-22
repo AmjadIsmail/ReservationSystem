@@ -8,6 +8,7 @@ namespace ReservationSystem.Domain.Models.FlightPrice
 {
     public class FlightOfferForFlightPrice
     {
+        public string? messageFunction { get; set; }
         public List<Itinerary>? itineraries { get; set; }
         public Price? price { get; set; }
         public PriceOption? pricingOptions { get; set; }

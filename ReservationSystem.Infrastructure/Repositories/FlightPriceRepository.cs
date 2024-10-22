@@ -101,7 +101,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             var res = ConvertXmlToModel(xmlDoc);
-                            flightPrice.data = res.data;
+                            flightPrice.flightPrice = res.flightPrice;
+                            flightPrice.Session = res.Session;
 
                         }
                     }
@@ -484,7 +485,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         public FlightPriceReturnModel ConvertXmlToModel(XDocument response)
         {
             FlightPriceReturnModel ReturnModel = new FlightPriceReturnModel();
-            ReturnModel.data = new List<FlightOfferForFlightPrice>();
+            ReturnModel.flightPrice = new List<FlightOfferForFlightPrice>();
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             XNamespace amadeus = "http://xml.amadeus.com/TIPNRR_23_1_1A";
@@ -508,7 +509,30 @@ namespace ReservationSystem.Infrastructure.Repositories
             string uniqueOfferReference = string.Empty;
             string? textData_freeTextQualification_textSubjectQualifier;
             string? textData_freeTextQualification_informationType;
-         
+
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";        
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+            
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                // Extract SessionId, SequenceNumber, and SecurityToken
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if(sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                ReturnModel.Session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
+
+            var messegeFunction = doc.Descendants(amadeus + "messageDetails")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault().Value;
             var pricingGroupLevelGroup = doc.Descendants(amadeus + "pricingGroupLevelGroup").ToList();
             if (pricingGroupLevelGroup != null)
             {
@@ -517,6 +541,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 foreach (var item in pricingGroupLevelGroup)
                 {
                     FlightOfferForFlightPrice offer = new FlightOfferForFlightPrice();
+                    offer.messageFunction = messegeFunction;
                     offer.itineraries = new List<Itinerary>();
                     Itinerary itinerary = new Itinerary();
                     itinerary.segments = new List<Segment>();
@@ -700,7 +725,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.itineraries.Add(itinerary);
                     offer.price = price; 
 
-                    ReturnModel.data.Add(offer);
+                    ReturnModel.flightPrice.Add(offer);
                 }
 
             }
