@@ -17,6 +17,7 @@ using ReservationSystem.Domain.Models.FareCheck;
 using System.Xml.Serialization;
 using ReservationSystem.Domain.Models;
 using System.Globalization;
+using System.Runtime.Intrinsics.X86;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -85,7 +86,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var errorInfo = xmlDoc.Descendants(fareNS+ "errorInfo").FirstOrDefault();
                             if (errorInfo != null)
                             {
-                              // Extract error details
+                             
                                 var errorCode = errorInfo.Descendants(fareNS+ "rejectErrorCode").Descendants(fareNS+ "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
                                 var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS+ "freeText").FirstOrDefault()?.Value;
                                 fareCheck.amadeusError = new AmadeusResponseError();
@@ -96,161 +97,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             }
                             else
                             {
-                                string xmlString = @"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3"" xmlns:wsa=""http://www.w3.org/2005/08/addressing"">
-   <soapenv:Header>
-      <wsa:To>http://www.w3.org/2005/08/addressing/anonymous</wsa:To>
-      <wsa:From>
-         <wsa:Address>https://nodeD1.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
-      </wsa:From>
-      <wsa:Action>http://webservices.amadeus.com/FARQNQ_07_1_1A</wsa:Action>
-      <wsa:MessageID>urn:uuid:03c0f934-3d8e-8564-b1ca-da937ee1324b</wsa:MessageID>
-      <wsa:RelatesTo RelationshipType=""http://www.w3.org/2005/08/addressing/reply"">WbsConsu-YnolyFLzLi2I7jx4WH4oun9AVUwrC5A-3NbJu5rjG</wsa:RelatesTo>
-      <awsse:Session TransactionStatusCode=""InSeries"">
-         <awsse:SessionId>001GMOKTEN</awsse:SessionId>
-         <awsse:SequenceNumber>2</awsse:SequenceNumber>
-         <awsse:SecurityToken>21BPXKG92ZO832ZDVI4PYDNE8B</awsse:SecurityToken>
-      </awsse:Session>
-   </soapenv:Header>
-   <soapenv:Body>
-      <Fare_CheckRulesReply xmlns=""http://xml.amadeus.com/FARQNR_07_1_1A"">
-         <transactionType>
-            <messageFunctionDetails>
-               <messageFunction>712</messageFunction>
-            </messageFunctionDetails>
-         </transactionType>
-         <flightDetails>
-            <nbOfSegments/>
-            <qualificationFareDetails>
-               <additionalFareDetails>
-                  <rateClass>YABAMILO</rateClass>
-               </additionalFareDetails>
-            </qualificationFareDetails>
-            <transportService>
-               <companyIdentification>
-                  <marketingCompany>6X</marketingCompany>
-               </companyIdentification>
-            </transportService>
-            <fareDetailInfo>
-               <nbOfUnits>
-                  <quantityDetails>
-                     <numberOfUnit>1</numberOfUnit>
-                     <unitQualifier>ND</unitQualifier>
-                  </quantityDetails>
-               </nbOfUnits>
-               <fareDeatilInfo>
-                  <fareTypeGrouping>
-                     <pricingGroup>ADT</pricingGroup>
-                  </fareTypeGrouping>
-               </fareDeatilInfo>
-            </fareDetailInfo>
-            <odiGrp>
-               <originDestination>
-                  <origin>LON</origin>
-                  <destination>MIA</destination>
-               </originDestination>
-            </odiGrp>
-            <travellerGrp>
-               <travellerIdentRef>
-                  <referenceDetails>
-                     <type>FC</type>
-                     <value>1</value>
-                  </referenceDetails>
-               </travellerIdentRef>
-            </travellerGrp>
-            <itemGrp>
-               <itemNb>
-                  <itemNumberDetails>
-                     <number>1</number>
-                  </itemNumberDetails>
-               </itemNb>
-               <unitGrp>
-                  <nbOfUnits>
-                     <quantityDetails>
-                        <numberOfUnit>1</numberOfUnit>
-                        <unitQualifier>PR</unitQualifier>
-                     </quantityDetails>
-                     <quantityDetails>
-                        <numberOfUnit>2</numberOfUnit>
-                        <unitQualifier>PR</unitQualifier>
-                     </quantityDetails>
-                  </nbOfUnits>
-                  <unitFareDetails>
-                     <fareTypeGrouping>
-                        <pricingGroup>ADT</pricingGroup>
-                     </fareTypeGrouping>
-                  </unitFareDetails>
-               </unitGrp>
-            </itemGrp>
-         </flightDetails>
-         <flightDetails>
-            <nbOfSegments/>
-            <qualificationFareDetails>
-               <additionalFareDetails>
-                  <rateClass>YABAMILO</rateClass>
-               </additionalFareDetails>
-            </qualificationFareDetails>
-            <transportService>
-               <companyIdentification>
-                  <marketingCompany>6X</marketingCompany>
-               </companyIdentification>
-            </transportService>
-            <fareDetailInfo>
-               <nbOfUnits>
-                  <quantityDetails>
-                     <numberOfUnit>1</numberOfUnit>
-                     <unitQualifier>ND</unitQualifier>
-                  </quantityDetails>
-               </nbOfUnits>
-               <fareDeatilInfo>
-                  <fareTypeGrouping>
-                     <pricingGroup>ADT</pricingGroup>
-                  </fareTypeGrouping>
-               </fareDeatilInfo>
-            </fareDetailInfo>
-            <odiGrp>
-               <originDestination>
-                  <origin>LON</origin>
-                  <destination>MIA</destination>
-               </originDestination>
-            </odiGrp>
-            <travellerGrp>
-               <travellerIdentRef>
-                  <referenceDetails>
-                     <type>FC</type>
-                     <value>2</value>
-                  </referenceDetails>
-               </travellerIdentRef>
-            </travellerGrp>
-            <itemGrp>
-               <itemNb>
-                  <itemNumberDetails>
-                     <number>1</number>
-                  </itemNumberDetails>
-               </itemNb>
-               <unitGrp>
-                  <nbOfUnits>
-                     <quantityDetails>
-                        <numberOfUnit>1</numberOfUnit>
-                        <unitQualifier>PR</unitQualifier>
-                     </quantityDetails>
-                     <quantityDetails>
-                        <numberOfUnit>2</numberOfUnit>
-                        <unitQualifier>PR</unitQualifier>
-                     </quantityDetails>
-                  </nbOfUnits>
-                  <unitFareDetails>
-                     <fareTypeGrouping>
-                        <pricingGroup>ADT</pricingGroup>
-                     </fareTypeGrouping>
-                  </unitFareDetails>
-               </unitGrp>
-            </itemGrp>
-         </flightDetails>
-      </Fare_CheckRulesReply>
-   </soapenv:Body>
-</soapenv:Envelope>";
-                               // XDocument xdoctest = XDocument.Parse(xmlString);                               
+                                                        
                                 var res = ConvertXmlToModel(xmlDoc, fareNS.NamespaceName);
+
                                 fareCheck.data = res;
                             }
 
@@ -288,14 +137,33 @@ namespace ReservationSystem.Infrastructure.Repositories
             FareCheckRulesReply fareCheck = new FareCheckRulesReply();          
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
-            XNamespace amadeus = xmlNameSpace;//"http://xml.amadeus.com/FMPTBR_24_1_1A";
+            XNamespace amadeus = xmlNameSpace;
 
             List<Itinerary> itinerariesList = new List<Itinerary>();
             var messageFunction = doc.Descendants(amadeus + "transactionType")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault()?.Value;
             fareCheck.TransactionType = new TransactionType();
             fareCheck.TransactionType.MessageFunctionDetails = new MessageFunctionDetails();
             fareCheck.TransactionType.MessageFunctionDetails.MessageFunction = messageFunction.ToString();
-
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                // Extract SessionId, SequenceNumber, and SecurityToken
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                fareCheck.Session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
             var flightDetails = doc.Descendants(amadeus + "flightDetails")?.ToList();
             fareCheck.FlightDetails = new List<FlightDetailsFareCheck>();
             foreach ( var item in flightDetails)
@@ -307,6 +175,17 @@ namespace ReservationSystem.Infrastructure.Repositories
                 _flightfare.QualificationFareDetails = new QualificationFareDetails { AdditionalFareDetails = new AdditionalFareDetails { RateClass = rateClass } };
                 var marketingCompany = item.Descendants(amadeus + "transportService")?.Descendants(amadeus + "companyIdentification")?.Descendants(amadeus + "marketingCompany")?.FirstOrDefault()?.Value;
                 _flightfare.TransportService = new TransportService { CompanyIdentification = new CompanyIdentification { MarketingCompany = marketingCompany } };
+                _flightfare.FlightErrorCodes = new List<FlightErrorCode>();
+                var flightErrorCode = item.Descendants(amadeus + "flightErrorCode")?.ToList();
+                foreach( var itemError in flightErrorCode)
+                {
+                   var textSubjectQualifier =  item.Descendants(amadeus + "freeTextQualification")?.Elements(amadeus + "textSubjectQualifier")?.FirstOrDefault ()?.Value;
+                   var informationType = item.Descendants(amadeus + "freeTextQualification")?.Elements(amadeus + "informationType")?.FirstOrDefault()?.Value;
+                    var freeText = item.Descendants(amadeus + "freeText")?.FirstOrDefault()?.Value;
+                    FlightErrorCode code = new FlightErrorCode { freeText = freeText, informationType = informationType, textSubjectQualifier = textSubjectQualifier };
+                    _flightfare.FlightErrorCodes.Add(code);
+                }
+
                 var numberOfUnit = item.Descendants(amadeus + "fareDetailInfo")?.Descendants(amadeus + "nbOfUnits")?.Descendants(amadeus + "quantityDetails")?.Descendants(amadeus + "numberOfUnit")?.FirstOrDefault()?.Value;
               
                 var unitQualifier = item.Descendants(amadeus + "fareDetailInfo")?.Descendants(amadeus + "nbOfUnits")?.Descendants(amadeus + "quantityDetails")?.Descendants(amadeus + "unitQualifier")?.FirstOrDefault()?.Value;
@@ -324,8 +203,17 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                 var travellerGrp_type = item.Descendants(amadeus + "travellerGrp")?.Descendants(amadeus + "travellerIdentRef")?.Descendants(amadeus + "referenceDetails")?.Descendants(amadeus + "type")?.FirstOrDefault()?.Value;
                 var travellerGrp_value = item.Descendants(amadeus + "travellerGrp")?.Descendants(amadeus + "travellerIdentRef")?.Descendants(amadeus + "referenceDetails")?.Descendants(amadeus + "value")?.FirstOrDefault()?.Value;
+               
+                var fareRulesDetails = item.Descendants(amadeus + "travellerGrp")?.Descendants(amadeus + "fareRulesDetails")?.ToList();
+                List<string> ruleSectionIds = new List<string>();
+
+                foreach (var Ruleitem in fareRulesDetails)
+                {
+                    var Ruleid = Ruleitem.Element(amadeus + "ruleSectionId")?.Value;
+                    ruleSectionIds.Add(Ruleid);
+                }
                 _flightfare.TravellerGrp = new TravellerGrp();
-                _flightfare.TravellerGrp.TravellerIdentRef = new TravellerIdentRef { ReferenceDetails = new ReferenceDetails { Type = travellerGrp_type, Value = travellerGrp_value } };
+                _flightfare.TravellerGrp.TravellerIdentRef = new TravellerIdentRef { ReferenceDetails = new ReferenceDetails { Type = travellerGrp_type, Value = travellerGrp_value , fareRulesDetails = ruleSectionIds } };
 
                 var itemGrp_itemNb_itemNumberDetails_number = item.Descendants(amadeus + "itemGrp")?.Descendants(amadeus + "itemNb")?.Descendants(amadeus + "itemNumberDetails")?.Descendants(amadeus + "number")?.FirstOrDefault()?.Value;
                 _flightfare.ItemGrp = new ItemGrp();
@@ -406,32 +294,27 @@ namespace ReservationSystem.Infrastructure.Repositories
             string requesterType = amadeusSettings["requestorType"];
             string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
             string pos_type = amadeusSettings["POS_Type"];
-            
-            string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:fare=""{action}"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
-   <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
-      <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
-      <add:Action>{action}</add:Action>
-      <add:To>{to}</add:To>
-      <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
-         <oas:UsernameToken oas1:Id=""UsernameToken-1"">
-            <oas:Username>{username}</oas:Username>
-            <oas:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">{pwdDigest.Split("|")[1]}</oas:Nonce>
-            <oas:Password Type=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest"">{pwdDigest.Split("|")[0]}</oas:Password>
-            <oas1:Created>{pwdDigest.Split("|")[2]}</oas1:Created>
-         </oas:UsernameToken>
-      </oas:Security> 
-    <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
-    <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
-     <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
-  </AMA_SecurityHostedUser>
-   </soapenv:Header>
-   <soapenv:Body>
+
+            //string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:fare=""{action}"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+            string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+   <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+      <ses:Session TransactionStatusCode=""InSeries"">
+      <ses:SessionId>{requestModel.sessionDetails.SessionId}</ses:SessionId>
+      <ses:SequenceNumber>{requestModel.sessionDetails.SequenceNumber+1}</ses:SequenceNumber>
+      <ses:SecurityToken>{requestModel.sessionDetails.SecurityToken }</ses:SecurityToken>
+    </ses:Session>
+    <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+    <add:Action>{action}</add:Action>
+    <add:To>{to}</add:To>  
+    <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+   </soap:Header>
+   <soap:Body>
      <Fare_CheckRules> 
     { messageFunctionDetails(requestModel?.typeQualifier?.ToList())}
      { itemNumber(requestModel?.itemNumber?.ToList(),requestModel?.FcType)}        
       </Fare_CheckRules>        
-   </soapenv:Body>
-</soapenv:Envelope>";
+   </soap:Body>
+</soap:Envelope>";
 
             return Request;
         }
