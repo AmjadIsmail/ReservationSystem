@@ -11,5 +11,6 @@ namespace ReservationSystem.Domain.Models.FareCheck
         public List<string>? typeQualifier { get; set; }
         public List<int>? itemNumber { get; set; }
         public string? FcType { get; set; }
+        public HeaderSession sessionDetails { get; set; }
     }
 }

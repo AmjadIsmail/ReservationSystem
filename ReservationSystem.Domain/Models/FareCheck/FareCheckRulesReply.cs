@@ -10,11 +10,15 @@ namespace ReservationSystem.Domain.Models.FareCheck
     [XmlRoot(ElementName = "Fare_CheckRulesReply", Namespace = "http://xml.amadeus.com/FARQNR_07_1_1A")]
     public class FareCheckRulesReply
     {
+        public HeaderSession? Session { get; set; }
+
         [XmlElement(ElementName = "transactionType")]
         public TransactionType TransactionType { get; set; }
 
         [XmlElement(ElementName = "flightDetails")]
         public List<FlightDetailsFareCheck> FlightDetails { get; set; }
+
+        
     }
 
     public class TransactionType
@@ -38,6 +42,7 @@ namespace ReservationSystem.Domain.Models.FareCheck
 
         [XmlElement(ElementName = "transportService")]
         public TransportService TransportService { get; set; }
+        public List<FlightErrorCode>? FlightErrorCodes { get; set; }
 
         [XmlElement(ElementName = "fareDetailInfo")]
         public FareDetailInfo FareDetailInfo { get; set; }
@@ -65,6 +70,17 @@ namespace ReservationSystem.Domain.Models.FareCheck
     {
         [XmlElement(ElementName = "companyIdentification")]
         public CompanyIdentification CompanyIdentification { get; set; }
+    }
+    public class FlightErrorCode
+    {
+        [XmlElement(ElementName = "textSubjectQualifier")]
+        public string? textSubjectQualifier { get; set; }
+
+        [XmlElement(ElementName = "informationType")]
+        public string? informationType { get; set; }
+
+        [XmlElement(ElementName = "freeText")]
+        public string? freeText { get; set; }
     }
     public class CompanyIdentification
     {
@@ -138,6 +154,8 @@ namespace ReservationSystem.Domain.Models.FareCheck
 
         [XmlElement(ElementName = "value")]
         public string Value { get; set; }
+        [XmlElement(ElementName = "fareRulesDetails")]
+        public List<string>? fareRulesDetails { get; set; }
     }
     public class ItemGrp
     {

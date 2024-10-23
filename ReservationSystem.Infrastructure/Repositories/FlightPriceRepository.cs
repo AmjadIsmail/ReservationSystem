@@ -101,8 +101,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             var res = ConvertXmlToModel(xmlDoc);
-                            flightPrice.flightPrice = res.flightPrice;
-                            flightPrice.Session = res.Session;
+                            flightPrice = res;
+                           // flightPrice.Session = res.Session;
 
                         }
                     }
@@ -328,10 +328,12 @@ namespace ReservationSystem.Infrastructure.Repositories
             requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
 
             string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
-   <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
-      <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
-      <add:Action>{action}</add:Action>
+        <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+        <ses:Session TransactionStatusCode=""Start""/>
+        <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+        <add:Action>{action}</add:Action>
       <add:To>{to}</add:To>
+        <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
       <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
          <oas:UsernameToken oas1:Id=""UsernameToken-1"">
             <oas:Username>{username}</oas:Username>
@@ -343,7 +345,6 @@ namespace ReservationSystem.Infrastructure.Repositories
       <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
          <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
       </AMA_SecurityHostedUser>
- <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
    </soapenv:Header>
    <soapenv:Body>
       <Fare_InformativePricingWithoutPNR>

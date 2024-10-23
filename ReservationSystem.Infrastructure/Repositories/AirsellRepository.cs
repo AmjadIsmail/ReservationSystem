@@ -229,27 +229,22 @@ namespace ReservationSystem.Infrastructure.Repositories
             string dutyCode = amadeusSettings["dutyCode"];
             string requesterType = amadeusSettings["requestorType"];
             string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];           
+            string pos_type = amadeusSettings["POS_Type"];
 
-            string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
-   <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
-      <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
-      <add:Action>{action}</add:Action>
-      <add:To>{to}</add:To>
-      <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
-         <oas:UsernameToken oas1:Id=""UsernameToken-1"">
-            <oas:Username>{username}</oas:Username>
-            <oas:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">{pwdDigest.Split("|")[1]}</oas:Nonce>
-            <oas:Password Type=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest"">{pwdDigest.Split("|")[0]}</oas:Password>
-            <oas1:Created>{pwdDigest.Split("|")[2]}</oas1:Created>
-         </oas:UsernameToken>
-      </oas:Security>
-      <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
-         <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
-      </AMA_SecurityHostedUser>
-        <awsse:Session TransactionStatusCode=""Start"" xmlns:awsse=""http://xml.amadeus.com/2010/06/Session_v3""/>
-   </soapenv:Header>
-   <soapenv:Body>
+            // string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+            string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+      <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+      <ses:Session TransactionStatusCode=""InSeries"">
+      <ses:SessionId>{requestModel.sessionDetails.SessionId}</ses:SessionId>
+      <ses:SequenceNumber>{requestModel.sessionDetails.SequenceNumber + 1}</ses:SequenceNumber>
+      <ses:SecurityToken>{requestModel.sessionDetails.SecurityToken}</ses:SecurityToken>
+    </ses:Session>
+    <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+    <add:Action>{action}</add:Action>
+    <add:To>{to}</add:To>  
+    <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+   </soap:Header>
+   <soap:Body>
       <Air_SellFromRecommendation>
          <messageActionDetails>
             <messageFunctionDetails>
@@ -328,9 +323,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             </segmentInformation>
          </itineraryDetails>
       </Air_SellFromRecommendation>
-   </soapenv:Body>
+   </soap:Body>
 
-</soapenv:Envelope>";
+</soap:Envelope>";
 
             return Request;
         }
