@@ -33,7 +33,7 @@ namespace ReservationApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] FlightPriceMoelSoap? flightPriceRequest)
         {
-            FlightPriceModel returnModel = new FlightPriceModel();           
+            FlightPriceModel returnModel = new FlightPriceModel();
             var data = await _flightprice.GetFlightPrice(flightPriceRequest);
             ApiResponse res = new ApiResponse();
             res.IsSuccessful = data.amadeusError == null;
@@ -45,17 +45,13 @@ namespace ReservationApi.Controllers
             }
             else
             {
-                res.Data = data.data;
+                res.Data = data;
             }
-<<<<<<< HEAD
-            res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.data.ToList().Count() : "Error";
-=======
             res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.flightPrice.ToList().Count() : "Error";
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             res.Response = data?.amadeusError == null ? "Success" : "Failed";
             return Ok(res);
         }
 
-    
+
     }
 }

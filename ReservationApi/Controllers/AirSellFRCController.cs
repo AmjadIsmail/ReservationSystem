@@ -35,11 +35,7 @@ namespace ReservationApi.Controllers
 
             res.IsSuccessful = data?.amadeusError == null ? true : false;
             res.StatusCode = data?.amadeusError == null ? 200 : 500;
-<<<<<<< HEAD
-            res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.data.ToList().Count() : "Error";
-=======
             res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.airSellResponse.ToList().Count() : "Error";
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             res.Response = data?.amadeusError == null ? "Success" : "Failed";
             if (data?.amadeusError != null)
             {
@@ -48,11 +44,7 @@ namespace ReservationApi.Controllers
             }
             else
             {
-<<<<<<< HEAD
-                res.Data = data.data;
-=======
                 res.Data = data;
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             }
 
             return Ok(res);

@@ -10,21 +10,15 @@ namespace ReservationSystem.Domain.Models.FareCheck
     [XmlRoot(ElementName = "Fare_CheckRulesReply", Namespace = "http://xml.amadeus.com/FARQNR_07_1_1A")]
     public class FareCheckRulesReply
     {
-<<<<<<< HEAD
-=======
         public HeaderSession? Session { get; set; }
 
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
         [XmlElement(ElementName = "transactionType")]
         public TransactionType TransactionType { get; set; }
 
         [XmlElement(ElementName = "flightDetails")]
         public List<FlightDetailsFareCheck> FlightDetails { get; set; }
-<<<<<<< HEAD
-=======
 
-        
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
+
     }
 
     public class TransactionType
@@ -48,10 +42,7 @@ namespace ReservationSystem.Domain.Models.FareCheck
 
         [XmlElement(ElementName = "transportService")]
         public TransportService TransportService { get; set; }
-<<<<<<< HEAD
-=======
         public List<FlightErrorCode>? FlightErrorCodes { get; set; }
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
 
         [XmlElement(ElementName = "fareDetailInfo")]
         public FareDetailInfo FareDetailInfo { get; set; }
@@ -80,8 +71,6 @@ namespace ReservationSystem.Domain.Models.FareCheck
         [XmlElement(ElementName = "companyIdentification")]
         public CompanyIdentification CompanyIdentification { get; set; }
     }
-<<<<<<< HEAD
-=======
     public class FlightErrorCode
     {
         [XmlElement(ElementName = "textSubjectQualifier")]
@@ -93,7 +82,6 @@ namespace ReservationSystem.Domain.Models.FareCheck
         [XmlElement(ElementName = "freeText")]
         public string? freeText { get; set; }
     }
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
     public class CompanyIdentification
     {
         [XmlElement(ElementName = "marketingCompany")]
@@ -166,11 +154,8 @@ namespace ReservationSystem.Domain.Models.FareCheck
 
         [XmlElement(ElementName = "value")]
         public string Value { get; set; }
-<<<<<<< HEAD
-=======
         [XmlElement(ElementName = "fareRulesDetails")]
         public List<string>? fareRulesDetails { get; set; }
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
     }
     public class ItemGrp
     {

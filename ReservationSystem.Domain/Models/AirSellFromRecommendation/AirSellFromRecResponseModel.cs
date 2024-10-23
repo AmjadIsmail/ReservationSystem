@@ -4,20 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-<<<<<<< HEAD
-=======
 using System.Xml.Serialization;
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
 
 namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
 {
     public class AirSellFromRecResponseModel
     {
-<<<<<<< HEAD
-        public List<FlightOffer> data { get; set; }
-        public AmadeusResponseError? amadeusError { get; set; }
-    }
-=======
         public HeaderSession? session { get; set; }
         public List<AirSellItineraryDetails> airSellResponse { get; set; }
         public AmadeusResponseError? amadeusError { get; set; }
@@ -31,7 +23,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
     }
 
     public class OriginDestination
-    {         
+    {
         public string? origin { get; set; }
         public string? destination { get; set; }
     }
@@ -41,7 +33,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
         public TimeOnly? departureTime { get; set; }
         public DateOnly? arrivalDate { get; set; }
         public TimeOnly? arrivalTime { get; set; }
-        public string?  dateVariation { get; set; }
+        public string? dateVariation { get; set; }
         public string? fromAirport { get; set; }
         public string? toAirport { get; set; }
         public string? marketingCompany { get; set; }
@@ -58,5 +50,4 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
     {
         public string equipment { get; set; }
     }
->>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
 }
