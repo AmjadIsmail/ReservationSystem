@@ -47,7 +47,11 @@ namespace ReservationApi.Controllers
             {
                 res.Data = data.data;
             }
+<<<<<<< HEAD
             res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.data.ToList().Count() : "Error";
+=======
+            res.Message = data?.amadeusError == null ? "Found Success: Total records:" + data.flightPrice.ToList().Count() : "Error";
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             res.Response = data?.amadeusError == null ? "Success" : "Failed";
             return Ok(res);
         }

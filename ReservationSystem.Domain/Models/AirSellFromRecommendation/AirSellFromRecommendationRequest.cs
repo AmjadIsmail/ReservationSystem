@@ -8,6 +8,10 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
 {
     public class AirSellFromRecommendationRequest
     {
+<<<<<<< HEAD
+=======
+        public HeaderSession sessionDetails { get; set; }
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
         public string? messageFunction { get; set; }
         public string? additionalMessageFunction { get; set; }
         public ItineraryDetails? outBound { get; set; }

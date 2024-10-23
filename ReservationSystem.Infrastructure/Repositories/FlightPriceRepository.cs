@@ -101,7 +101,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             var res = ConvertXmlToModel(xmlDoc);
+<<<<<<< HEAD
                             flightPrice.data = res.data;
+=======
+                            flightPrice = res;
+                           // flightPrice.Session = res.Session;
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
 
                         }
                     }
@@ -327,10 +332,12 @@ namespace ReservationSystem.Infrastructure.Repositories
             requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
 
             string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
-   <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
-      <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
-      <add:Action>{action}</add:Action>
+        <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+        <ses:Session TransactionStatusCode=""Start""/>
+        <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+        <add:Action>{action}</add:Action>
       <add:To>{to}</add:To>
+        <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
       <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
          <oas:UsernameToken oas1:Id=""UsernameToken-1"">
             <oas:Username>{username}</oas:Username>
@@ -484,7 +491,11 @@ namespace ReservationSystem.Infrastructure.Repositories
         public FlightPriceReturnModel ConvertXmlToModel(XDocument response)
         {
             FlightPriceReturnModel ReturnModel = new FlightPriceReturnModel();
+<<<<<<< HEAD
             ReturnModel.data = new List<FlightOfferForFlightPrice>();
+=======
+            ReturnModel.flightPrice = new List<FlightOfferForFlightPrice>();
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             XNamespace amadeus = "http://xml.amadeus.com/TIPNRR_23_1_1A";
@@ -508,7 +519,34 @@ namespace ReservationSystem.Infrastructure.Repositories
             string uniqueOfferReference = string.Empty;
             string? textData_freeTextQualification_textSubjectQualifier;
             string? textData_freeTextQualification_informationType;
+<<<<<<< HEAD
          
+=======
+
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";        
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+            
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                // Extract SessionId, SequenceNumber, and SecurityToken
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if(sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                ReturnModel.Session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
+
+            var messegeFunction = doc.Descendants(amadeus + "messageDetails")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault().Value;
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
             var pricingGroupLevelGroup = doc.Descendants(amadeus + "pricingGroupLevelGroup").ToList();
             if (pricingGroupLevelGroup != null)
             {
@@ -517,6 +555,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                 foreach (var item in pricingGroupLevelGroup)
                 {
                     FlightOfferForFlightPrice offer = new FlightOfferForFlightPrice();
+<<<<<<< HEAD
+=======
+                    offer.messageFunction = messegeFunction;
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
                     offer.itineraries = new List<Itinerary>();
                     Itinerary itinerary = new Itinerary();
                     itinerary.segments = new List<Segment>();
@@ -700,7 +742,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.itineraries.Add(itinerary);
                     offer.price = price; 
 
+<<<<<<< HEAD
                     ReturnModel.data.Add(offer);
+=======
+                    ReturnModel.flightPrice.Add(offer);
+>>>>>>> 327b9c02008c178a3d19c315f50d1a405d46bcb1
                 }
 
             }
