@@ -78,7 +78,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             {
 
                             }
-
+                           
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
