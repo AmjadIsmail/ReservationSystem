@@ -27,12 +27,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;         
         private readonly ICacheService _cacheService;
         private readonly IDBRepository _dbRepository;
+        private readonly IHelperRepository _helperRepository;
        
-        public TravelBoardSearchRepository(IConfiguration _configuration, ICacheService cacheService, IDBRepository dBRepository)
+        public TravelBoardSearchRepository(IConfiguration _configuration, ICacheService cacheService, IDBRepository dBRepository, IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cacheService = cacheService;
             _dbRepository = dBRepository;
+            _helperRepository = helperRepository;
         }
          
         public async Task<string> generatePassword()
@@ -87,8 +89,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                
                 var amadeusSettings = configuration.GetSection("AmadeusSoap");
                 string action = amadeusSettings["travelBoardSearchAction"];                 
-                var _url = amadeusSettings["ApiUrl"]; // "https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY";
-                var _action = amadeusSettings["travelBoardSearchAction"]; // "http://webservices.amadeus.com/FMPTBQ_24_1_1A";
+                var _url = amadeusSettings["ApiUrl"]; 
+                var _action = amadeusSettings["travelBoardSearchAction"];
                 string Result = string.Empty;
                 string Envelope = await CreateSoapEnvelopeSimple(requestModel);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -112,28 +114,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,   
-                                OmitXmlDeclaration = false,  
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\TbSearchResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-                           
+                             await _helperRepository.SaveXmlResponse("TbSearchResponse", result2);
+                            
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            
+                            await _helperRepository.SaveJson(jsonText, "TbSearchResponseJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if ( errorInfo != null)
                             {

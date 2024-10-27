@@ -30,10 +30,12 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly IHelperRepository _helperRepository;
+        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cache = cache;
+            _helperRepository = helperRepository;
         }
 
         public async Task<FlightPriceReturnModel> GetFlightPrice(FlightPriceMoelSoap requestModel)
@@ -68,24 +70,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,
-                                OmitXmlDeclaration = false,
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\FlightPriceResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-
+                            await _helperRepository.SaveXmlResponse("FlightPriceResponse", result2);
+                            XmlDocument xmlDoc2 = new XmlDocument();
+                            xmlDoc2.LoadXml(result2);
+                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "FlightPriceResponseJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -97,12 +86,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 return flightPrice;
 
                             }
-                            XmlDocument xmlDoc2 = new XmlDocument();
-                            xmlDoc2.LoadXml(result2);
-                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            
                             var res = ConvertXmlToModel(xmlDoc);
                             flightPrice = res;
-                            // flightPrice.Session = res.Session;
+                           
 
                         }
                     }
