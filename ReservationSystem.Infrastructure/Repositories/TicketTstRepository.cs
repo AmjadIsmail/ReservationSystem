@@ -81,12 +81,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             XNamespace fareNS = ns;
-                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
+                            var errorInfo = xmlDoc.Descendants(fareNS + "applicationError").FirstOrDefault();
                             if (errorInfo != null)
                             {
-                                // Extract error details
-                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
-                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
+                             
+                                var errorCode = errorInfo.Descendants(fareNS + "applicationErrorInfo").Descendants(fareNS + "applicationErrorDetail").Descendants(fareNS + "applicationErrorCode").FirstOrDefault()?.Value;
+                                var errorText = errorInfo.Descendants(fareNS + "errorText").Descendants(fareNS + "errorFreeText").FirstOrDefault()?.Value;
                                 fopResponse.amadeusError = new AmadeusResponseError();
                                 fopResponse.amadeusError.error = errorText;
                                 fopResponse.amadeusError.errorCode = Convert.ToInt16(errorCode);

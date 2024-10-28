@@ -320,7 +320,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
         <add:Action>{action}</add:Action>
       <add:To>{to}</add:To>
-        <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+      <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
       <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
          <oas:UsernameToken oas1:Id=""UsernameToken-1"">
             <oas:Username>{username}</oas:Username>

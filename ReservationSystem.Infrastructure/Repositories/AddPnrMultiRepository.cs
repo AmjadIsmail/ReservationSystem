@@ -70,11 +70,16 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "CommitPNRResponseJson");
                             XNamespace fareNS = ns;
-                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
+                            var errorInfo = xmlDoc.Descendants(fareNS + "generalErrorInfo").FirstOrDefault();
                             if (errorInfo != null)
                             {                                
-                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
-                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
+                                var errorCode = errorInfo.Descendants(fareNS + "errorOrWarningCodeDetails").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
+                                var errorTextList = errorInfo.Descendants(fareNS + "errorWarningDescription").Descendants(fareNS + "freeText")?.ToList();
+                                string errorText = string.Empty;
+                                foreach(var error in errorTextList)
+                                {
+                                    errorText += error + " ";
+                                }
                                 pnrCommit.amadeusError = new AmadeusResponseError();
                                 pnrCommit.amadeusError.error = errorText;
                                 pnrCommit.amadeusError.errorCode = Convert.ToInt16(errorCode);
@@ -618,6 +623,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             "<infantIndicator>"+(AdtCount +1)+"</infantIndicator>\r\n      " +
                             "</passenger>\r\n      " +
                             "</travellerInformation>\r\n   " +
+                            "<dateOfBirth>\r\n      " +
+                            "<dateAndTimeDetails>\r\n      " +
+                            "<date>" + ConvertDob(passenger?.dob) + "</date>\r\n    " +
+                            "</dateAndTimeDetails>\r\n   " +
+                            "</dateOfBirth>\r\n  " +
                             "</passengerData>\r\n   " +
                             "<passengerData>\r\n " +
                             "<travellerInformation>\r\n    " +
@@ -681,6 +691,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                            "<type>" + passenger.type + "</type>\r\n          " +                          
                            "</passenger>\r\n      " +
                            "</travellerInformation>\r\n   " +
+                            "<dateOfBirth>\r\n      " +
+                            "<dateAndTimeDetails>\r\n      " +
+                            "<date>" + ConvertDob(passenger?.dob) + "</date>\r\n    " +
+                            "</dateAndTimeDetails>\r\n   " +
+                            "</dateOfBirth>\r\n  " +
                            "</passengerData>\r\n   " +
                            infData +
                            "</travellerInfo>\r\n";

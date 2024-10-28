@@ -12,6 +12,6 @@ namespace ReservationSystem.Domain.Repositories
     {
         public Task<AddPnrMultiResponse> AddPnrMulti(AddPnrMultiRequset requestModel);
 
-        Task<PnrCommitResponse?> CommitPNR(PnrCommitRequest requestModel);
+        public Task<PnrCommitResponse?> CommitPNR(PnrCommitRequest requestModel);
     }
 }
