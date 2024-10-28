@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ReservationSystem.Domain.Models.FareCheck;
+using ReservationSystem.Domain.Models;
 
 namespace ReservationSystem.Domain.Repositories
 {
@@ -12,6 +13,7 @@ namespace ReservationSystem.Domain.Repositories
     {
         public Task<FareCheckReturnModel> FareCheckRequest(FareCheckModel fareCheckRequest);
 
+        public Task Security_Signout(HeaderSession header);
         public Task<bool> Security_Signout();
     }
 }

@@ -114,7 +114,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                             await _helperRepository.SaveXmlResponse("TbSearchResponse", result2);
+                            await _helperRepository.SaveXmlResponse("TbSearch_Request", Envelope);
+                             await _helperRepository.SaveXmlResponse("TbSearch_Response", result2);
                             
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);

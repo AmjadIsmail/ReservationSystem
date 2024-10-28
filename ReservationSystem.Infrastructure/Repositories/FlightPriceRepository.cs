@@ -70,7 +70,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("FlightPriceResponse", result2);
+                            await _helperRepository.SaveXmlResponse("FlightPrice_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("FlightPrice_Response", result2);
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
@@ -320,7 +321,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
         <add:Action>{action}</add:Action>
       <add:To>{to}</add:To>
-        <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+      <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
       <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
          <oas:UsernameToken oas1:Id=""UsernameToken-1"">
             <oas:Username>{username}</oas:Username>
