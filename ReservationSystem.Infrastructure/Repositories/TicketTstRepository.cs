@@ -20,10 +20,12 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public TicketTstRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly IHelperRepository _helperRepository;
+        public TicketTstRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cache = cache;
+            _helperRepository = helperRepository;
         }
         public async Task<TicketTstResponse> CreateTicketTst(TicketTstRequest requestModel)
         {
@@ -58,6 +60,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         using (StreamReader rd = new StreamReader(response.GetResponseStream()))
                         {
                             var result2 = rd.ReadToEnd();
+                            await _helperRepository.SaveXmlResponse("Tst_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("Tst_Response", result2);
                             XDocument xmlDoc = XDocument.Parse(result2);
                             XmlWriterSettings settings = new XmlWriterSettings
                             {

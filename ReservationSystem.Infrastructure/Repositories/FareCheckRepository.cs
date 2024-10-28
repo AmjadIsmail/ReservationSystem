@@ -63,7 +63,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("FareCheckResponse", result2);                            
+                            await _helperRepository.SaveXmlResponse("FareCheck_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("FareCheck_Response", result2);                            
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);

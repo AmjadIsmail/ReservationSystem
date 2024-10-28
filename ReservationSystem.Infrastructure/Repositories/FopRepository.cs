@@ -64,7 +64,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("FopResponse", result2);
+                            await _helperRepository.SaveXmlResponse("Fop_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("Fop_Response", result2);
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
