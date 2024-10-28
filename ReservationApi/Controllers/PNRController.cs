@@ -49,6 +49,32 @@ namespace ReservationApi.Controllers
             return Ok(res);
 
         }
+        
+        [HttpPost("CommitPnr")]
+        public async Task<IActionResult> CommitPnr([FromBody] PnrCommitRequest request)
+        {
+
+            ApiResponse res = new ApiResponse();
+
+            var data = await _Repo.CommitPNR(request);
+
+            res.IsSuccessful = data?.amadeusError == null ? true : false;
+            res.StatusCode = data?.amadeusError == null ? 200 : 500;
+            res.Message = data?.amadeusError == null ? "Found Success:" : "Error";
+            res.Response = data?.amadeusError == null ? "Success" : "Failed";
+            if (data?.amadeusError != null)
+            {
+                res.Data = data?.amadeusError;
+                res.StatusCode = data?.amadeusError?.errorCode.Value != 0 ? data.amadeusError.errorCode.Value : 500;
+            }
+            else
+            {
+                res.Data = data;
+            }
+
+            return Ok(res);
+
+        }
 
     }
 }

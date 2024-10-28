@@ -17,6 +17,7 @@ using ReservationSystem.Domain.Models.AddPnrMulti;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Globalization;
 using ReservationSystem.Domain.Repositories;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -24,12 +25,91 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public AddPnrMultiRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly IHelperRepository _helperRepository;
+        public AddPnrMultiRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cache = cache;
+            _helperRepository = helperRepository;
         }
+        public async Task<PnrCommitResponse?> CommitPNR(PnrCommitRequest requestModel)
+        {
+            PnrCommitResponse pnrCommit = new PnrCommitResponse();
+            try
+            {
 
+                var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = amadeusSettings["ApiUrl"]; 
+                var _action = amadeusSettings["PNR_AddMultiElements"];
+                string Result = string.Empty;
+                string Envelope = await CreatePnrCommitRequest(requestModel);
+                string ns = "http://xml.amadeus.com/PNRACC_21_1_1A";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Headers.Add("SOAPAction", _action);
+                request.ContentType = "text/xml;charset=\"utf-8\"";
+                request.Accept = "text/xml";
+                request.Method = "POST";
+
+                using (Stream stream = request.GetRequestStream())
+                {
+                    byte[] content = Encoding.UTF8.GetBytes(Envelope);
+                    stream.Write(content, 0, content.Length);
+                }
+
+                try
+                {
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        using (StreamReader rd = new StreamReader(response.GetResponseStream()))
+                        {
+                            var result2 = rd.ReadToEnd();
+                            XDocument xmlDoc = XDocument.Parse(result2);
+                            await _helperRepository.SaveXmlResponse("CommitPNRResponse", result2);   
+                            XmlDocument xmlDoc2 = new XmlDocument();
+                            xmlDoc2.LoadXml(result2);
+                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "CommitPNRResponseJson");
+                            XNamespace fareNS = ns;
+                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
+                            if (errorInfo != null)
+                            {                                
+                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
+                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
+                                pnrCommit.amadeusError = new AmadeusResponseError();
+                                pnrCommit.amadeusError.error = errorText;
+                                pnrCommit.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                return pnrCommit;
+
+                            }
+
+                           var res = ConvertXmlToModel(xmlDoc, ns);
+                           // pnrCommit = res;
+
+                        }
+                    }
+                }
+                catch (WebException ex)
+                {
+                    using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        Result = rd.ReadToEnd();
+                        pnrCommit.amadeusError = new AmadeusResponseError();
+                        pnrCommit.amadeusError.error = Result;
+                        pnrCommit.amadeusError.errorCode = 0;
+                        return pnrCommit;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                pnrCommit.amadeusError = new AmadeusResponseError();
+                pnrCommit.amadeusError.error = ex.Message.ToString();
+                pnrCommit.amadeusError.errorCode = 0;
+                return pnrCommit;
+            }
+            return pnrCommit;
+        }
         public async Task<AddPnrMultiResponse> AddPnrMulti(AddPnrMultiRequset requestModel)
         {
             AddPnrMultiResponse AirSell = new AddPnrMultiResponse();
@@ -63,27 +143,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,
-                                OmitXmlDeclaration = false,
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\PNRMultiResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-
+                            await _helperRepository.SaveXmlResponse("PNRMultiResponse", result2); 
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "PNRMultiResponseJson");
                             XNamespace fareNS = ns;
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
                             if (errorInfo != null)
@@ -716,6 +780,108 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
                 return "Error while generate pwd " + ex.Message.ToString();
             }
+        }
+
+        public async Task<string> CreatePnrCommitRequest(PnrCommitRequest requestModel)
+        {
+
+            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            string action = amadeusSettings["PNR_AddMultiElements"];
+            string to = amadeusSettings["ApiUrl"];
+           string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+      <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+      <ses:Session TransactionStatusCode=""{requestModel.sessionDetails.TransactionStatusCode}"">
+      <ses:SessionId>{requestModel.sessionDetails.SessionId}</ses:SessionId>
+      <ses:SequenceNumber>{requestModel.sessionDetails.SequenceNumber + 1}</ses:SequenceNumber>
+      <ses:SecurityToken>{requestModel.sessionDetails.SecurityToken}</ses:SecurityToken>
+    </ses:Session>
+    <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+    <add:Action>{action}</add:Action>
+    <add:To>{to}</add:To>  
+    <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+   </soap:Header>
+   <soap:Body>
+     <PNR_AddMultiElements>
+          <pnrActions>
+            <optionCode>{requestModel.optionCode1}</optionCode>
+            <optionCode>{requestModel.optionCode2}</optionCode>
+          </pnrActions>
+    </PNR_AddMultiElements>
+   </soap:Body>
+</soap:Envelope>";
+
+            return Request;
+        }
+
+        public PnrCommitResponse ConvertXmlToModelCommitPnr(XDocument response, string amadeusns)
+        {
+            PnrCommitResponse ReturnModel = new PnrCommitResponse();
+           
+            XDocument doc = response;
+
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+            XNamespace amadeus = amadeusns;
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                ReturnModel.session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
+            ReturnModel.PNRHeader = new PNRHeader();
+            var pnrHeader = doc?.Descendants(amadeus + "pnrHeader")?.FirstOrDefault();
+            if (pnrHeader != null)
+            {
+                var companyId = pnrHeader?.Descendants(amadeus + "reservationInfo")?.Descendants(amadeus + "reservation")?.Descendants(amadeus + "companyId")?.FirstOrDefault()?.Value;
+                var controlNumber = pnrHeader?.Descendants(amadeus + "reservationInfo")?.Descendants(amadeus + "reservation")?.Descendants(amadeus + "controlNumber")?.FirstOrDefault()?.Value;
+                ReturnModel.PNRHeader.Reservation = new Reservation { companyId = companyId, controlNumber = controlNumber, PNR = controlNumber };
+            }
+            var securityInformation = doc?.Descendants(amadeus + "securityInformation")?.FirstOrDefault();
+            if(securityInformation != null)
+            {
+                var typeOfPnrElement = doc?.Descendants(amadeus + "responsibilityInformation")?.Descendants(amadeus + "typeOfPnrElement")?.FirstOrDefault()?.Value;
+                ReturnModel.PNRHeader.pnrSecurityInformation = new PnrSecurityInformation
+                {
+                    responsibilityInformation = new ResponsibilityInformation
+                    {
+                        typeOfPnrElement = typeOfPnrElement
+                    }
+                };
+            }
+            var sbrPOSDetails = doc?.Descendants(amadeus + "sbrPOSDetails")?.FirstOrDefault();
+            if(sbrPOSDetails != null)
+            {
+                ReturnModel.PNRHeader.sbrPOSDetails = sbrPOSDetails;
+            }
+            var sbrCreationPosDetails = doc?.Descendants(amadeus + "sbrCreationPosDetails")?.FirstOrDefault();
+            if (sbrCreationPosDetails != null)
+            {
+                ReturnModel.PNRHeader.sbrCreationPosDetails = sbrCreationPosDetails;
+            }
+            var sbrUpdatorPosDetails = doc?.Descendants(amadeus + "sbrUpdatorPosDetails")?.FirstOrDefault();
+            if (sbrUpdatorPosDetails != null)
+            {
+                ReturnModel.PNRHeader.sbrCreationPosDetails = sbrUpdatorPosDetails;
+            }
+            var originDestinationDetails = doc?.Descendants(amadeus + "originDestinationDetails")?.FirstOrDefault();
+            if (originDestinationDetails != null)
+            {
+                ReturnModel.PNRHeader.sbrCreationPosDetails = originDestinationDetails;
+            }
+
+
+            return ReturnModel;
         }
     }
 }

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:awsse="http://xml.amadeus.com/2010/06/Session_v3" xmlns:wsa="http://www.w3.org/2005/08/addressing">
+  <soapenv:Header>
+    <wsa:To>http://www.w3.org/2005/08/addressing/anonymous</wsa:To>
+    <wsa:From>
+      <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
+    </wsa:From>
+    <wsa:Action>http://webservices.amadeus.com/FMPTBQ_24_1_1A</wsa:Action>
+    <wsa:MessageID>urn:uuid:beca056f-1df8-5154-29b5-bf511fa19435</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">9ef5508a-d955-4424-b5d6-8ab91f4e29d6</wsa:RelatesTo>
+    <awsse:Session TransactionStatusCode="End">
+      <awsse:SessionId>01NHBC6DTN</awsse:SessionId>
+      <awsse:SequenceNumber>1</awsse:SequenceNumber>
+      <awsse:SecurityToken>21CFY2UMZVMBB2ECQLZGMQ5NS8</awsse:SecurityToken>
+    </awsse:Session>
+  </soapenv:Header>
+  <soapenv:Body>
+    <Fare_MasterPricerTravelBoardSearchReply xmlns="http://xml.amadeus.com/FMPTBR_24_1_1A">
+      <errorMessage>
+        <applicationError>
+          <applicationErrorDetail>
+            <error>118</error>
+          </applicationErrorDetail>
+        </applicationError>
+        <errorMessageText>
+          <freeTextQualification>
+            <textSubjectQualifier>3</textSubjectQualifier>
+          </freeTextQualification>
+          <description>Transaction unable to process : PRI (60257 / 369)</description>
+        </errorMessageText>
+      </errorMessage>
+    </Fare_MasterPricerTravelBoardSearchReply>
+  </soapenv:Body>
+</soapenv:Envelope>

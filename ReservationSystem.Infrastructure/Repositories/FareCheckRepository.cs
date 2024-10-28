@@ -25,10 +25,12 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public FareCheckRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly IHelperRepository _helperRepository;
+        public FareCheckRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cache = cache;
+            _helperRepository = helperRepository;
         }
         public async Task<FareCheckReturnModel> FareCheckRequest(FareCheckModel fareCheckRequest)
         {
@@ -61,27 +63,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,
-                                OmitXmlDeclaration = false,
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\FareCheckResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-                           
+                            await _helperRepository.SaveXmlResponse("FareCheckResponse", result2);                            
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "FareCheckResponseJson");
                             XNamespace fareNS = "http://xml.amadeus.com/FARQNR_07_1_1A";
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
                             if (errorInfo != null)
