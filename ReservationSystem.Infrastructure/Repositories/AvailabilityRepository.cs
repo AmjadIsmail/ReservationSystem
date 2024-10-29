@@ -180,9 +180,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                 {
                     res = res + "&infants=" + request.infant;
                 }
-                if (!String.IsNullOrEmpty(request.travelClass))
+                if (!String.IsNullOrEmpty(request.cabinClass))
                 {
-                    res = res + "&travelClass=" + request.travelClass;
+                    res = res + "&travelClass=" + request.cabinClass;
                 }
                 if(request.nonStop != null)
                 {

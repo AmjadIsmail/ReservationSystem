@@ -26,7 +26,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
 
     public class SegmentInformation
     {
-        public travelProductInformation? travelProductInformation { get; set; }
+        public List<travelProductInformation>? travelProductInformation { get; set; }
     }
     public class travelProductInformation
     {

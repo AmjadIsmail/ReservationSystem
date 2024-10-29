@@ -277,14 +277,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             </pricingTickInfo>           
          </fareOptions> 
 <travelFlightInfo>
-            <companyIdentity>
-               <carrierQualifier>X</carrierQualifier>
-               <carrierId>NK</carrierId>
-               <carrierId>F9</carrierId>
-            </companyIdentity>
-            <flightDetail>
-               <flightType>N</flightType>
-            </flightDetail>
+           "+getCabinClass(requestModel.cabinClass)+@"
+           "+getFlightType(requestModel.flightType)+@"
 </travelFlightInfo>
          <itinerary>
             <requestedSegmentRef>
@@ -332,6 +326,41 @@ namespace ReservationSystem.Infrastructure.Repositories
 </soapenv:Envelope>";
 
             return Request;
+        }
+        private string getCabinClass (string cabinclass)
+        {
+            string returncabinClass = @"";
+            try
+            {
+                if (!string.IsNullOrEmpty(cabinclass))
+                {
+                    returncabinClass = returncabinClass + @"  
+            <cabinId>
+             <cabin>"+cabinclass+@"</cabin>
+            </cabinId>";
+                }
+            }
+            catch
+            {
+
+            }
+            return returncabinClass;
+        }
+        private string getFlightType(string flightType)
+        {
+            string returnflightType = @"";
+            try
+            {
+                if (!string.IsNullOrEmpty(flightType))
+                {
+                    returnflightType = returnflightType + @"  
+                    <flightDetail>
+                    <flightType>"+ flightType + @"</flightType>
+                   </flightDetail>";
+                }
+            }
+            catch{}
+            return returnflightType;
         }
         public AvailabilityModel ConvertXmlToModel(XDocument response)
         {

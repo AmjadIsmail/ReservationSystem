@@ -15,7 +15,8 @@ namespace ReservationSystem.Domain.Models.Availability
         public int? adults { get; set; }
         public int? children { get; set; }
         public int? infant { get; set; }
-        public string? travelClass { get; set; }
+        public string? cabinClass { get; set; }
+        public string? flightType { get; set; } // direct / indirect
         public string? includeAirlines { get; set; }
         public string? excludeAirlines { get; set; }
         public bool? nonStop { get; set; }
