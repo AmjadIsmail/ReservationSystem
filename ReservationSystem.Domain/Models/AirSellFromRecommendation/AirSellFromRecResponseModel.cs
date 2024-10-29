@@ -19,7 +19,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
     {
         public string? messageFunction { get; set; }
         public OriginDestination? originDestination { get; set; }
-        public AirSellFlightDetails? flightDetails { get; set; }
+        public List<AirSellFlightDetails>? flightDetails { get; set; }
     }
 
     public class OriginDestination

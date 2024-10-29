@@ -30,10 +30,12 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly IHelperRepository _helperRepository;
+        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository)
         {
             configuration = _configuration;
             _cache = cache;
+            _helperRepository = helperRepository;
         }
 
         public async Task<FlightPriceReturnModel> GetFlightPrice(FlightPriceMoelSoap requestModel)
@@ -68,24 +70,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,
-                                OmitXmlDeclaration = false,
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\FlightPriceResponse" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-
+                            await _helperRepository.SaveXmlResponse("FlightPrice_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("FlightPrice_Response", result2);
+                            XmlDocument xmlDoc2 = new XmlDocument();
+                            xmlDoc2.LoadXml(result2);
+                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "FlightPriceResponseJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -97,12 +87,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 return flightPrice;
 
                             }
-                            XmlDocument xmlDoc2 = new XmlDocument();
-                            xmlDoc2.LoadXml(result2);
-                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            
                             var res = ConvertXmlToModel(xmlDoc);
                             flightPrice = res;
-                            // flightPrice.Session = res.Session;
+                           
 
                         }
                     }
@@ -252,58 +240,69 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 string group = $@"";
+                int ob = 1;
+                foreach(var modelo in model.outbound)
+                {
+                    group = group + $@"<segmentGroup>
+                    <segmentInformation>
+                       <flightDate>
+                          <departureDate>{modelo.departure_date.Replace("-", "")}</departureDate>
+                          <departureTime>{modelo.departure_time.Replace(":", "")}</departureTime>
+                       </flightDate>
+                       <boardPointDetails>
+                          <trueLocationId>{modelo.airport_from.Replace("-", "")}</trueLocationId>
+                       </boardPointDetails>
+                       <offpointDetails>
+                          <trueLocationId>{modelo.airport_to.Replace("-", "")}</trueLocationId>
+                       </offpointDetails>
+                       <companyDetails>
+                          <marketingCompany>{modelo.marketing_company}</marketingCompany>
+                       </companyDetails>
+                       <flightIdentification>
+                          <flightNumber>{modelo.flight_number}</flightNumber>
+                          <bookingClass>{modelo.booking_class}</bookingClass>
+                       </flightIdentification>
+                       <flightTypeDetails>
+                          <flightIndicator>1</flightIndicator>
+                       </flightTypeDetails>
+                       <itemNumber>{ob}</itemNumber>
+                             </segmentInformation>
+                            </segmentGroup>";
+                    ob++;
+                }
+                int ib = model.outbound.Count() +1;
+                foreach (var modeli in model.inbound)
+                {
+                    group = group + $@"<segmentGroup>
+                    <segmentInformation>
+                       <flightDate>
+                          <departureDate>{modeli.departure_date.Replace("-", "")}</departureDate>
+                          <departureTime>{modeli.departure_time.Replace(":", "")}</departureTime>
+                       </flightDate>
+                       <boardPointDetails>
+                          <trueLocationId>{modeli.airport_from.Replace("-", "")}</trueLocationId>
+                       </boardPointDetails>
+                       <offpointDetails>
+                          <trueLocationId>{modeli.airport_to.Replace("-", "")}</trueLocationId>
+                       </offpointDetails>
+                       <companyDetails>
+                          <marketingCompany>{modeli.marketing_company}</marketingCompany>
+                       </companyDetails>
+                       <flightIdentification>
+                          <flightNumber>{modeli.flight_number}</flightNumber>
+                          <bookingClass>{modeli.booking_class}</bookingClass>
+                       </flightIdentification>
+                       <flightTypeDetails>
+                          <flightIndicator>2</flightIndicator>
+                       </flightTypeDetails>
+                       <itemNumber>{ib}</itemNumber>
+                             </segmentInformation>
+                            </segmentGroup>";
+                    ib++;
+                }
 
-                group = $@"<segmentGroup>
-            <segmentInformation>
-               <flightDate>
-                  <departureDate>{model.outbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.outbound.departure_time.Replace(":", "")}</departureTime>
-               </flightDate>
-               <boardPointDetails>
-                  <trueLocationId>{model.outbound.airport_from.Replace("-", "")}</trueLocationId>
-               </boardPointDetails>
-               <offpointDetails>
-                  <trueLocationId>{model.outbound.airport_to.Replace("-", "")}</trueLocationId>
-               </offpointDetails>
-               <companyDetails>
-                  <marketingCompany>{model.outbound.marketing_company}</marketingCompany>
-               </companyDetails>
-               <flightIdentification>
-                  <flightNumber>{model.outbound.flight_number}</flightNumber>
-                  <bookingClass>{model.outbound.booking_class}</bookingClass>
-               </flightIdentification>
-               <flightTypeDetails>
-                  <flightIndicator>1</flightIndicator>
-               </flightTypeDetails>
-               <itemNumber>1</itemNumber>
-            </segmentInformation>
-         </segmentGroup>
-            <segmentGroup>
-            <segmentInformation>
-               <flightDate>
-                  <departureDate>{model.inbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.inbound.departure_time.Replace(":", "")}</departureTime>
-               </flightDate>
-               <boardPointDetails>
-                  <trueLocationId>{model.inbound.airport_from}</trueLocationId>
-               </boardPointDetails>
-               <offpointDetails>
-                  <trueLocationId>{model.inbound.airport_to}</trueLocationId>
-               </offpointDetails>
-               <companyDetails>
-                  <marketingCompany>{model.inbound.marketing_company}</marketingCompany>
-               </companyDetails>
-               <flightIdentification>
-                  <flightNumber>{model.inbound.flight_number}</flightNumber>
-                  <bookingClass>{model.inbound.booking_class}</bookingClass>
-               </flightIdentification>
-               <flightTypeDetails>
-                  <flightIndicator>2</flightIndicator>
-               </flightTypeDetails>
-               <itemNumber>2</itemNumber>
-            </segmentInformation>
-         </segmentGroup>
-        ";
+
+
 
                 return group;
             }
@@ -333,7 +332,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
         <add:Action>{action}</add:Action>
       <add:To>{to}</add:To>
-        <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+      <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
       <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
          <oas:UsernameToken oas1:Id=""UsernameToken-1"">
             <oas:Username>{username}</oas:Username>

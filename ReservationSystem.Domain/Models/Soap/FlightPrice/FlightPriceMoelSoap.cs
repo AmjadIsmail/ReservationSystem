@@ -15,8 +15,8 @@ namespace ReservationSystem.Domain.Models.Soap.FlightPrice
         public int? infant { get; set; }
         public string? pricingOptionKey { get; set; }
 
-        public FlightSegmentSoap outbound { get; set; }
-        public FlightSegmentSoap inbound { get; set; }
+        public List<FlightSegmentSoap> outbound { get; set; }
+        public List<FlightSegmentSoap> inbound { get; set; }
     }
     public class FlightSegmentSoap
     {

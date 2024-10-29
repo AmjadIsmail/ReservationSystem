@@ -10,7 +10,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
 {
     public class AirSellFromRecommendationRequest
     {
-        public HeaderSession sessionDetails { get; set; }
+       // public HeaderSession sessionDetails { get; set; }
         public string? messageFunction { get; set; }
         public string? additionalMessageFunction { get; set; }
         public ItineraryDetails? outBound { get; set; }
@@ -26,7 +26,7 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
 
     public class SegmentInformation
     {
-        public travelProductInformation? travelProductInformation { get; set; }
+        public List<travelProductInformation>? travelProductInformation { get; set; }
     }
     public class travelProductInformation
     {
