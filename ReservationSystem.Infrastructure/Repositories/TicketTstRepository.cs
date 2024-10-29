@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml;
 using ReservationSystem.Domain.Models.TicketTst;
+using ReservationSystem.Domain.Models;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -98,8 +99,8 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                             }
 
-                            // var res = ConvertXmlToModel(xmlDoc, ns);
-                            //  fopResponse = res;
+                            var res = ConvertXmlToModel(xmlDoc, ns);
+                            fopResponse = res;
 
                         }
                     }
@@ -203,6 +204,77 @@ namespace ReservationSystem.Infrastructure.Repositories
 </soap:Envelope>";
 
             return Request;
+        }
+
+        public TicketTstResponse ConvertXmlToModel(XDocument response, string amadeusns)
+        {
+            TicketTstResponse ReturnModel = new TicketTstResponse();
+            TicketTstResponseDetails detail = new TicketTstResponseDetails();
+            ReturnModel.responseDetails = detail;
+            XDocument doc = response;
+
+            XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";
+            XNamespace wsa = "http://www.w3.org/2005/08/addressing";
+
+            var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
+            if (sessionElement != null)
+            {
+                string sessionId = sessionElement.Element(awsse + "SessionId")?.Value;
+                string sequenceNumber = sessionElement.Element(awsse + "SequenceNumber")?.Value;
+                string securityToken = sessionElement.Element(awsse + "SecurityToken")?.Value;
+                string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
+                int SeqNumber = 0;
+                if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
+                ReturnModel.session = new HeaderSession
+                {
+                    SecurityToken = securityToken,
+                    SequenceNumber = SeqNumber,
+                    SessionId = sessionId,
+                    TransactionStatusCode = TransactionStatusCode
+                };
+            }
+         
+            XNamespace amadeus = amadeusns;
+
+            var tstList = doc.Descendants(amadeus + "tstList")?.ToList();
+           
+            if (tstList != null)
+            {
+                detail.tstList = new List<TstList>();
+             foreach(var lst in tstList)
+                {
+                    TstList tst = new TstList();
+                    var tstReference = lst.Descendants(amadeus + "tstReference")?.FirstOrDefault();
+                    if(tstReference != null)
+                    {
+                        var referenceType = tstReference.Descendants(amadeus + "referenceType")?.FirstOrDefault()?.Value;
+                        var uniqueReference = tstReference.Descendants(amadeus + "uniqueReference")?.FirstOrDefault()?.Value;
+                        var iDSequenceNumber = tstReference.Descendants(amadeus + "iDDescription")?.Descendants(amadeus + "iDSequenceNumber")?.FirstOrDefault()?.Value;
+                        tst.TstReference = new TstReference
+                        {
+                            IDDescription = new IDDescription { IDSequenceNumber = iDSequenceNumber != null ? Convert.ToInt16(iDSequenceNumber) : 0 },
+                            UniqueReference = uniqueReference != null ? Convert.ToInt16 (uniqueReference) : 0,
+                            ReferenceType = referenceType
+                        };
+                    }
+                    var paxInformation = lst.Descendants(amadeus + "paxInformation")?.FirstOrDefault();
+                    if( paxInformation != null)
+                    {
+                        var refQualifier = paxInformation.Descendants(amadeus + "refDetails")?.Descendants(amadeus+ "refQualifier")?.FirstOrDefault()?.Value;
+                        var refNumber = paxInformation.Descendants(amadeus + "refDetails")?.Descendants(amadeus + "refNumber")?.FirstOrDefault()?.Value;
+                        tst.PaxInformation = new PaxInformation
+                        {
+                            RefDetails = new Domain.Models.TicketTst.RefDetails
+                            {
+                                RefNumber = refNumber != null ? Convert.ToInt16(refNumber): 0,
+                                RefQualifier = refQualifier
+                            }
+                        };
+                    }
+                    detail.tstList.Add(tst);
+                }
+            }
+            return ReturnModel;
         }
     }
 }

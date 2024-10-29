@@ -88,8 +88,8 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                             }
 
-                           var res = ConvertXmlToModel(xmlDoc, ns);
-                           // pnrCommit = res;
+                           var res = ConvertXmlToModelCommitPnr(xmlDoc, ns);
+                            pnrCommit = res;
 
                         }
                     }
@@ -303,7 +303,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 firstName = passengerFirstName,
                                 type = passengertype,
                                 dob = passengerDob
+                            },
+                            traveler = new Traveller
+                            {
+                                surname = travellerSurname,
+                                quantity = travellerquantity
                             }
+
                         };
                     }
                     var enhancedPassengerData = info.Descendants(amadeus + "enhancedPassengerData")?.ToList();

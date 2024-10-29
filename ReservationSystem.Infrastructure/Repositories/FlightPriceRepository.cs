@@ -240,58 +240,69 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 string group = $@"";
+                int ob = 1;
+                foreach(var modelo in model.outbound)
+                {
+                    group = group + $@"<segmentGroup>
+                    <segmentInformation>
+                       <flightDate>
+                          <departureDate>{modelo.departure_date.Replace("-", "")}</departureDate>
+                          <departureTime>{modelo.departure_time.Replace(":", "")}</departureTime>
+                       </flightDate>
+                       <boardPointDetails>
+                          <trueLocationId>{modelo.airport_from.Replace("-", "")}</trueLocationId>
+                       </boardPointDetails>
+                       <offpointDetails>
+                          <trueLocationId>{modelo.airport_to.Replace("-", "")}</trueLocationId>
+                       </offpointDetails>
+                       <companyDetails>
+                          <marketingCompany>{modelo.marketing_company}</marketingCompany>
+                       </companyDetails>
+                       <flightIdentification>
+                          <flightNumber>{modelo.flight_number}</flightNumber>
+                          <bookingClass>{modelo.booking_class}</bookingClass>
+                       </flightIdentification>
+                       <flightTypeDetails>
+                          <flightIndicator>1</flightIndicator>
+                       </flightTypeDetails>
+                       <itemNumber>{ob}</itemNumber>
+                             </segmentInformation>
+                            </segmentGroup>";
+                    ob++;
+                }
+                int ib = model.outbound.Count() +1;
+                foreach (var modeli in model.inbound)
+                {
+                    group = group + $@"<segmentGroup>
+                    <segmentInformation>
+                       <flightDate>
+                          <departureDate>{modeli.departure_date.Replace("-", "")}</departureDate>
+                          <departureTime>{modeli.departure_time.Replace(":", "")}</departureTime>
+                       </flightDate>
+                       <boardPointDetails>
+                          <trueLocationId>{modeli.airport_from.Replace("-", "")}</trueLocationId>
+                       </boardPointDetails>
+                       <offpointDetails>
+                          <trueLocationId>{modeli.airport_to.Replace("-", "")}</trueLocationId>
+                       </offpointDetails>
+                       <companyDetails>
+                          <marketingCompany>{modeli.marketing_company}</marketingCompany>
+                       </companyDetails>
+                       <flightIdentification>
+                          <flightNumber>{modeli.flight_number}</flightNumber>
+                          <bookingClass>{modeli.booking_class}</bookingClass>
+                       </flightIdentification>
+                       <flightTypeDetails>
+                          <flightIndicator>2</flightIndicator>
+                       </flightTypeDetails>
+                       <itemNumber>{ib}</itemNumber>
+                             </segmentInformation>
+                            </segmentGroup>";
+                    ib++;
+                }
 
-                group = $@"<segmentGroup>
-            <segmentInformation>
-               <flightDate>
-                  <departureDate>{model.outbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.outbound.departure_time.Replace(":", "")}</departureTime>
-               </flightDate>
-               <boardPointDetails>
-                  <trueLocationId>{model.outbound.airport_from.Replace("-", "")}</trueLocationId>
-               </boardPointDetails>
-               <offpointDetails>
-                  <trueLocationId>{model.outbound.airport_to.Replace("-", "")}</trueLocationId>
-               </offpointDetails>
-               <companyDetails>
-                  <marketingCompany>{model.outbound.marketing_company}</marketingCompany>
-               </companyDetails>
-               <flightIdentification>
-                  <flightNumber>{model.outbound.flight_number}</flightNumber>
-                  <bookingClass>{model.outbound.booking_class}</bookingClass>
-               </flightIdentification>
-               <flightTypeDetails>
-                  <flightIndicator>1</flightIndicator>
-               </flightTypeDetails>
-               <itemNumber>1</itemNumber>
-            </segmentInformation>
-         </segmentGroup>
-            <segmentGroup>
-            <segmentInformation>
-               <flightDate>
-                  <departureDate>{model.inbound.departure_date.Replace("-", "")}</departureDate>
-                  <departureTime>{model.inbound.departure_time.Replace(":", "")}</departureTime>
-               </flightDate>
-               <boardPointDetails>
-                  <trueLocationId>{model.inbound.airport_from}</trueLocationId>
-               </boardPointDetails>
-               <offpointDetails>
-                  <trueLocationId>{model.inbound.airport_to}</trueLocationId>
-               </offpointDetails>
-               <companyDetails>
-                  <marketingCompany>{model.inbound.marketing_company}</marketingCompany>
-               </companyDetails>
-               <flightIdentification>
-                  <flightNumber>{model.inbound.flight_number}</flightNumber>
-                  <bookingClass>{model.inbound.booking_class}</bookingClass>
-               </flightIdentification>
-               <flightTypeDetails>
-                  <flightIndicator>2</flightIndicator>
-               </flightTypeDetails>
-               <itemNumber>2</itemNumber>
-            </segmentInformation>
-         </segmentGroup>
-        ";
+
+
 
                 return group;
             }
