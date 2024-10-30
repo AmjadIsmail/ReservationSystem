@@ -18,6 +18,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Globalization;
 using ReservationSystem.Domain.DB_Models;
 using Newtonsoft.Json;
+using System.Data;
 
 
 namespace ReservationSystem.Infrastructure.Repositories
@@ -369,6 +370,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             XNamespace amadeus = "http://xml.amadeus.com/FMPTBR_24_1_1A";
+            var AirlineCache = _cacheService.GetAirlines();
+            var AirportCache = _cacheService.GetAirports();
 
             List<Itinerary>  itinerariesList = new List<Itinerary>();
             
@@ -406,24 +409,32 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
+                        DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
+                        var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
                         var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
+                        DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
+                        var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+
                         var arrivalTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
 
                         var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
+                        DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
+                        var carriername = carrier != null ? carrier[1].ToString() : "";
                         var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
                         Segment segment = new Segment();
                         string dateTimeStr = departureDate + departureTime;
                         string format = "ddMMyyHHmm";
                         DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
-                        segment.departure = new Departure { at = departureD, iataCode = departureLocation , terminal = departureTerminal  };
+                        segment.departure = new Departure { at = departureD, iataCode = departureLocation , terminal = departureTerminal , iataName = depAirportName  };
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
-                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal };
+                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal ,  iataName=arrAirportName };
                         segment.carrierCode = marketingCarrier;
+                        segment.carrierName = carriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
