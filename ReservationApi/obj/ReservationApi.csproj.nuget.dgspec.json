@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[0.10.0, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.4.2, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[8.0.6, )"
@@ -206,6 +210,10 @@
               "target": "Package",
               "version": "[0.10.0, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.4.2, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[8.0.6, )"
@@ -300,6 +308,10 @@
             "Codaxy.Xsd2": {
               "target": "Package",
               "version": "[0.10.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.4.2, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
@@ -407,6 +419,10 @@
             "Codaxy.Xsd2": {
               "target": "Package",
               "version": "[0.10.0, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.4.2, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

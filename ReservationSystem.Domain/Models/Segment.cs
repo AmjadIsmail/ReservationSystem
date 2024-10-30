@@ -11,6 +11,7 @@ namespace ReservationSystem.Domain.Models
         public Departure? departure { get; set; }
         public Arrival? arrival { get; set; }
         public string? carrierCode { get; set; }
+        public string? carrierName { get; set; }
         public string? number { get; set; }
         public Aircraft? aircraft { get; set; }
         public Operating? operating { get; set; }

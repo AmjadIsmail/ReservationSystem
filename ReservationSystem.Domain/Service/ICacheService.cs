@@ -1,6 +1,7 @@
 ﻿using ReservationSystem.Domain.DB_Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,5 +22,12 @@ namespace ReservationSystem.Domain.Service
         public void RemoveAll();
 
         public List<FlightMarkup> GetFlightsMarkup();
+
+        public DataTable GetAirlines();
+        public Task<DataTable> SetAirlineDataTableFromExcelToCache();
+
+        public Task<DataTable> SetAirportToCache();
+
+        public DataTable GetAirports();
     }
 }

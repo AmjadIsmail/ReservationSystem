@@ -7,6 +7,7 @@ using ReservationSystem.Domain.Models;
 using ReservationSystem.Domain.Models.Availability;
 using ReservationSystem.Domain.Repositories;
 using ReservationSystem.Domain.Service;
+using ReservationSystem.Infrastructure.Service;
 using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -33,8 +34,8 @@ namespace ReservationApi.Controllers
         {           
            
             ApiResponse res = new ApiResponse();
-             
-                var data = await _availability.GetAvailability( availabilityRequest);
+            
+             var data = await _availability.GetAvailability( availabilityRequest);
               
                 res.IsSuccessful = data?.amadeusError == null ? true : false;
                 res.StatusCode = data?.amadeusError == null ? 200 : 500;
@@ -52,7 +53,7 @@ namespace ReservationApi.Controllers
             
             return Ok(res);
 
-        }
+        }        
 
         [HttpGet("clearCache")]
         public async Task<IActionResult> Get()
@@ -64,7 +65,6 @@ namespace ReservationApi.Controllers
             res.StatusCode = 200;
             res.Data = "Clear Success"; 
             return Ok(res);
-
         }
 
 
