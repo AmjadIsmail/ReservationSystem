@@ -35,6 +35,7 @@ builder.Services.AddScoped<IPricePnrRepository, PricePnrRepository>();
 builder.Services.AddScoped<ITicketTstRepository, TicketTstRepository>();
 builder.Services.AddScoped<IHelperRepository, HelperRepository>();
 builder.Services.AddScoped<IDBRepository, DBRepository>();
+builder.Services.AddScoped<IPnrRetreiveRepository, PnrRetreiveRepository>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Services.AddResponseCompression();

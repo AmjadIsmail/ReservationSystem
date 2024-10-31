@@ -35,8 +35,11 @@ namespace ReservationSystem.Domain.Models.AirSellFromRecommendation
         public TimeOnly? arrivalTime { get; set; }
         public string? dateVariation { get; set; }
         public string? fromAirport { get; set; }
+        public string? fromAirportName { get; set; }
         public string? toAirport { get; set; }
+        public string? toAirportName { get; set; }
         public string? marketingCompany { get; set; }
+        public string? marketingCompanyName { get; set; }
         public string? flightNumber { get; set; }
         public string? bookingClass { get; set; }
         public string? flightIndicator { get; set; }

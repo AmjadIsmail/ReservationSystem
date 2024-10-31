@@ -10,13 +10,13 @@ namespace ReservationSystem.Domain.Models.FareCheck
     [XmlRoot(ElementName = "Fare_CheckRulesReply", Namespace = "http://xml.amadeus.com/FARQNR_07_1_1A")]
     public class FareCheckRulesReply
     {
-        public HeaderSession? Session { get; set; }
+        public HeaderSession? session { get; set; }
 
         [XmlElement(ElementName = "transactionType")]
-        public TransactionType TransactionType { get; set; }
+        public TransactionType transactionType { get; set; }
 
         [XmlElement(ElementName = "flightDetails")]
-        public List<FlightDetailsFareCheck> FlightDetails { get; set; }
+        public List<FlightDetailsFareCheck> flightDetails { get; set; }
 
 
     }
@@ -24,52 +24,52 @@ namespace ReservationSystem.Domain.Models.FareCheck
     public class TransactionType
     {
         [XmlElement(ElementName = "messageFunctionDetails")]
-        public MessageFunctionDetails MessageFunctionDetails { get; set; }
+        public MessageFunctionDetails messageFunctionDetails { get; set; }
     }
 
     public class MessageFunctionDetails
     {
         [XmlElement(ElementName = "messageFunction")]
-        public string MessageFunction { get; set; }
+        public string messageFunction { get; set; }
     }
     public class FlightDetailsFareCheck
     {
         [XmlElement(ElementName = "nbOfSegments")]
-        public string NbOfSegments { get; set; }
+        public string nbOfSegments { get; set; }
 
         [XmlElement(ElementName = "qualificationFareDetails")]
-        public QualificationFareDetails QualificationFareDetails { get; set; }
+        public QualificationFareDetails qualificationFareDetails { get; set; }
 
         [XmlElement(ElementName = "transportService")]
-        public TransportService TransportService { get; set; }
-        public List<FlightErrorCode>? FlightErrorCodes { get; set; }
+        public TransportService transportService { get; set; }
+        public List<FlightErrorCode>? flightErrorCodes { get; set; }
 
         [XmlElement(ElementName = "fareDetailInfo")]
-        public FareDetailInfo FareDetailInfo { get; set; }
+        public FareDetailInfo fareDetailInfo { get; set; }
 
         [XmlElement(ElementName = "odiGrp")]
-        public OdiGrp OdiGrp { get; set; }
+        public OdiGrp odiGrp { get; set; }
 
         [XmlElement(ElementName = "travellerGrp")]
-        public TravellerGrp TravellerGrp { get; set; }
+        public TravellerGrp travellerGrp { get; set; }
 
         [XmlElement(ElementName = "itemGrp")]
-        public ItemGrp ItemGrp { get; set; }
+        public ItemGrp itemGrp { get; set; }
     }
     public class QualificationFareDetails
     {
         [XmlElement(ElementName = "additionalFareDetails")]
-        public AdditionalFareDetails AdditionalFareDetails { get; set; }
+        public AdditionalFareDetails additionalFareDetails { get; set; }
     }
     public class AdditionalFareDetails
     {
         [XmlElement(ElementName = "rateClass")]
-        public string RateClass { get; set; }
+        public string rateClass { get; set; }
     }
     public class TransportService
     {
         [XmlElement(ElementName = "companyIdentification")]
-        public CompanyIdentification CompanyIdentification { get; set; }
+        public CompanyIdentification companyIdentification { get; set; }
     }
     public class FlightErrorCode
     {
@@ -85,109 +85,109 @@ namespace ReservationSystem.Domain.Models.FareCheck
     public class CompanyIdentification
     {
         [XmlElement(ElementName = "marketingCompany")]
-        public string MarketingCompany { get; set; }
+        public string marketingCompany { get; set; }
     }
 
     public class FareDetailInfo
     {
         [XmlElement(ElementName = "nbOfUnits")]
-        public NbOfUnits NbOfUnits { get; set; }
+        public NbOfUnits nbOfUnits { get; set; }
 
         [XmlElement(ElementName = "fareDeatilInfo")]
-        public FareDetail FareDetail { get; set; }
+        public FareDetail fareDetail { get; set; }
     }
     public class NbOfUnits
     {
         [XmlElement(ElementName = "quantityDetails")]
-        public List<QuantityDetails> QuantityDetails { get; set; }
+        public List<QuantityDetails> quantityDetails { get; set; }
     }
 
     public class QuantityDetails
     {
         [XmlElement(ElementName = "numberOfUnit")]
-        public string NumberOfUnit { get; set; }
+        public string numberOfUnit { get; set; }
 
         [XmlElement(ElementName = "unitQualifier")]
-        public string UnitQualifier { get; set; }
+        public string unitQualifier { get; set; }
     }
     public class FareDetail
     {
         [XmlElement(ElementName = "fareTypeGrouping")]
-        public FareTypeGrouping FareTypeGrouping { get; set; }
+        public FareTypeGrouping fareTypeGrouping { get; set; }
     }
 
     public class FareTypeGrouping
     {
         [XmlElement(ElementName = "pricingGroup")]
-        public string PricingGroup { get; set; }
+        public string pricingGroup { get; set; }
     }
 
     public class OdiGrp
     {
         [XmlElement(ElementName = "originDestination")]
-        public OriginDestination OriginDestination { get; set; }
+        public OriginDestination originDestination { get; set; }
     }
     public class OriginDestination
     {
         [XmlElement(ElementName = "origin")]
-        public string Origin { get; set; }
+        public string origin { get; set; }
 
         [XmlElement(ElementName = "destination")]
-        public string Destination { get; set; }
+        public string destination { get; set; }
     }
 
     public class TravellerGrp
     {
         [XmlElement(ElementName = "travellerIdentRef")]
-        public TravellerIdentRef TravellerIdentRef { get; set; }
+        public TravellerIdentRef travellerIdentRef { get; set; }
     }
     public class TravellerIdentRef
     {
         [XmlElement(ElementName = "referenceDetails")]
-        public ReferenceDetails ReferenceDetails { get; set; }
+        public ReferenceDetails referenceDetails { get; set; }
     }
 
     public class ReferenceDetails
     {
         [XmlElement(ElementName = "type")]
-        public string Type { get; set; }
+        public string type { get; set; }
 
         [XmlElement(ElementName = "value")]
-        public string Value { get; set; }
+        public string value { get; set; }
         [XmlElement(ElementName = "fareRulesDetails")]
         public List<string>? fareRulesDetails { get; set; }
     }
     public class ItemGrp
     {
         [XmlElement(ElementName = "itemNb")]
-        public ItemNb ItemNb { get; set; }
+        public ItemNb itemNb { get; set; }
 
         [XmlElement(ElementName = "unitGrp")]
-        public UnitGrp UnitGrp { get; set; }
+        public UnitGrp unitGrp { get; set; }
     }
 
     public class ItemNb
     {
         [XmlElement(ElementName = "itemNumberDetails")]
-        public ItemNumberDetails ItemNumberDetails { get; set; }
+        public ItemNumberDetails itemNumberDetails { get; set; }
     }
     public class ItemNumberDetails
     {
         [XmlElement(ElementName = "number")]
-        public string Number { get; set; }
+        public string number { get; set; }
     }
 
     public class UnitGrp
     {
         [XmlElement(ElementName = "nbOfUnits")]
-        public NbOfUnits NbOfUnits { get; set; }
+        public NbOfUnits nbOfUnits { get; set; }
 
         [XmlElement(ElementName = "unitFareDetails")]
-        public UnitFareDetails UnitFareDetails { get; set; }
+        public UnitFareDetails unitFareDetails { get; set; }
     }
     public class UnitFareDetails
     {
         [XmlElement(ElementName = "fareTypeGrouping")]
-        public FareTypeGrouping FareTypeGrouping { get; set; }
+        public FareTypeGrouping fareTypeGrouping { get; set; }
     }
 }

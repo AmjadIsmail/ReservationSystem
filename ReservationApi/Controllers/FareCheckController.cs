@@ -45,7 +45,7 @@ namespace ReservationApi.Controllers
             {
                 res.Data = data.data;
                 res.Response = "Success";
-                res.Message = "Total Records found :" + data.data.FlightDetails.Count();
+                res.Message = "Total Records found :" + data.data.flightDetails.Count();
                 await _fareCheck.Security_Signout(_request.sessionDetails);
             }
 
