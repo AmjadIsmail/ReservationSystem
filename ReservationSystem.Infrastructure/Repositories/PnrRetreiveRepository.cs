@@ -62,12 +62,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("CommitPNR_Request", Envelope);
-                            await _helperRepository.SaveXmlResponse("CommitPNR_Response", result2);
+                            await _helperRepository.SaveXmlResponse("RetrivePNR_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("RetrivePNR_Response", result2);
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            await _helperRepository.SaveJson(jsonText, "CommitPNRResponseJson");
+                            await _helperRepository.SaveJson(jsonText, "RetrivePNRResponseJson");
                             XNamespace fareNS = ns;
                             var errorInfo = xmlDoc.Descendants(fareNS + "generalErrorInfo").FirstOrDefault();
                             if (errorInfo != null)
