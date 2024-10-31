@@ -10,10 +10,7 @@ namespace ReservationSystem.Domain.Models.FOP
 {
     public class FopResponseDetails
     {
-       // public HeaderSession? Session { get; set; }
-        public FOP_CreateFormOfPaymentReply? CreateFormOfPaymentReply { get;set; }      
-      //  public AmadeusResponseError? amadeusError { get; set; }
-
+        public FOP_CreateFormOfPaymentReply? CreateFormOfPaymentReply { get;set; } 
     }
     public class FOP_CreateFormOfPaymentReply
     {

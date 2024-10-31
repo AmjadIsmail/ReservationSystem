@@ -184,7 +184,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
                 int SeqNumber = 0;
                 if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
-                res.Session = new HeaderSession
+                res.session = new HeaderSession
                 {
                     SecurityToken = securityToken,
                     SequenceNumber = SeqNumber,

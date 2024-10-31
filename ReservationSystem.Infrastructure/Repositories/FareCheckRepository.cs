@@ -128,9 +128,9 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             List<Itinerary> itinerariesList = new List<Itinerary>();
             var messageFunction = doc.Descendants(amadeus + "transactionType")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault()?.Value;
-            fareCheck.TransactionType = new TransactionType();
-            fareCheck.TransactionType.MessageFunctionDetails = new MessageFunctionDetails();
-            fareCheck.TransactionType.MessageFunctionDetails.MessageFunction = messageFunction.ToString();
+            fareCheck.transactionType = new TransactionType();
+            fareCheck.transactionType.messageFunctionDetails = new MessageFunctionDetails();
+            fareCheck.transactionType.messageFunctionDetails.messageFunction = messageFunction.ToString();
             XNamespace awsse = "http://xml.amadeus.com/2010/06/Session_v3";
             XNamespace wsa = "http://www.w3.org/2005/08/addressing";
             var sessionElement = doc.Descendants(awsse + "Session").FirstOrDefault();
@@ -143,7 +143,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 string TransactionStatusCode = sessionElement.Attribute("TransactionStatusCode")?.Value;
                 int SeqNumber = 0;
                 if (sequenceNumber != null) { SeqNumber = Convert.ToInt32(sequenceNumber); }
-                fareCheck.Session = new HeaderSession
+                fareCheck.session = new HeaderSession
                 {
                     SecurityToken = securityToken,
                     SequenceNumber = SeqNumber,
@@ -152,17 +152,17 @@ namespace ReservationSystem.Infrastructure.Repositories
                 };
             }
             var flightDetails = doc.Descendants(amadeus + "flightDetails")?.ToList();
-            fareCheck.FlightDetails = new List<FlightDetailsFareCheck>();
+            fareCheck.flightDetails = new List<FlightDetailsFareCheck>();
             foreach (var item in flightDetails)
             {
                 var nbOfSegments = item.Descendants(amadeus + "nbOfSegments")?.FirstOrDefault()?.Value;
                 FlightDetailsFareCheck _flightfare = new FlightDetailsFareCheck();
-                _flightfare.NbOfSegments = nbOfSegments;
+                _flightfare.nbOfSegments = nbOfSegments;
                 var rateClass = item.Descendants(amadeus + "qualificationFareDetails").Descendants(amadeus + "additionalFareDetails")?.Descendants(amadeus + "rateClass")?.FirstOrDefault().Value;
-                _flightfare.QualificationFareDetails = new QualificationFareDetails { AdditionalFareDetails = new AdditionalFareDetails { RateClass = rateClass } };
+                _flightfare.qualificationFareDetails = new QualificationFareDetails { additionalFareDetails = new AdditionalFareDetails { rateClass = rateClass } };
                 var marketingCompany = item.Descendants(amadeus + "transportService")?.Descendants(amadeus + "companyIdentification")?.Descendants(amadeus + "marketingCompany")?.FirstOrDefault()?.Value;
-                _flightfare.TransportService = new TransportService { CompanyIdentification = new CompanyIdentification { MarketingCompany = marketingCompany } };
-                _flightfare.FlightErrorCodes = new List<FlightErrorCode>();
+                _flightfare.transportService = new TransportService { companyIdentification = new CompanyIdentification { marketingCompany = marketingCompany } };
+                _flightfare.flightErrorCodes = new List<FlightErrorCode>();
                 var flightErrorCode = item.Descendants(amadeus + "flightErrorCode")?.ToList();
                 foreach (var itemError in flightErrorCode)
                 {
@@ -170,23 +170,23 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var informationType = item.Descendants(amadeus + "freeTextQualification")?.Elements(amadeus + "informationType")?.FirstOrDefault()?.Value;
                     var freeText = item.Descendants(amadeus + "freeText")?.FirstOrDefault()?.Value;
                     FlightErrorCode code = new FlightErrorCode { freeText = freeText, informationType = informationType, textSubjectQualifier = textSubjectQualifier };
-                    _flightfare.FlightErrorCodes.Add(code);
+                    _flightfare.flightErrorCodes.Add(code);
                 }
 
                 var numberOfUnit = item.Descendants(amadeus + "fareDetailInfo")?.Descendants(amadeus + "nbOfUnits")?.Descendants(amadeus + "quantityDetails")?.Descendants(amadeus + "numberOfUnit")?.FirstOrDefault()?.Value;
 
                 var unitQualifier = item.Descendants(amadeus + "fareDetailInfo")?.Descendants(amadeus + "nbOfUnits")?.Descendants(amadeus + "quantityDetails")?.Descendants(amadeus + "unitQualifier")?.FirstOrDefault()?.Value;
-                _flightfare.FareDetailInfo = new FareDetailInfo();
-                _flightfare.FareDetailInfo.NbOfUnits = new NbOfUnits();
-                _flightfare.FareDetailInfo.NbOfUnits.QuantityDetails = new List<QuantityDetails>();
-                _flightfare.FareDetailInfo.NbOfUnits.QuantityDetails.Add(new QuantityDetails { NumberOfUnit = numberOfUnit, UnitQualifier = unitQualifier });
+                _flightfare.fareDetailInfo = new FareDetailInfo();
+                _flightfare.fareDetailInfo.nbOfUnits = new NbOfUnits();
+                _flightfare.fareDetailInfo.nbOfUnits.quantityDetails = new List<QuantityDetails>();
+                _flightfare.fareDetailInfo.nbOfUnits.quantityDetails.Add(new QuantityDetails { numberOfUnit = numberOfUnit, unitQualifier = unitQualifier });
 
                 var pricingGroup = item.Descendants(amadeus + "fareDetailInfo")?.Descendants(amadeus + "fareDeatilInfo")?.Descendants(amadeus + "fareTypeGrouping")?.Descendants(amadeus + "pricingGroup")?.FirstOrDefault()?.Value;
 
                 var origin = item.Descendants(amadeus + "odiGrp")?.Descendants(amadeus + "originDestination")?.Descendants(amadeus + "origin")?.FirstOrDefault()?.Value;
                 var destination = item.Descendants(amadeus + "odiGrp")?.Descendants(amadeus + "originDestination")?.Descendants(amadeus + "destination")?.FirstOrDefault()?.Value;
-                _flightfare.OdiGrp = new OdiGrp();
-                _flightfare.OdiGrp.OriginDestination = new OriginDestination { Destination = destination, Origin = origin };
+                _flightfare.odiGrp = new OdiGrp();
+                _flightfare.odiGrp.originDestination = new OriginDestination { destination = destination, origin = origin };
 
                 var travellerGrp_type = item.Descendants(amadeus + "travellerGrp")?.Descendants(amadeus + "travellerIdentRef")?.Descendants(amadeus + "referenceDetails")?.Descendants(amadeus + "type")?.FirstOrDefault()?.Value;
                 var travellerGrp_value = item.Descendants(amadeus + "travellerGrp")?.Descendants(amadeus + "travellerIdentRef")?.Descendants(amadeus + "referenceDetails")?.Descendants(amadeus + "value")?.FirstOrDefault()?.Value;
@@ -199,12 +199,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var Ruleid = Ruleitem.Element(amadeus + "ruleSectionId")?.Value;
                     ruleSectionIds.Add(Ruleid);
                 }
-                _flightfare.TravellerGrp = new TravellerGrp();
-                _flightfare.TravellerGrp.TravellerIdentRef = new TravellerIdentRef { ReferenceDetails = new ReferenceDetails { Type = travellerGrp_type, Value = travellerGrp_value, fareRulesDetails = ruleSectionIds } };
+                _flightfare.travellerGrp = new TravellerGrp();
+                _flightfare.travellerGrp.travellerIdentRef = new TravellerIdentRef { referenceDetails = new ReferenceDetails { type = travellerGrp_type, value = travellerGrp_value, fareRulesDetails = ruleSectionIds } };
 
                 var itemGrp_itemNb_itemNumberDetails_number = item.Descendants(amadeus + "itemGrp")?.Descendants(amadeus + "itemNb")?.Descendants(amadeus + "itemNumberDetails")?.Descendants(amadeus + "number")?.FirstOrDefault()?.Value;
-                _flightfare.ItemGrp = new ItemGrp();
-                _flightfare.ItemGrp.ItemNb = new ItemNb { ItemNumberDetails = new ItemNumberDetails { Number = itemGrp_itemNb_itemNumberDetails_number } };
+                _flightfare.itemGrp = new ItemGrp();
+                _flightfare.itemGrp.itemNb = new ItemNb { itemNumberDetails = new ItemNumberDetails { number = itemGrp_itemNb_itemNumberDetails_number } };
 
                 var quantityDetails = item.Descendants(amadeus + "itemGrp")?.Descendants(amadeus + "unitGrp")?.Descendants(amadeus + "nbOfUnits")?.Descendants(amadeus + "quantityDetails")?.ToList();
 
@@ -213,18 +213,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                 {
                     var unit = item.Descendants(amadeus + "numberOfUnit")?.FirstOrDefault()?.Value;
                     var qfy = item.Descendants(amadeus + "unitQualifier")?.FirstOrDefault()?.Value;
-                    QuantityDetails det = new QuantityDetails { NumberOfUnit = unit, UnitQualifier = qfy };
+                    QuantityDetails det = new QuantityDetails { numberOfUnit = unit, unitQualifier = qfy };
                     _quantitydetals.Add(det);
                 }
-                _flightfare.ItemGrp.UnitGrp = new UnitGrp();
-                _flightfare.ItemGrp.UnitGrp.NbOfUnits = new NbOfUnits();
-                _flightfare.ItemGrp.UnitGrp.NbOfUnits.QuantityDetails = new List<QuantityDetails>();
-                _flightfare.ItemGrp.UnitGrp.NbOfUnits.QuantityDetails.AddRange(_quantitydetals);
+                _flightfare.itemGrp.unitGrp = new UnitGrp();
+                _flightfare.itemGrp.unitGrp.nbOfUnits = new NbOfUnits();
+                _flightfare.itemGrp.unitGrp.nbOfUnits.quantityDetails = new List<QuantityDetails>();
+                _flightfare.itemGrp.unitGrp.nbOfUnits.quantityDetails.AddRange(_quantitydetals);
 
                 var farepricingGroup = item.Descendants(amadeus + "itemGrp")?.Descendants(amadeus + "unitGrp")?.Descendants(amadeus + "unitFareDetails")?.Descendants(amadeus + "fareTypeGrouping")?.Descendants(amadeus + "pricingGroup")?.FirstOrDefault()?.Value;
-                _flightfare.ItemGrp.UnitGrp.UnitFareDetails = new UnitFareDetails();
-                _flightfare.ItemGrp.UnitGrp.UnitFareDetails.FareTypeGrouping = new FareTypeGrouping { PricingGroup = farepricingGroup };
-                fareCheck.FlightDetails.Add(_flightfare);
+                _flightfare.itemGrp.unitGrp.unitFareDetails = new UnitFareDetails();
+                _flightfare.itemGrp.unitGrp.unitFareDetails.fareTypeGrouping = new FareTypeGrouping { pricingGroup = farepricingGroup };
+                fareCheck.flightDetails.Add(_flightfare);
             }
             return fareCheck;
         }
@@ -356,90 +356,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 return "";
             }
         }
-        public async Task<bool> Security_Signout()
-        {
-
-            try
-            {
-
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"];
-                var _action = amadeusSettings["Security_SignOut"];
-                string Result = string.Empty;
-                string Envelope = await CreateSingout_Request();
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
-                request.Headers.Add("SOAPAction", _action);
-                request.ContentType = "text/xml;charset=\"utf-8\"";
-                request.Accept = "text/xml";
-                request.Method = "POST";
-
-                using (Stream stream = request.GetRequestStream())
-                {
-                    byte[] content = Encoding.UTF8.GetBytes(Envelope);
-                    stream.Write(content, 0, content.Length);
-                }
-
-                try
-                {
-                    using (WebResponse response = request.GetResponse())
-                    {
-                        using (StreamReader rd = new StreamReader(response.GetResponseStream()))
-                        {
-                            var result2 = rd.ReadToEnd();
-                            XDocument xmlDoc = XDocument.Parse(result2);
-                            XmlWriterSettings settings = new XmlWriterSettings
-                            {
-                                Indent = true,
-                                OmitXmlDeclaration = false,
-                                Encoding = System.Text.Encoding.UTF8
-                            };
-                            try
-                            {
-                                using (XmlWriter writer = XmlWriter.Create("d:\\reservationlogs\\Security_Signout_Response" + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
-                                {
-                                    xmlDoc.Save(writer);
-                                }
-                            }
-                            catch
-                            {
-
-                            }
-
-                            XmlDocument xmlDoc2 = new XmlDocument();
-                            xmlDoc2.LoadXml(result2);
-                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            XNamespace fareNS = "http://xml.amadeus.com/FARQNR_07_1_1A";
-                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
-                            if (errorInfo != null)
-                            {
-                                // Extract error details
-                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
-                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
-
-                                return false;
-
-                            }
-
-                        }
-                    }
-                }
-                catch (WebException ex)
-                {
-                    using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
-                    {
-                        Result = rd.ReadToEnd();
-
-                        return false;
-
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-            return true;
-        }
+       
         public async Task<string> CreateSingout_Request()
         {
             string pwdDigest = await generatePassword();

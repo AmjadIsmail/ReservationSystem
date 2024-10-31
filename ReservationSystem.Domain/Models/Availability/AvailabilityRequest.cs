@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReservationSystem.Domain.Models.Validators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,10 +11,15 @@ namespace ReservationSystem.Domain.Models.Availability
     {
         public string? origin { get; set; }
         public string? destination { get; set; }
+
+        [DateCheck(360)]
         public string? departureDate { get; set; }
+        [DateCheck(360)]
         public string? returnDate { get; set; }
+        [PassengerCheck]
         public int? adults { get; set; }
         public int? children { get; set; }
+        [PassengerCheck]
         public int? infant { get; set; }
         public string? cabinClass { get; set; }
         public string? flightType { get; set; } // direct / indirect

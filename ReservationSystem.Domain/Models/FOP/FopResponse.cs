@@ -10,7 +10,7 @@ namespace ReservationSystem.Domain.Models.FOP
 {
     public class FopResponse
     {
-        public HeaderSession? Session { get; set; }
+        public HeaderSession? session { get; set; }
         public FopResponseDetails? responseDetails { get; set; }
         public AmadeusResponseError? amadeusError { get; set; }
      
