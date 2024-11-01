@@ -8,6 +8,7 @@ namespace ReservationSystem.Domain.Models
 {
     public class Operating
     {
-        public string? carrierCode { get; set; }
+        public string? operatingCarrierCode { get; set; }
+        public string? operatingCarrierName { get; set; }
     }
 }

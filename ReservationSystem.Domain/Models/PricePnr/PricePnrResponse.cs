@@ -11,7 +11,9 @@ namespace ReservationSystem.Domain.Models.PricePnr
     public class PricePnrResponse
     {
         public HeaderSession? session { get; set; }
+        public string? warningDetails { get; set; }
         public AmadeusResponseError? amadeusError { get; set; }
         public PnrResponseDetails? responseDetails { get; set; }
+       
     }
 }

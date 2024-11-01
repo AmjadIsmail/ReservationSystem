@@ -274,7 +274,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     string[] stringArray = airline.Split(',');
                     foreach (var item in stringArray)
                     {
-                        var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.carrierCode == item))).ToList();
+                        var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.marketingCarrierCode == item))).ToList();
 
 
                         foreach (var flight in offer)

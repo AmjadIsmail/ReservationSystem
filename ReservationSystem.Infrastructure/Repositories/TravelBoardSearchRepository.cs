@@ -36,50 +36,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             _cacheService = cacheService;
             _dbRepository = dBRepository;
             _helperRepository = helperRepository;
-        }
-         
-        public async Task<string> generatePassword()
-        {
-            try
-            {
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                string password = amadeusSettings["clearPassword"];
-                string passSHA;
-                byte[] nonce = new byte[32];
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(nonce);
-                }
-                DateTime utcNow = DateTime.UtcNow;
-                string TIMESTAMP = utcNow.ToString("o");
-                string nonceBase64 = Convert.ToBase64String(nonce);
-                using (SHA1 sha1 = SHA1.Create())
-                {
-                    byte[] passwordSha = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
-                    byte[] combined = Combine(nonce, Encoding.UTF8.GetBytes(TIMESTAMP), passwordSha);
-                    byte[] passSha = sha1.ComputeHash(combined);
-                    passSHA = Convert.ToBase64String(passSha);                   
-                }
-                return passSHA + "|" + nonceBase64 + "|" + TIMESTAMP;
-
-            }
-            catch(Exception ex)
-            {
-                return "Error while generate pwd " + ex.Message.ToString();
-            }
-        }
-
-        static byte[] Combine(params byte[][] arrays)
-        {
-            byte[] rv = new byte[arrays.Sum(a => a.Length)];
-            int offset = 0;
-            foreach (byte[] array in arrays)
-            {
-                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
-                offset += array.Length;
-            }
-            return rv;
-        }
+        }        
+        
 
         public async Task<AvailabilityModel> GetAvailability(AvailabilityRequest requestModel)
         {
@@ -209,7 +167,7 @@ namespace ReservationSystem.Infrastructure.Repositories
       
         public async  Task<string> CreateSoapEnvelopeSimple(AvailabilityRequest requestModel)
         {                      
-            string pwdDigest =  await generatePassword();
+            string pwdDigest =  await _helperRepository.generatePassword();
             var amadeusSettings = configuration.GetSection("AmadeusSoap");
             string action = amadeusSettings["travelBoardSearchAction"];
             string to = amadeusSettings["ApiUrl"];
@@ -377,15 +335,13 @@ namespace ReservationSystem.Infrastructure.Repositories
             
             var currency = doc.Descendants(amadeus + "conversionRate").Descendants(amadeus + "conversionRateDetail")?.Elements(amadeus + "currency")?.FirstOrDefault()?.Value;
             var flightIndexOutBound = doc.Descendants(amadeus + "flightIndex").Where(f => f.Element(amadeus + "requestedSegmentRef").Element(amadeus + "segRef").Value == "1")
-                             .ToList();
-
-            // var flightDetailsList = doc.Descendants(amadeus + "flightDetails").ToList();
+                             .ToList();           
             if (flightIndexOutBound != null)
             {
                 
                 var flightDetails1 = flightIndexOutBound.Descendants(amadeus + "groupOfFlights").ToList();
-               
-               
+                var segRef = "1";
+
                 foreach ( var groupOfFlights in flightDetails1)
                 {
                     Itinerary itinerary = new Itinerary();
@@ -393,8 +349,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var FlightProposal = groupOfFlights.Element(amadeus + "propFlightGrDetail")?.Element(amadeus + "flightProposal").Element(amadeus + "ref").Value;
                     var numberOfStops = groupOfFlights.Descendants(amadeus + "flightDetails").ToList().Count();
                     numberOfStops = numberOfStops - 1;
+                    int segmentRef = 1;
                     foreach (var flightDetails in (groupOfFlights.Descendants(amadeus + "flightDetails").ToList()))
                     {
+                        
                         var productDateTime = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "productDateTime");
                         var departureDate = productDateTime?.Element(amadeus + "dateOfDeparture")?.Value;
                         var departureTime = productDateTime?.Element(amadeus + "timeOfDeparture")?.Value;
@@ -422,10 +380,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
 
                         var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
+                        var operatingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "operatingCarrier")?.Value;
                         DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
-                        var carriername = carrier != null ? carrier[1].ToString() : "";
+                        var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
                         var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
                         Segment segment = new Segment();
+                        segment.segmentRef = segRef;
                         string dateTimeStr = departureDate + departureTime;
                         string format = "ddMMyyHHmm";
                         DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
@@ -433,27 +393,40 @@ namespace ReservationSystem.Infrastructure.Repositories
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
                         segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal ,  iataName=arrAirportName };
-                        segment.carrierCode = marketingCarrier;
-                        segment.carrierName = carriername;
+                        segment.marketingCarrierCode = marketingCarrier;
+                        segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
                         segment.id = FlightProposal;
-                        segment.operating = new Operating {  carrierCode = marketingCarrier };
+                        var tempRecommend = doc.Descendants(amadeus + "recommendation").Where(e => e.Element(amadeus + "itemNumber")?.Elements(amadeus + "itemNumberId")?.Elements(amadeus + "number")?.FirstOrDefault().Value == FlightProposal).FirstOrDefault();
+                        if(tempRecommend != null)
+                        {
+                            var paxFareProduct = tempRecommend?.Descendants(amadeus + "paxFareProduct")?.FirstOrDefault();
+                            var fareDetails = paxFareProduct?.Descendants(amadeus + "fareDetails").Where(e => e.Elements(amadeus + "segmentRef")?.Elements(amadeus+ "segRef")?.FirstOrDefault().Value == segmentRef.ToString()).FirstOrDefault();
+                            var rbd = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "rbd")?.FirstOrDefault()?.Value;
+                            var cabin = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                            var availStatus = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
+                            var fareBasis = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "fareProductDetail")?.Descendants(amadeus + "fareBasis")?.FirstOrDefault()?.Value;
+                            var breakpoint = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "breakPoint")?.FirstOrDefault()?.Value;
+                            segment.avlStatus = availStatus;
+                            segment.bookingClass = rbd;
+                            segment.cabinClass = cabin;
+                            segment.fareBasis = fareBasis;
+                            segment.breakPoint = breakpoint;
+                        }
+                        DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
+                        var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
+                        segment.operating = new Operating {  operatingCarrierCode = operatingCarrier , operatingCarrierName = operatingCarrierName };
                         segment.numberOfStops = numberOfStops;
                         
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
                         itinerary.segment_type = "OutBound";
-
+                      
                     }
-
                     itinerariesList.Add(itinerary);
-
-
                 }
-
-
             }
 
             var flightIndexInbound = doc.Descendants(amadeus + "flightIndex").Where(f => f.Element(amadeus + "requestedSegmentRef").Element(amadeus + "segRef").Value == "2")
@@ -464,7 +437,7 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                 var flightDetails1 = flightIndexInbound.Descendants(amadeus + "groupOfFlights").ToList();
 
-
+                var segRef = "2";
                 foreach (var groupOfFlights in flightDetails1)
                 {
                     Itinerary itinerary = new Itinerary();
@@ -472,6 +445,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var FlightProposal = groupOfFlights.Element(amadeus + "propFlightGrDetail")?.Element(amadeus + "flightProposal").Element(amadeus + "ref").Value;
                     var numberOfStops = groupOfFlights.Descendants(amadeus + "flightDetails").ToList().Count();
                     numberOfStops = numberOfStops - 1;
+                    int segmentRef =2;
                     foreach (var flightDetails in (groupOfFlights.Descendants(amadeus + "flightDetails").ToList()))
                     {
                         var productDateTime = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "productDateTime");
@@ -492,10 +466,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
+                        DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
+                        var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+
+
                         var arrivalTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
 
                         var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
+                        var operatingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "operatingCarrier")?.Value;
+                        DataRow drmarketingcarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
+                        var marketingcarriername = drmarketingcarrier != null ? drmarketingcarrier[1].ToString() : "";
+
+
                         var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
                         Segment segment = new Segment();
                         string dateTimeStr = departureDate + departureTime;
@@ -505,18 +488,36 @@ namespace ReservationSystem.Infrastructure.Repositories
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
                         segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation, terminal = arrivalTerminal };
-                        segment.carrierCode = marketingCarrier;
+                        segment.marketingCarrierCode = marketingCarrier;
+                        segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
                         segment.id = FlightProposal;
-                        segment.operating = new Operating { carrierCode = marketingCarrier };
+                        var tempRecommend = doc.Descendants(amadeus + "recommendation").Where(e => e.Element(amadeus + "itemNumber")?.Elements(amadeus + "itemNumberId")?.Elements(amadeus + "number")?.FirstOrDefault().Value == FlightProposal).FirstOrDefault();
+                        if (tempRecommend != null)
+                        {
+                            var paxFareProduct = tempRecommend?.Descendants(amadeus + "paxFareProduct")?.FirstOrDefault();
+                            var fareDetails = paxFareProduct?.Descendants(amadeus + "fareDetails").Where(e => e.Elements(amadeus + "segmentRef")?.Elements(amadeus + "segRef")?.FirstOrDefault().Value == segmentRef.ToString()).FirstOrDefault();
+                            var rbd = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "rbd")?.FirstOrDefault()?.Value;
+                            var cabin = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                            var availStatus = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
+                            var fareBasis = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "fareProductDetail")?.Descendants(amadeus + "fareBasis")?.FirstOrDefault()?.Value;
+                            var breakpoint = fareDetails?.Descendants(amadeus + "groupOfFares")?.Descendants(amadeus + "productInformation")?.Descendants(amadeus + "breakPoint")?.FirstOrDefault()?.Value;
+                            segment.avlStatus = availStatus;
+                            segment.bookingClass = rbd;
+                            segment.cabinClass = cabin;
+                            segment.fareBasis = fareBasis;
+                            segment.breakPoint = breakpoint;
+                        }
+                        DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
+                        var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
+                        segment.operating = new Operating { operatingCarrierCode = operatingCarrier, operatingCarrierName = operatingCarrierName };
                         segment.numberOfStops = numberOfStops;
-
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
                         itinerary.segment_type = "InBound";
-
+                        
                     }
 
                     itinerariesList.Add(itinerary);
@@ -534,8 +535,13 @@ namespace ReservationSystem.Infrastructure.Repositories
             string pricingTicketingPriceType = string.Empty;
             string isRefundable = string.Empty;
             string LastTicketDate = string.Empty;
-            string cabinProduct = string.Empty;
+            string cabinClass = string.Empty;
+            string bookingClass = string.Empty;
+            string avlStatus = string.Empty;
             string farebasis = string.Empty;
+            string passengerType = string.Empty;
+            string fareType = string.Empty;
+            string breakPoint = string.Empty;   
             string companyname = string.Empty;
             string adultpp = string.Empty;
             string adulttax = string.Empty;
@@ -627,38 +633,38 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
 
                     }
-
+                    cabinClass = string.Empty;bookingClass = string.Empty;avlStatus = string.Empty;farebasis = string.Empty;
+                    passengerType = string.Empty;faretype = string.Empty;avlStatus = string.Empty;
                     var fareDetailsGroupOfFare = item.Descendants(amadeus + "fareDetails").Descendants(amadeus + "groupOfFares").ToList();
-
+                   
                     if (fareDetailsGroupOfFare != null)
                     {
-                        cabinProduct = string.Empty;
+                      
                         foreach (var productInfo in fareDetailsGroupOfFare)
                         {
-                            var cabinP = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "cabinProduct").ToList();
-                            cabinProduct = string.Empty;
-                            foreach (var itemcabinp in cabinP)
-                            {
-                                if(cabinProduct == string.Empty) 
-                                { 
-                                    cabinProduct += itemcabinp.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
-                                }
-                                else
-                                {
-                                    cabinProduct = cabinProduct + "," + itemcabinp.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
-                                }
-                               
-                            }
-                            var fbasis = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "fareProductDetail").ToList();
-                            foreach (var f in fbasis)
-                            {
-                                farebasis = farebasis + "," + f.Element(amadeus + "fareBasis")?.Value;
-                                faretype = faretype = faretype + "," + f.Element(amadeus + "fareType").Value;
-                            }
+                            // read segment ref
+                            var cabinclass = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "cabin")?.FirstOrDefault()?.Value;
+                            var bookingclass = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "rbd")?.FirstOrDefault()?.Value;
+                            var availlStatus = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "cabinProduct")?.Descendants(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
+                            cabinClass = cabinclass;
+                            bookingClass = bookingclass;
+                            avlStatus = availlStatus;
 
+                            var fbasis = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "fareProductDetail")?.Descendants(amadeus + "fareBasis")?.FirstOrDefault()?.Value;
+                            var pasType = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "fareProductDetail")?.Descendants(amadeus + "passengerType")?.FirstOrDefault()?.Value;
+                            var ftype = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "fareProductDetail")?.Descendants(amadeus + "fareType")?.FirstOrDefault()?.Value;
+                            var breakpoint = productInfo.Descendants(amadeus + "productInformation").Descendants(amadeus + "breakPoint")?.FirstOrDefault()?.Value;
+                            farebasis = fbasis;
+                            passengerType = pasType;
+                            fareType = ftype;
+                            breakPoint = breakpoint;
                         }
                     }
-
+                    var itineary = itinerariesList.Where(e => e.flightProposal_ref == itemNumberId)?.FirstOrDefault();
+                    if(itineary != null)
+                    {
+                        itineary.segments.ForEach(e => e.cabinClass = cabinClass);
+                    }
 
                     var taxes = new List<Taxes>();
                     if (adultpp != string.Empty)
@@ -707,11 +713,45 @@ namespace ReservationSystem.Infrastructure.Repositories
                         var traveler = pfx.Descendants(amadeus + "traveller").ToList();
                         foreach (var tr in traveler)
                         {
-                            TravelerPricing tp = new TravelerPricing { travelerType = ptc, travelerId = tr.Element(amadeus + "ref").Value, price = offer.price };
+                            var tempPrice = new Price();
+                            if(ptc == "ADT")
+                            {
+                             
+                                tempPrice.currency = offer.price.currency;
+                                tempPrice.adultPP = offer.price.adultPP;
+                                tempPrice.adultTax = offer.price.adultTax;
+                                tempPrice.billingCurrency = offer.price.billingCurrency;
+                                tempPrice.billingCurrency = offer.price.baseAmount;
+                              
+                            }
+                            else if (ptc == "CNN")
+                            {
+                                tempPrice.childPp = offer.price.childPp;
+                                tempPrice.childTax = offer.price.childTax;
+                                tempPrice.currency = offer.price.currency;
+                                tempPrice.baseAmount = offer.price.baseAmount;
+                                tempPrice.billingCurrency = offer.price.billingCurrency;
+                            }
+                            else if (ptc == "INF")
+                            {
+                                tempPrice.infantPp = offer.price.infantPp;
+                                tempPrice.infantTax = offer.price.infantTax;
+                                tempPrice.currency = offer.price.currency;
+                                tempPrice.baseAmount = offer.price.baseAmount;
+                                tempPrice.billingCurrency = offer.price.billingCurrency;
+                            }
+
+                            TravelerPricing tp = new TravelerPricing { travelerType = ptc, travelerId = tr.Element(amadeus + "ref").Value, price = tempPrice};
                             offer.travelerPricings.Add(tp);
                         }
                     }
-                    offer.bookingClass = cabinProduct;
+                    offer.bookingClass = bookingClass;
+                    offer.cabinClass = cabinClass;
+                    offer.avlStatus = avlStatus;
+                    offer.fareBasis = farebasis;
+                    offer.passengerType = passengerType;
+                    offer.fareType = faretype;
+                    offer.breakPoint = breakPoint;
                     offer.validatingAirlineCodes = companyname.Split(" ").ToList<string>();
                     #region Get Itineraries from outbound
                     List<Itinerary> _outbounItineraries = new List<Itinerary>(); List<Itinerary> _inbounItineraries = new List<Itinerary>();
@@ -798,7 +838,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     string[] stringArray = airline.Split(',');
                     foreach (var item in stringArray)
                     {
-                        var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.carrierCode == item))).ToList();
+                        var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.marketingCarrierCode == item))).ToList();
 
 
                         foreach (var flight in offer)

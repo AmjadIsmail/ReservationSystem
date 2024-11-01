@@ -17,6 +17,7 @@ using ReservationSystem.Domain.Models.AddPnrMulti;
 using ReservationSystem.Domain.Models;
 using System.Security.Cryptography.Xml;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -74,6 +75,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             await _helperRepository.SaveJson(jsonText, "PNRMultiResponseJson");
                             XNamespace fareNS = ns;
                             var errorInfo = xmlDoc.Descendants(fareNS + "applicationError").FirstOrDefault();
+                            var warningError = new AmadeusResponseError();
                             if (errorInfo != null)
                             {
                                 // Extract error details
@@ -82,12 +84,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 fopResponse.amadeusError = new AmadeusResponseError();
                                 fopResponse.amadeusError.error = errorText;
                                 fopResponse.amadeusError.errorCode = Convert.ToInt16(errorCode);
-                                return fopResponse;
+                                warningError = fopResponse.amadeusError;
+                                //return fopResponse;
 
                             }
 
                             var res = ConvertXmlToModel(xmlDoc, ns);
                             fopResponse = res;
+                            if (warningError.error != null)
+                            {
+                                fopResponse.warningDetails = warningError.error;
+                            }
+
 
                         }
                     }

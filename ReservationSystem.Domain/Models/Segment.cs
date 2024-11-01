@@ -10,18 +10,23 @@ namespace ReservationSystem.Domain.Models
     {
         public Departure? departure { get; set; }
         public Arrival? arrival { get; set; }
-        public string? carrierCode { get; set; }
-        public string? carrierName { get; set; }
+        public string? marketingCarrierCode { get; set; }
+        public string? marketingCarrierName { get; set; }
         public string? number { get; set; }
         public Aircraft? aircraft { get; set; }
         public Operating? operating { get; set; }
         public string? duration { get; set; }
         public string? id { get; set; }
+        public string? segmentRef { get; set; }
         public int? numberOfStops { get; set; }
         public List<Co2Emissions>? co2Emissions { get; set; }
         public bool? blacklistedInEU { get; set; }
         public BaggageAllowance? baggageAllowence { get; set; }
         public string? cabinClass { get; set; }
+        public string? bookingClass {get;set;}
+        public string? avlStatus { get; set; }
+        public string? fareBasis { get; set; }
+        public string? breakPoint { get; set; }
         public string? cabinStatus { get; set; }
         public string? rateClass { get; set; }
     }
