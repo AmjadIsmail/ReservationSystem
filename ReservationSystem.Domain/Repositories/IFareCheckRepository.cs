@@ -14,6 +14,6 @@ namespace ReservationSystem.Domain.Repositories
         public Task<FareCheckReturnModel> FareCheckRequest(FareCheckModel fareCheckRequest);
 
         public Task Security_Signout(HeaderSession header);
-        public Task<bool> Security_Signout();
+     
     }
 }

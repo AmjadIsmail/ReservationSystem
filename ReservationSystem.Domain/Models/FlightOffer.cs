@@ -23,7 +23,13 @@ namespace ReservationSystem.Domain.Models
         public PriceOption? pricingOptions { get; set; }
         public List<string>? validatingAirlineCodes { get; set; }
         public List<TravelerPricing>? travelerPricings { get; set; }
-        public string bookingClass { get; set; }
+        public string? cabinClass { get; set; }
+        public string? bookingClass { get; set; }
+        public string? avlStatus { get; set; }
+        public string? fareBasis { get; set; }
+        public string? passengerType { get; set; }
+        public string? fareType { get; set; }
+        public string? breakPoint { get; set; }
     }
 
     public class FlightOfferForOrder

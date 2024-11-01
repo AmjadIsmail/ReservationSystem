@@ -284,7 +284,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     string arrival = arrivalDate + arrivalTime;
                     DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
                     segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation };
-                    segment.carrierCode = marketingCarrier;
+                    segment.marketingCarrierCode = marketingCarrier;
                     segment.aircraft = new Aircraft { code = flightNumber };
                     itinerary1.segments.Add(segment);
                                      
@@ -324,7 +324,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 string arrival = arrivalDate + arrivalTime;
                 DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
                 segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation };
-                segment.carrierCode = marketingCarrier;
+                segment.marketingCarrierCode = marketingCarrier;
                 segment.aircraft = new Aircraft { code = flightNumber };
                 itinerary1.segments.Add(segment);
                 //}

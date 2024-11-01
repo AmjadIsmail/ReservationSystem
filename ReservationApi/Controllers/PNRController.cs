@@ -70,6 +70,7 @@ namespace ReservationApi.Controllers
             else
             {
                 res.Data = data;
+                await _Repo.Security_Signout(request.sessionDetails);
             }
 
             return Ok(res);
