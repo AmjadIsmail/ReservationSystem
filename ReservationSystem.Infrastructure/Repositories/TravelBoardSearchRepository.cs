@@ -333,7 +333,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             var AirportCache = _cacheService.GetAirports();
 
             List<Itinerary>  itinerariesList = new List<Itinerary>();
-            
+            List<string> timeduration = new List<string>();
+
             var currency = doc.Descendants(amadeus + "conversionRate").Descendants(amadeus + "conversionRateDetail")?.Elements(amadeus + "currency")?.FirstOrDefault()?.Value;
             var flightIndexOutBound = doc.Descendants(amadeus + "flightIndex").Where(f => f.Element(amadeus + "requestedSegmentRef").Element(amadeus + "segRef").Value == "1")
                              .ToList();           
@@ -351,6 +352,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var numberOfStops = groupOfFlights.Descendants(amadeus + "flightDetails").ToList().Count();
                     numberOfStops = numberOfStops - 1;
                     int segmentRef = 1;
+                    timeduration = new List<string>();
                     foreach (var flightDetails in (groupOfFlights.Descendants(amadeus + "flightDetails").ToList()))
                     {
                         
@@ -365,6 +367,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         if (duration != null)
                         {
                             FlightDuration = duration?.Descendants(amadeus + "attributeDescription")?.FirstOrDefault().Value;
+                            timeduration.Add(FlightDuration);
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
@@ -415,14 +418,16 @@ namespace ReservationSystem.Infrastructure.Repositories
                             segment.cabinClass = cabin;
                             segment.fareBasis = fareBasis;
                             segment.breakPoint = breakpoint;
+                            segment.rateClass = fareBasis;
+                            segment.cabinStatus = availStatus;
                         }
                         DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
                         var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
                         segment.operating = new Operating {  operatingCarrierCode = operatingCarrier , operatingCarrierName = operatingCarrierName };
                         segment.numberOfStops = numberOfStops;
-                        
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
+                        itinerary.duration = CalculateDuration(timeduration); 
                         itinerary.segment_type = "OutBound";
                       
                     }
@@ -447,6 +452,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     var numberOfStops = groupOfFlights.Descendants(amadeus + "flightDetails").ToList().Count();
                     numberOfStops = numberOfStops - 1;
                     int segmentRef =2;
+                    timeduration = new List<string>();
                     foreach (var flightDetails in (groupOfFlights.Descendants(amadeus + "flightDetails").ToList()))
                     {
                         var productDateTime = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "productDateTime");
@@ -460,6 +466,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         if (duration != null)
                         {
                             FlightDuration = duration?.Descendants(amadeus + "attributeDescription")?.FirstOrDefault().Value;
+                            timeduration.Add(FlightDuration);
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
@@ -510,13 +517,16 @@ namespace ReservationSystem.Infrastructure.Repositories
                             segment.cabinClass = cabin;
                             segment.fareBasis = fareBasis;
                             segment.breakPoint = breakpoint;
+                            segment.rateClass = fareBasis;
+                            segment.cabinStatus = availStatus;
                         }
                         DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
                         var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
                         segment.operating = new Operating { operatingCarrierCode = operatingCarrier, operatingCarrierName = operatingCarrierName };
-                        segment.numberOfStops = numberOfStops;
+                        segment.numberOfStops = numberOfStops;                         
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
+                        itinerary.duration = CalculateDuration(timeduration); 
                         itinerary.segment_type = "InBound";
                         
                     }
@@ -629,7 +639,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var lstDate = fareitem.Descendants(amadeus + "pricingMessage").Elements(amadeus + "description")?.ToList();
                             foreach (var i in lstDate?.Skip(1)?.Take(1))
                             {
-                                LastTicketDate = LastTicketDate; //+ " " + i.Value;
+                                LastTicketDate = i.Value;
                             }
                         }
 
@@ -702,8 +712,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                     };
 
                     offer.id = itemNumberId;
+                    offer.type = "Availability";
                     offer.lastTicketingDate = LastTicketDate;
-                    offer.lastTicketingDateTime = "0:00";
                     offer.oneWay = flightIndexInbound != null ? false : true;
                     offer.pricingOptions = new PriceOption { fareType = faretype.Split(',').ToList<string>(), includedCheckedBagsOnly = false };
                     offer.source = "Amadeus";
@@ -752,7 +762,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.fareBasis = farebasis;
                     offer.passengerType = passengerType;
                     offer.fareType = faretype;
-                    offer.breakPoint = breakPoint;
+                    offer.breakPoint = breakPoint;                   
                     offer.validatingAirlineCodes = companyname.Split(" ").ToList<string>();
                     #region Get Itineraries from outbound
                     List<Itinerary> _outbounItineraries = new List<Itinerary>(); List<Itinerary> _inbounItineraries = new List<Itinerary>();
@@ -770,7 +780,24 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             return ReturnModel;
         }
-
+        private string CalculateDuration(List<string> timestring)
+        {
+            string _duration = timestring[0];
+            try
+            {
+                TimeSpan totalDuration = new TimeSpan();
+                foreach(var item in timestring)
+                {
+                    TimeSpan span1 = TimeSpan.ParseExact(item, "hhmm", null);
+                    totalDuration += span1;
+                }
+                return totalDuration.ToString(@"hh\:mm");
+            }
+            catch
+            {
+                return _duration;
+            }
+        }
         private List<FlightOffer> applyMarkup(List<FlightOffer> offers, List<FlightMarkup> dictionary)
         {
             try

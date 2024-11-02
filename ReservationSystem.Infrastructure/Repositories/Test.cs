@@ -416,7 +416,6 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                     offer.id = itemNumberId;
                     offer.lastTicketingDate = LastTicketDate;
-                    offer.lastTicketingDateTime = "0:00";
                     offer.oneWay = flightIndexInbound != null ? false : true;
                     offer.pricingOptions = new PriceOption { fareType = faretype.Split(',').ToList<string>() , includedCheckedBagsOnly = false};
                     offer.source = "Amadeus";

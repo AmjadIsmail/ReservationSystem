@@ -36,8 +36,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             req.id = requestOrder?.flightOffers[0].id;
             req.type = requestOrder?.flightOffers[0].type;
             req.source = requestOrder.flightOffers[0].source;
-            req.instantTicketingRequired = requestOrder.flightOffers[0].instantTicketingRequired;
-            req.nonHomogeneous = requestOrder.flightOffers[0].nonHomogeneous;
+           // req.instantTicketingRequired = requestOrder.flightOffers[0].instantTicketingRequired;
+            //req.nonHomogeneous = requestOrder.flightOffers[0].nonHomogeneous;
             req.paymentCardRequired = false;
             req.lastTicketingDate = requestOrder.flightOffers[0].lastTicketingDate;
             req.itineraries = requestOrder.flightOffers[0].itineraries;
