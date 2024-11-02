@@ -22,7 +22,6 @@ namespace ReservationSystem.Infrastructure.Repositories
     public class AvailabilityRepository  : IAvailabilityRepository
     {
         private readonly IConfiguration configuration;
-       // private readonly IMemoryCache _cache;
         private readonly ICacheService _cacheService;
         private readonly IDBRepository _dbRepository;
         public AvailabilityRepository(IConfiguration _configuration ,  ICacheService cacheService , IDBRepository dBRepository)
@@ -161,8 +160,6 @@ namespace ReservationSystem.Infrastructure.Repositories
             string res = string.Empty;
             try
             {
-                // https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2024-07-02&returnDate=2024-07-22&adults=2&children=1&infants=1&travelClass=ECONOMY&nonStop=false&currencyCode=GBP&maxPrice=500&max=25
-                // https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=SYD&destinationLocationCode=BKK&departureDate=2024-07-02&returnDate=2024-07-22&adults=2&children=1&infants=1&travelClass=ECONOMY&nonStop=False&currencyCode=GBP&maxPrice=500&max=20
                 var amadeusSettings = configuration.GetSection("Amadeus");
                 var apiUrl = amadeusSettings["apiUrl"]+ "v2/shopping/flight-offers?";
                 res = apiUrl + "originLocationCode=" + request.origin + "&destinationLocationCode=" + request.destination;

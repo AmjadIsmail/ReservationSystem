@@ -49,7 +49,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
 
                 var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"]; // "https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY";
+                var _url = amadeusSettings["ApiUrl"]; 
                 var _action = amadeusSettings["fareInformativePricingWithoutPNRAction"];
                 string Result = string.Empty;
                 string Envelope = await CreateFlightPriceRequest(requestModel);
@@ -318,7 +318,7 @@ namespace ReservationSystem.Infrastructure.Repositories
         }
         public async Task<string> CreateFlightPriceRequest(FlightPriceMoelSoap requestModel)
         {
-            string pwdDigest = await generatePassword();
+            string pwdDigest = await _helperRepository.generatePassword();
             var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
             string action = amadeusSettings["fareInformativePricingWithoutPNRAction"];
             string to = amadeusSettings["ApiUrl"];
@@ -362,48 +362,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             return Request;
         }
 
-        public async Task<string> generatePassword()
-        {
-            try
-            {
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                string password = amadeusSettings["clearPassword"];
-                string passSHA;
-                byte[] nonce = new byte[32];
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(nonce);
-                }
-                DateTime utcNow = DateTime.UtcNow;
-                string TIMESTAMP = utcNow.ToString("o");
-                string nonceBase64 = Convert.ToBase64String(nonce);
-                using (SHA1 sha1 = SHA1.Create())
-                {
-                    byte[] passwordSha = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
-                    byte[] combined = Combine(nonce, Encoding.UTF8.GetBytes(TIMESTAMP), passwordSha);
-                    byte[] passSha = sha1.ComputeHash(combined);
-                    passSHA = Convert.ToBase64String(passSha);
-                }
-                return passSHA + "|" + nonceBase64 + "|" + TIMESTAMP;
-
-            }
-            catch (Exception ex)
-            {
-                return "Error while generate pwd " + ex.Message.ToString();
-            }
-        }
-
-        static byte[] Combine(params byte[][] arrays)
-        {
-            byte[] rv = new byte[arrays.Sum(a => a.Length)];
-            int offset = 0;
-            foreach (byte[] array in arrays)
-            {
-                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
-                offset += array.Length;
-            }
-            return rv;
-        }
+    
         public async Task<FlightPriceModelReturn> GetFlightPrice_Rest(string token, FlightPriceModel requestModel)
         {
             FlightPriceModelReturn flightPrice = new FlightPriceModelReturn();

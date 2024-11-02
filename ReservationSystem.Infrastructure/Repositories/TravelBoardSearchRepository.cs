@@ -470,6 +470,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
+                        DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
+                        var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
                         var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
@@ -492,10 +494,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                         string dateTimeStr = departureDate + departureTime;
                         string format = "ddMMyyHHmm";
                         DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
-                        segment.departure = new Departure { at = departureD, iataCode = departureLocation, terminal = departureTerminal };
+                        segment.departure = new Departure { at = departureD, iataCode = departureLocation, iataName = depAirportName, terminal = departureTerminal };
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
-                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation, terminal = arrivalTerminal };
+                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation, iataName = arrAirportName, terminal = arrivalTerminal };
                         segment.marketingCarrierCode = marketingCarrier;
                         segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
@@ -731,8 +733,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 tempPrice.currency = offer.price.currency;
                                 tempPrice.adultPP = offer.price.adultPP;
                                 tempPrice.adultTax = offer.price.adultTax;
-                                tempPrice.billingCurrency = offer.price.billingCurrency;
-                                tempPrice.billingCurrency = offer.price.baseAmount;
+                                tempPrice.billingCurrency = offer.price.currency;
+                                tempPrice.baseAmount = offer.price.baseAmount;
                               
                             }
                             else if (ptc == "CNN")
@@ -741,7 +743,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 tempPrice.childTax = offer.price.childTax;
                                 tempPrice.currency = offer.price.currency;
                                 tempPrice.baseAmount = offer.price.baseAmount;
-                                tempPrice.billingCurrency = offer.price.billingCurrency;
+                                tempPrice.billingCurrency = offer.price.currency;
                             }
                             else if (ptc == "INF")
                             {
@@ -749,7 +751,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 tempPrice.infantTax = offer.price.infantTax;
                                 tempPrice.currency = offer.price.currency;
                                 tempPrice.baseAmount = offer.price.baseAmount;
-                                tempPrice.billingCurrency = offer.price.billingCurrency;
+                                tempPrice.billingCurrency = offer.price.currency;
                             }
 
                             TravelerPricing tp = new TravelerPricing { travelerType = ptc, travelerId = tr.Element(amadeus + "ref").Value, price = tempPrice};

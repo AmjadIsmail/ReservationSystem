@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repositories\Test.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Codaxy.Xsd2" Version="0.10.0" />
     <PackageReference Include="EPPlus" Version="7.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />

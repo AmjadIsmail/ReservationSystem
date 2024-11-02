@@ -183,13 +183,13 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
             string action = amadeusSettings["Ticket_CreateTSTFromPricing"];
-            string to = amadeusSettings["ApiUrl"];
+            string to = amadeusSettings["ApiUrl"] ?? "https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY";
             string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
       <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
       <ses:Session TransactionStatusCode=""InSeries"">
-      <ses:SessionId>{requestModel.sessionDetails.SessionId}</ses:SessionId>
-      <ses:SequenceNumber>{requestModel.sessionDetails.SequenceNumber + 1}</ses:SequenceNumber>
-      <ses:SecurityToken>{requestModel.sessionDetails.SecurityToken}</ses:SecurityToken>
+      <ses:SessionId>{requestModel?.sessionDetails?.SessionId}</ses:SessionId>
+      <ses:SequenceNumber>{requestModel?.sessionDetails?.SequenceNumber + 1}</ses:SequenceNumber>
+      <ses:SecurityToken>{requestModel?.sessionDetails?.SecurityToken}</ses:SecurityToken>
     </ses:Session>
     <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
     <add:Action>{action}</add:Action>

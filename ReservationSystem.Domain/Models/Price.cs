@@ -9,23 +9,39 @@ namespace ReservationSystem.Domain.Models
 {
     public class Price
     {
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? currency { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? adultPP { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? adultTax { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? childPp { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? childTax{ get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? infantPp { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? infantTax { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? total { get; set; }
-        [JsonProperty("base")]
+        [JsonProperty("base",NullValueHandling = NullValueHandling.Ignore)]
         public string? baseAmount { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<Taxes>? taxes { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<taxDetails>? taxDetails { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public List<Fee>? fees { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? grandTotal { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? billingCurrency { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? refundableTaxes { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public decimal? markup { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public decimal? discount { get; set;
         }
     }

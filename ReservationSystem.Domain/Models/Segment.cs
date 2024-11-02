@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,10 +18,9 @@ namespace ReservationSystem.Domain.Models
         public Operating? operating { get; set; }
         public string? duration { get; set; }
         public int? id { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? segmentRef { get; set; }
-        public int? numberOfStops { get; set; }
-        public List<Co2Emissions>? co2Emissions { get; set; }
-        public bool? blacklistedInEU { get; set; }
+        public int? numberOfStops { get; set; }       
         public BaggageAllowance? baggageAllowence { get; set; }
         public string? cabinClass { get; set; }
         public string? bookingClass {get;set;}

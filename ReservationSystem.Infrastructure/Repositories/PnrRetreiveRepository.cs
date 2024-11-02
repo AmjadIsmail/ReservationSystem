@@ -114,44 +114,14 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             return pnrResponse;
         }
-        static byte[] Combine(params byte[][] arrays)        {            byte[] rv = new byte[arrays.Sum(a => a.Length)];            int offset = 0;            foreach (byte[] array in arrays)            {                Buffer.BlockCopy(array, 0, rv, offset, array.Length);                offset += array.Length;            }            return rv;        }
-        public async Task<string> generatePassword()
-        {
-            try
-            {
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                string password = amadeusSettings["clearPassword"];
-                string passSHA;
-                byte[] nonce = new byte[32];
-                using (var rng = new RNGCryptoServiceProvider())
-                {
-                    rng.GetBytes(nonce);
-                }
-                DateTime utcNow = DateTime.UtcNow;
-                string TIMESTAMP = utcNow.ToString("o");
-                string nonceBase64 = Convert.ToBase64String(nonce);
-                using (SHA1 sha1 = SHA1.Create())
-                {
-                    byte[] passwordSha = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));
-                    byte[] combined = Combine(nonce, Encoding.UTF8.GetBytes(TIMESTAMP), passwordSha);
-                    byte[] passSha = sha1.ComputeHash(combined);
-                    passSHA = Convert.ToBase64String(passSha);
-                }
-                return passSHA + "|" + nonceBase64 + "|" + TIMESTAMP;
-
-            }
-            catch (Exception ex)
-            {
-                return "Error while generate pwd " + ex.Message.ToString();
-            }
-        }
+      
         public async Task<string> CreateSoapRequest(PnrRetrieveRequst requestModel)
         {
             
             var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
             var action = amadeusSettings["PNR_Retrieve"];
             string to = amadeusSettings["ApiUrl"];
-            string pwdDigest = await generatePassword();
+            string pwdDigest = await _helperRepository.generatePassword();
             string username = amadeusSettings["webUserId"];
             string dutyCode = amadeusSettings["dutyCode"];
             string requesterType = amadeusSettings["requestorType"];
