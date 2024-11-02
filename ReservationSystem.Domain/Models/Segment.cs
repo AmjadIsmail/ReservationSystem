@@ -16,7 +16,7 @@ namespace ReservationSystem.Domain.Models
         public Aircraft? aircraft { get; set; }
         public Operating? operating { get; set; }
         public string? duration { get; set; }
-        public string? id { get; set; }
+        public int? id { get; set; }
         public string? segmentRef { get; set; }
         public int? numberOfStops { get; set; }
         public List<Co2Emissions>? co2Emissions { get; set; }

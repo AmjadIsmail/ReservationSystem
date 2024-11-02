@@ -19,6 +19,7 @@ using System.Globalization;
 using ReservationSystem.Domain.DB_Models;
 using Newtonsoft.Json;
 using System.Data;
+using ReservationSystem.Domain.Models.FlightPrice;
 
 
 namespace ReservationSystem.Infrastructure.Repositories
@@ -398,7 +399,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
-                        segment.id = FlightProposal;
+                        segment.id = FlightProposal != null ? Convert.ToInt16(FlightProposal) : 0;
                         var tempRecommend = doc.Descendants(amadeus + "recommendation").Where(e => e.Element(amadeus + "itemNumber")?.Elements(amadeus + "itemNumberId")?.Elements(amadeus + "number")?.FirstOrDefault().Value == FlightProposal).FirstOrDefault();
                         if(tempRecommend != null)
                         {
@@ -493,7 +494,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
-                        segment.id = FlightProposal;
+                        segment.id = FlightProposal != null ? Convert.ToInt16(FlightProposal) : 0;
                         var tempRecommend = doc.Descendants(amadeus + "recommendation").Where(e => e.Element(amadeus + "itemNumber")?.Elements(amadeus + "itemNumberId")?.Elements(amadeus + "number")?.FirstOrDefault().Value == FlightProposal).FirstOrDefault();
                         if (tempRecommend != null)
                         {

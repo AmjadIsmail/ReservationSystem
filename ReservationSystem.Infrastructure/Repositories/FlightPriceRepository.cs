@@ -602,53 +602,54 @@ namespace ReservationSystem.Infrastructure.Repositories
                     {
                         uniqueOfferReference = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "offerReferences")?.Descendants(amadeus + "offerIdentifier")?.Elements(amadeus + "uniqueOfferReference")?.FirstOrDefault()?.Value;
                     }
-
-                    // segmentLevelGroup start working from here
-                    var segmentInformation_OutBound = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.Where(e => e.Element(amadeus + "itemNumber")?.Value == "1")?.ToList();
-                    var segmentInformation_Return = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.Where(e => e.Element(amadeus + "itemNumber")?.Value == "2").ToList();
-                    if (segmentInformation_OutBound != null)
+                    var segmentInfo = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.ToList();
+                    int midSegment = segmentInfo.Count() / 2;
+                    var segmentInformation = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.ToList().Take(midSegment);
+                    var segmentInformation_Return = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.ToList().Skip(midSegment);
+                    if (segmentInformation != null)
                     {
-                        foreach (var departure in segmentInformation_OutBound)
+                       
+                        foreach (var seg in segmentInformation)
                         {
-                            Segment outbound = new Segment();
-                            outbound.departure = new Departure();
-                            var dept = departure?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "departureDate")?.FirstOrDefault()?.Value;
+                           
+                            Segment journy = new Segment();
+                            journy.departure = new Departure();
+                            var dept = seg?.Descendants(amadeus + "flightDate")?.Elements(amadeus + "departureDate")?.FirstOrDefault()?.Value;
                             if (dept != null)
                             {
-                                outbound.departure.at = DateTime.ParseExact(dept, "ddMMyy", CultureInfo.InvariantCulture);
+                                journy.departure.at = DateTime.ParseExact(dept, "ddMMyy", CultureInfo.InvariantCulture);
 
                             }
-                            var fromlocation = departure?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
-                            outbound.departure.iataCode = fromlocation != null ? fromlocation : "";
+                            var itemNumber = seg?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
+                            var fromlocation = seg?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
+                            journy.departure.iataCode = fromlocation != null ? fromlocation : "";
                             DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == fromlocation);
                             var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
-                            outbound.departure.iataName = depAirportName;
-                            var toLocation = departure?.Descendants(amadeus + "offpointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
-                            outbound.arrival = new Arrival();
-                            outbound.arrival.iataCode = toLocation;
+                            journy.departure.iataName = depAirportName;
+                            var toLocation = seg?.Descendants(amadeus + "offpointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
+                            journy.arrival = new Arrival();
+                            journy.arrival.iataCode = toLocation;
                             DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == toLocation);
                             var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
-                            outbound.arrival.iataName = arrAirportName;
+                            journy.arrival.iataName = arrAirportName;
                             var Addinfo = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "additionalInformation")?.FirstOrDefault();
                             var arrivalDate = Addinfo?.Descendants(amadeus + "productDateTimeDetails")?.Descendants(amadeus + "arrivalDate")?.FirstOrDefault()?.Value;
                             if (arrivalDate != null)
                             {
-                                outbound.arrival.at = DateTime.ParseExact(arrivalDate, "ddMMyy", CultureInfo.InvariantCulture);
+                                journy.arrival.at = DateTime.ParseExact(arrivalDate, "ddMMyy", CultureInfo.InvariantCulture);
                             }
-                            var marketingCompany = departure?.Descendants(amadeus + "companyDetails")?.Elements(amadeus + "marketingCompany")?.FirstOrDefault()?.Value;
-                            var flightNumber = departure?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "flightNumber")?.FirstOrDefault()?.Value;
-                            var bookingClass = departure?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "bookingClass")?.FirstOrDefault()?.Value;
-                            var itemnumber = departure?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
-                            outbound.marketingCarrierCode = marketingCompany;
+                            var marketingCompany = seg?.Descendants(amadeus + "companyDetails")?.Elements(amadeus + "marketingCompany")?.FirstOrDefault()?.Value;
+                            var flightNumber = seg?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "flightNumber")?.FirstOrDefault()?.Value;
+                            var bookingClass = seg?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "bookingClass")?.FirstOrDefault()?.Value;
+                            var itemnumber = seg?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
+                            journy.marketingCarrierCode = marketingCompany;
                             DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCompany);
                             var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
-                            outbound.marketingCarrierName = marketingcarriername;
-                            outbound.number = flightNumber;
-                            outbound.aircraft = new Aircraft { code = flightNumber };
-                           // outbound.operating = new Operating { operatingCarrierCode = marketingCompany ,  };
+                            journy.marketingCarrierName = marketingcarriername;
+                            journy.number = flightNumber;
+                            journy.aircraft = new Aircraft { code = flightNumber };
                             var numberOfStops = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.Where(e => e.Element(amadeus + "itemNumber")?.Value == "1")?.ToList().Count() - 1;
-                            outbound.numberOfStops = numberOfStops;
-                           
+                            journy.numberOfStops = numberOfStops;                           
                             var farebasis_rateclass = item?.Descendants(amadeus + "fareBasis")?.Descendants(amadeus + "additionalFareDetails")?.Elements(amadeus + "rateClass")?.FirstOrDefault()?.Value;
                             var farebasis_secondRateClass = item?.Descendants(amadeus + "fareBasis")?.Descendants(amadeus + "additionalFareDetails")?.Elements(amadeus + "secondRateClass")?.FirstOrDefault()?.Value;
                             var cabin_group = item?.Descendants(amadeus + "cabinGroup")?.Descendants(amadeus + "cabinSegment")?.Descendants(amadeus + "bookingClassDetails")?.Elements(amadeus + "designator")?.FirstOrDefault()?.Value;
@@ -656,21 +657,23 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var baggage_quantityCode = item?.Descendants(amadeus + "baggageAllowance")?.Descendants(amadeus + "baggageDetails")?.Elements(amadeus + "quantityCode")?.FirstOrDefault()?.Value;
                             var cabin = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "cabin")?.FirstOrDefault()?.Value;
                             var cabin_avlStatus = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
-                            outbound.baggageAllowence = new BaggageAllowance
+                            journy.baggageAllowence = new BaggageAllowance
                             {
                                 free_allowance = baggage_freeAllowence != null ? baggage_freeAllowence : "",
                                 quantity_code = baggage_quantityCode != null ? baggage_quantityCode : ""
                             };
-                            outbound.cabinClass = cabin;
-                            outbound.cabinStatus = cabin_avlStatus;
-                            outbound.rateClass = farebasis_rateclass;
-                            itinerary.segments.Add(outbound);
-                            itinerary.segment_type = "OutBound";
-
-                        }
-
-
+                            journy.cabinClass = cabin;
+                            journy.cabinStatus = cabin_avlStatus;
+                            journy.rateClass = farebasis_rateclass;
+                            journy.id = Convert.ToInt16( itemnumber);
+                            itinerary.segments.Add(journy);
+                            itinerary.segment_type = "OutBound";                           
+                                                     
+                         }
                     }
+                    offer.itineraries.Add(itinerary);
+                    itinerary = new Itinerary();
+                    itinerary.segments = new List<Segment>();
                     if (segmentInformation_Return != null)
                     {
                         foreach (var arrival in segmentInformation_Return)
@@ -734,6 +737,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             itinerary.segment_type = "InBound";
                         }
                     }
+                    offer.itineraries.Add(itinerary);
                     var price = new Price();
                     price.baseAmount = "";
                     price.total = otherMonetaryDetails_amount;
@@ -742,8 +746,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     price.currency = fareAmount_currency;
                     var taxes = lstTaxdetails;
                     price.taxDetails = new List<taxDetails>();
-                    price.taxDetails = lstTaxdetails;
-                    offer.itineraries.Add(itinerary);
+                    price.taxDetails = lstTaxdetails;                    
                     offer.price = price;
 
                     ReturnModel.flightPrice.Add(offer);
