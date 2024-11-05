@@ -17,11 +17,13 @@ namespace ReservationApi.Controllers
         private IPnrRetreiveRepository _repo;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public PNRRetrieveController(IPnrRetreiveRepository repo, IMemoryCache memoryCache, ICacheService cacheService)
+        private IHelperRepository _helperRepository;
+        public PNRRetrieveController(IPnrRetreiveRepository repo, IMemoryCache memoryCache, ICacheService cacheService, IHelperRepository helperRepository )
         {
             _repo = repo;
             _cache = memoryCache;
             _cacheService = cacheService;
+            _helperRepository = helperRepository;
         }
 
         //[Authorize]
@@ -51,5 +53,31 @@ namespace ReservationApi.Controllers
 
         }
 
+        [HttpPost("RetrivePnr2")]
+        public async Task<IActionResult> RetrivePnr2([FromBody] PnrRetrieveRequst Request)
+        {
+
+            ApiResponse res = new ApiResponse();
+
+            var data = await _repo.RetrivePnr2(Request);
+
+            res.IsSuccessful = data?.amadeusError == null ? true : false;
+            res.StatusCode = data?.amadeusError == null ? 200 : 500;
+            res.Message = data?.amadeusError == null ? "Success" : "Error";
+            res.Response = data?.amadeusError == null ? "Success" : "Failed";
+            if (data?.amadeusError != null)
+            {
+                res.Data = data?.amadeusError;
+                res.StatusCode = data?.amadeusError?.errorCode.Value != 0 ? data.amadeusError.errorCode.Value : 500;
+            }
+            else
+            {
+                res.Data = data;
+                await _helperRepository.Security_Signout(Request.sessionDetails);
+            }
+
+            return Ok(res);
+
+        }
     }
 }

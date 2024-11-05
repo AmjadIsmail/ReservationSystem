@@ -15,9 +15,14 @@ namespace ReservationSystem.Domain.Models
         public string? marketingCarrierName { get; set; }
         public string? number { get; set; }
         public Aircraft? aircraft { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Operating? operating { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? duration { get; set; }
         public int? id { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? segmentRef { get; set; }
         public int? numberOfStops { get; set; }       
@@ -26,6 +31,7 @@ namespace ReservationSystem.Domain.Models
         public string? bookingClass {get;set;}
         public string? avlStatus { get; set; }
         public string? fareBasis { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? breakPoint { get; set; }
         public string? cabinStatus { get; set; }
         public string? rateClass { get; set; }

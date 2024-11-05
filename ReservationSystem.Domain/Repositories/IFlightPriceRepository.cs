@@ -12,5 +12,7 @@ namespace ReservationSystem.Domain.Repositories
     public interface IFlightPriceRepository
     {
         public Task<FlightPriceReturnModel> GetFlightPrice(FlightPriceMoelSoap request);
+
+        public Task<FlightPriceReturnModel> GetFlightPriceWithBestPrice(FlightPriceMoelSoap requestModel);
     }
 }

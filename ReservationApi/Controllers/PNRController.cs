@@ -17,11 +17,13 @@ namespace ReservationApi.Controllers
         private IAddPnrMultiRepository _Repo;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public PNRController(IAddPnrMultiRepository Repo, IMemoryCache memoryCache, ICacheService cacheService)
+        private readonly IHelperRepository _helperRepository;
+        public PNRController(IAddPnrMultiRepository Repo, IMemoryCache memoryCache, ICacheService cacheService , IHelperRepository helperRepository)
         {
             _Repo = Repo;
             _cache = memoryCache;
             _cacheService = cacheService;
+            _helperRepository = helperRepository;
         }
         //[Authorize]
         [HttpPost]
@@ -70,7 +72,7 @@ namespace ReservationApi.Controllers
             else
             {
                 res.Data = data;
-                await _Repo.Security_Signout(request.sessionDetails);
+                await _helperRepository.Security_Signout(request.sessionDetails);
             }
 
             return Ok(res);

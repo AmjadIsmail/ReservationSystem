@@ -12,6 +12,11 @@ using System.Xml;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
+using ReservationSystem.Domain.Models.Availability;
+using ReservationSystem.Domain.Models.FareCheck;
+using ReservationSystem.Domain.Models;
+using System.Net;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -100,6 +105,103 @@ namespace ReservationSystem.Infrastructure.Repositories
                 offset += array.Length;
             }
             return rv;
+        }
+
+        public async Task Security_Signout(HeaderSession header)
+        {
+            FareCheckReturnModel fareCheck = new FareCheckReturnModel();
+            try
+            {
+
+                var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = amadeusSettings["ApiUrl"];
+                var _action = amadeusSettings["Security_SignOut"];
+                string Result = string.Empty;
+                string Envelope = await Signout_Request(header);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Headers.Add("SOAPAction", _action);
+                request.ContentType = "text/xml;charset=\"utf-8\"";
+                request.Accept = "text/xml";
+                request.Method = "POST";
+
+                using (Stream stream = request.GetRequestStream())
+                {
+                    byte[] content = Encoding.UTF8.GetBytes(Envelope);
+                    stream.Write(content, 0, content.Length);
+                }
+
+                try
+                {
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        using (StreamReader rd = new StreamReader(response.GetResponseStream()))
+                        {
+                            var result2 = rd.ReadToEnd();
+                            XDocument xmlDoc = XDocument.Parse(result2);
+                            await SaveXmlResponse("securitySignout", result2);
+                            XmlDocument xmlDoc2 = new XmlDocument();
+                            xmlDoc2.LoadXml(result2);
+                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await SaveJson(jsonText, "securitySignoutJson");
+                            XNamespace fareNS = "http://xml.amadeus.com/FARQNR_07_1_1A";
+                            var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
+                            if (errorInfo != null)
+                            {
+                                var errorCode = errorInfo.Descendants(fareNS + "rejectErrorCode").Descendants(fareNS + "errorDetails").Descendants(fareNS + "errorCode").FirstOrDefault()?.Value;
+                                var errorText = errorInfo.Descendants(fareNS + "errorFreeText").Descendants(fareNS + "freeText").FirstOrDefault()?.Value;
+                                fareCheck.amadeusError = new AmadeusResponseError();
+                                fareCheck.amadeusError.error = errorText;
+                                fareCheck.amadeusError.errorCode = Convert.ToInt16(errorCode);
+
+                            }
+                        }
+                    }
+                }
+                catch (WebException ex)
+                {
+                    using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        Result = rd.ReadToEnd();
+                        fareCheck.amadeusError = new AmadeusResponseError();
+                        fareCheck.amadeusError.error = Result;
+                        fareCheck.amadeusError.errorCode = 0;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                fareCheck.amadeusError = new AmadeusResponseError();
+                fareCheck.amadeusError.error = ex.Message.ToString();
+                fareCheck.amadeusError.errorCode = 0;
+                // return fareCheck;
+            }
+            // return fareCheck;
+        }
+        public async Task<string> Signout_Request(HeaderSession requestModel)
+        {
+
+            var amadeusSettings = configuration.GetSection("AmadeusSoap");
+            string action = amadeusSettings["Security_SignOut"];
+            string to = amadeusSettings["ApiUrl"];
+            string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+   <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+      <ses:Session TransactionStatusCode=""End"">
+      <ses:SessionId>{requestModel.SessionId}</ses:SessionId>
+      <ses:SequenceNumber>{requestModel.SequenceNumber + 1}</ses:SequenceNumber>
+      <ses:SecurityToken>{requestModel.SecurityToken}</ses:SecurityToken>
+    </ses:Session>
+    <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+    <add:Action>{action}</add:Action>
+    <add:To>{to}</add:To>  
+    <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+   </soap:Header>
+   <soap:Body>
+     <Security_SignOut></Security_SignOut>  
+   </soap:Body>
+</soap:Envelope>";
+
+            return Request;
         }
     }
 }

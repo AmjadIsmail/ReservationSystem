@@ -11,5 +11,7 @@ namespace ReservationSystem.Domain.Repositories
     public interface IPnrRetreiveRepository
     {
         public Task<PnrRetrieveResponse> GetPnrDetails(PnrRetrieveRequst requestModel);
+
+        public Task<PnrRetrieveResponse> RetrivePnr2(PnrRetrieveRequst requestModel);
     }
 }

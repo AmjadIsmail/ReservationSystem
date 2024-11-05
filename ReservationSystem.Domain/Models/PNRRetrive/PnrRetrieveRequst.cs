@@ -8,10 +8,11 @@ using System.Threading.Tasks;
 namespace ReservationSystem.Domain.Models.PNRRetrive
 {
     public class PnrRetrieveRequst
-    {
-        [Required]
-        public string pnrNumber { get; set; }        
+    {        
+        public string? pnrNumber { get; set; }        
         public string? retrieveType { get; set; }
-        
+
+        public HeaderSession? sessionDetails { get; set; }
+
     }
 }

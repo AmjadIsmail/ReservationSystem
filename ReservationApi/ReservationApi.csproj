@@ -47,4 +47,9 @@
     <Folder Include="DBContext\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="bin\Airlines.xlsx" />
+    <None Include="bin\Airports.xlsx" />
+  </ItemGroup>
+
 </Project>

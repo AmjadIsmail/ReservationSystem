@@ -74,12 +74,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("FlightPrice_Request", Envelope);
-                            await _helperRepository.SaveXmlResponse("FlightPrice_Response", result2);
+                            await _helperRepository.SaveXmlResponse("Fare_InformativePricingWithoutPNR_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("Fare_InformativePricingWithoutPNR_Response", result2);
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            await _helperRepository.SaveJson(jsonText, "FlightPriceResponseJson");
+                            await _helperRepository.SaveJson(jsonText, "Fare_InformativePricingWithoutPNRJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -92,7 +92,7 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                             }
                             
-                            var res = ConvertXmlToModel(xmlDoc);
+                            var res = ConvertXmlToModel(xmlDoc, fareNS);
                             flightPrice = res;
                            
 
@@ -362,7 +362,51 @@ namespace ReservationSystem.Infrastructure.Repositories
             return Request;
         }
 
-    
+        public async Task<string> CreateFlightPriceRequestWithBestPrice(FlightPriceMoelSoap requestModel , string _action)
+        {
+            string pwdDigest = await _helperRepository.generatePassword();
+            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            string action = _action;
+            string to = amadeusSettings["ApiUrl"];
+            string username = amadeusSettings["webUserId"];
+            string dutyCode = amadeusSettings["dutyCode"];
+            string requesterType = amadeusSettings["requestorType"];
+            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
+            string pos_type = amadeusSettings["POS_Type"];
+            requestModel.child = requestModel?.child != null ? requestModel.child : 0;
+            requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
+
+            string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
+        <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
+        <ses:Session TransactionStatusCode=""Start""/>
+        <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
+        <add:Action>{action}</add:Action>
+      <add:To>{to}</add:To>
+      <link:TransactionFlowLink xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1""/>
+      <oas:Security xmlns:oas=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"" xmlns:oas1=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"">
+         <oas:UsernameToken oas1:Id=""UsernameToken-1"">
+            <oas:Username>{username}</oas:Username>
+            <oas:Nonce EncodingType=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary"">{pwdDigest.Split("|")[1]}</oas:Nonce>
+            <oas:Password Type=""http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest"">{pwdDigest.Split("|")[0]}</oas:Password>
+            <oas1:Created>{pwdDigest.Split("|")[2]}</oas1:Created>
+         </oas:UsernameToken>
+      </oas:Security>
+      <AMA_SecurityHostedUser xmlns=""http://xml.amadeus.com/2010/06/Security_v1"">
+         <UserID AgentDutyCode=""{dutyCode}"" RequestorType=""{requesterType}"" PseudoCityCode=""{PseudoCityCode}"" POS_Type=""{pos_type}""/>
+      </AMA_SecurityHostedUser>
+   </soapenv:Header>
+   <soapenv:Body>
+      <Fare_InformativeBestPricingWithoutPNR>
+       {GeneratePassengerGroup(requestModel.adults.Value, requestModel.child.Value, requestModel.infant.Value)}
+        {GenerateSegmentGroup(requestModel)}
+         {GeneratePricingOptionsGroup(requestModel.pricingOptionKey)}
+      </Fare_InformativeBestPricingWithoutPNR>
+   </soapenv:Body>
+
+</soapenv:Envelope>";
+
+            return Request;
+        }
         public async Task<FlightPriceModelReturn> GetFlightPrice_Rest(string token, FlightPriceModel requestModel)
         {
             FlightPriceModelReturn flightPrice = new FlightPriceModelReturn();
@@ -445,13 +489,13 @@ namespace ReservationSystem.Infrastructure.Repositories
 
         }
 
-        public FlightPriceReturnModel ConvertXmlToModel(XDocument response)
+        public FlightPriceReturnModel ConvertXmlToModel(XDocument response, XNamespace ns)
         {
             FlightPriceReturnModel ReturnModel = new FlightPriceReturnModel();
             ReturnModel.flightPrice = new List<FlightOfferForFlightPrice>();
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
-            XNamespace amadeus = "http://xml.amadeus.com/TIPNRR_23_1_1A";
+            XNamespace amadeus = ns;
             List<Itinerary> itinerariesList = new List<Itinerary>();
             string? numberOfPax;
             string? passengerid;
@@ -493,8 +537,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                     TransactionStatusCode = TransactionStatusCode
                 };
             }
-
-            var messegeFunction = doc.Descendants(amadeus + "messageDetails")?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault().Value;
+            var messegeFunction = doc.Descendants(amadeus + "messageDetails").FirstOrDefault();
+            string strMsgFunction = string.Empty;
+            if(messegeFunction != null)
+            {
+                var messegDetail = messegeFunction?.Descendants(amadeus + "messageFunctionDetails")?.Descendants(amadeus + "messageFunction")?.FirstOrDefault().Value;
+                strMsgFunction = messegDetail;
+            }
             var pricingGroupLevelGroup = doc.Descendants(amadeus + "pricingGroupLevelGroup").ToList();
             if (pricingGroupLevelGroup != null)
             {
@@ -504,7 +553,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 foreach (var item in pricingGroupLevelGroup)
                 {
                     FlightOfferForFlightPrice offer = new FlightOfferForFlightPrice();
-                    offer.messageFunction = messegeFunction;
+                    offer.messageFunction = strMsgFunction;
                     offer.itineraries = new List<Itinerary>();
                     Itinerary itinerary = new Itinerary();
                     itinerary.segments = new List<Segment>();
@@ -616,6 +665,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var baggage_quantityCode = item?.Descendants(amadeus + "baggageAllowance")?.Descendants(amadeus + "baggageDetails")?.Elements(amadeus + "quantityCode")?.FirstOrDefault()?.Value;
                             var cabin = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "cabin")?.FirstOrDefault()?.Value;
                             var cabin_avlStatus = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
+                            var bookingClassRbd = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "rbd")?.FirstOrDefault()?.Value;
                             journy.baggageAllowence = new BaggageAllowance
                             {
                                 free_allowance = baggage_freeAllowence != null ? baggage_freeAllowence : "",
@@ -624,6 +674,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             journy.cabinClass = cabin;
                             journy.cabinStatus = cabin_avlStatus;
                             journy.rateClass = farebasis_rateclass;
+                            journy.bookingClass = bookingClassRbd;
+                            journy.fareBasis = farebasis_rateclass;
+                            journy.avlStatus = cabin_avlStatus;
                             journy.id = Convert.ToInt16( itemnumber);
                             itinerary.segments.Add(journy);
                             itinerary.segment_type = "OutBound";                           
@@ -684,6 +737,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var baggage_quantityCode = item?.Descendants(amadeus + "baggageAllowance")?.Descendants(amadeus + "baggageDetails")?.Elements(amadeus + "quantityCode")?.FirstOrDefault()?.Value;
                             var cabin = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "cabin")?.FirstOrDefault()?.Value;
                             var cabin_avlStatus = arrival?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "avlStatus")?.FirstOrDefault()?.Value;
+                            var bookingClassRbd = item?.Descendants(amadeus + "flightProductInformationType")?.Descendants(amadeus + "cabinProduct")?.Elements(amadeus + "rbd")?.FirstOrDefault()?.Value;
                             inbound.baggageAllowence = new BaggageAllowance
                             {
                                 free_allowance = baggage_freeAllowence != null ? baggage_freeAllowence : "",
@@ -692,6 +746,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             inbound.cabinClass = cabin;
                             inbound.cabinStatus = cabin_avlStatus;
                             inbound.rateClass = farebasis_rateclass;
+                            inbound.bookingClass = bookingClassRbd;
+                            inbound.fareBasis = farebasis_rateclass;
+                            inbound.avlStatus = cabin_avlStatus;
                             itinerary.segments.Add(inbound);
                             itinerary.segment_type = "InBound";
                         }
@@ -713,6 +770,89 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             }
             return ReturnModel;
+        }
+
+        public async Task<FlightPriceReturnModel> GetFlightPriceWithBestPrice(FlightPriceMoelSoap requestModel)
+        {
+            FlightPriceReturnModel flightPrice = new FlightPriceReturnModel();
+            try
+            {
+
+                var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = amadeusSettings["ApiUrl"];
+                var _action = amadeusSettings["fareInformativeBestPricingWithoutPNRAction"];
+                string Result = string.Empty;
+                string Envelope = await CreateFlightPriceRequestWithBestPrice(requestModel,_action);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
+                request.Headers.Add("SOAPAction", _action);
+                request.ContentType = "text/xml;charset=\"utf-8\"";
+                request.Accept = "text/xml";
+                request.Method = "POST";
+                XNamespace fareNS = "http://xml.amadeus.com/TIBNRR_23_1_1A"; // price
+                XDocument xmlDoc = new XDocument();
+                using (Stream stream = request.GetRequestStream())
+                {
+                    byte[] content = Encoding.UTF8.GetBytes(Envelope);
+                    stream.Write(content, 0, content.Length);
+                }
+
+                try
+                {
+                    using (WebResponse response = request.GetResponse())
+                    {
+                        using (StreamReader rd = new StreamReader(response.GetResponseStream()))
+                        {
+                            var result2 = rd.ReadToEnd();
+                            xmlDoc = XDocument.Parse(result2);
+                            await _helperRepository.SaveXmlResponse("Fare_InformativeBestPricingWithoutPNR_Request", Envelope);
+                            await _helperRepository.SaveXmlResponse("Fare_InformativeBestPricingWithoutPNR_Response", result2);
+                            XmlDocument xmlDoc2 = new XmlDocument();
+                            xmlDoc2.LoadXml(result2);
+                            string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
+                            await _helperRepository.SaveJson(jsonText, "Fare_InformativeBestPricingWithoutPNRJson");
+                            var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
+                            if (errorInfo != null)
+                            {
+                                var errorText = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "errorMessageText").Descendants(fareNS + "description")?.FirstOrDefault()?.Value;
+                                var errorCode = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "applicationError").Descendants(fareNS + "applicationErrorDetail").Descendants(fareNS + "error")?.FirstOrDefault()?.Value;
+                                flightPrice.amadeusError = new AmadeusResponseError();
+                                flightPrice.amadeusError.error = errorText;
+                                flightPrice.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                return flightPrice;
+
+                            }
+
+                            var res = ConvertXmlToModel(xmlDoc, fareNS);
+                            flightPrice = res;
+
+
+                        }
+                    }
+                }
+                catch (WebException ex)
+                {
+                    using (StreamReader rd = new StreamReader(ex.Response.GetResponseStream()))
+                    {
+                        Result = rd.ReadToEnd();
+                        var errorText = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "errorMessageText").Descendants(fareNS + "description")?.FirstOrDefault()?.Value;
+                        var errorCode = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "applicationError").Descendants(fareNS + "applicationErrorDetail").Descendants(fareNS + "error")?.FirstOrDefault()?.Value;
+
+                        flightPrice.amadeusError = new AmadeusResponseError();
+                        flightPrice.amadeusError.error = errorText;
+                        flightPrice.amadeusError.errorCode = errorCode != null ? Convert.ToInt16(errorCode) : 0;
+                        return flightPrice;
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                flightPrice.amadeusError = new AmadeusResponseError();
+                flightPrice.amadeusError.error = ex.Message.ToString(); ;
+                flightPrice.amadeusError.errorCode = 500;
+                return flightPrice;
+            }
+            return flightPrice;
         }
     }
 }

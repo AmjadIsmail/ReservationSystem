@@ -212,7 +212,7 @@ namespace ReservationSystem.Infrastructure.Repositories
       <Fare_MasterPricerTravelBoardSearch>
          <numberOfUnit>
             <unitNumberDetail>
-               <numberOfUnits>{requestModel.adults+requestModel.children}</numberOfUnits>
+               <numberOfUnits>{requestModel.adults + requestModel.children}</numberOfUnits>
                <typeOfUnit>PX</typeOfUnit>
             </unitNumberDetail>
             <unitNumberDetail>
@@ -220,7 +220,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                <typeOfUnit>RC</typeOfUnit>
             </unitNumberDetail>
          </numberOfUnit>"
-        + GetPaxReference(requestModel.adults.Value,requestModel.children.Value,requestModel.infant.Value)+
+        + GetPaxReference(requestModel.adults.Value, requestModel.children.Value, requestModel.infant.Value) +
          @"<fareOptions>
             <pricingTickInfo>
                <pricingTicketing>
@@ -237,8 +237,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             </pricingTickInfo>           
          </fareOptions> 
 <travelFlightInfo>
-           "+getCabinClass(requestModel.cabinClass)+@"
-           "+getFlightType(requestModel.flightType)+@"
+           " + getCabinClass(requestModel.cabinClass) + @"
+           " + getFlightType(requestModel.flightType) + @"
 </travelFlightInfo>
          <itinerary>
             <requestedSegmentRef>
@@ -246,7 +246,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             </requestedSegmentRef>
             <departureLocalization>
                <departurePoint>
-                  <locationId>" + requestModel.origin +@"</locationId>
+                  <locationId>" + requestModel.origin + @"</locationId>
                </departurePoint>
             </departureLocalization>
             <arrivalLocalization>
@@ -274,11 +274,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                   <locationId>" + requestModel.origin + @"</locationId>
                </arrivalPointDetails>
             </arrivalLocalization>
-            <timeDetails>
-               <firstDateTimeDetail>
-                  <date>" + requestModel.returnDate+ @"</date>
-               </firstDateTimeDetail>
-            </timeDetails>
+           "+ getReturnDate(requestModel.returnDate)+@"
          </itinerary>
       </Fare_MasterPricerTravelBoardSearch>
    </soapenv:Body>
@@ -286,6 +282,24 @@ namespace ReservationSystem.Infrastructure.Repositories
 </soapenv:Envelope>";
 
             return Request;
+        }
+        private string getReturnDate(string? returnDate)
+        {
+            string retDate = $@"";
+            try
+            {
+                if (!string.IsNullOrEmpty(returnDate)){
+                    retDate = $@" <timeDetails>
+               <firstDateTimeDetail>
+                  <date>" + returnDate + @"</date>
+               </firstDateTimeDetail>
+            </timeDetails>";
+                }
+            }
+            catch{
+
+            }
+            return retDate;
         }
         private string getCabinClass (string cabinclass)
         {

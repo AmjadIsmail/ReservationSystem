@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ReservationSystem.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace ReservationSystem.Domain.Repositories
         public Task SaveXmlResponse(string filename, string response);
 
         public Task<string> generatePassword();
+        public Task Security_Signout(HeaderSession header);
     }
 }
