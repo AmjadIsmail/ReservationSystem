@@ -316,3 +316,4 @@ bin/
 /ReservationApi/obj/Debug/net8.0/ReservationApi.AssemblyInfo.cs
 /ReservationApi/obj/Debug/net8.0/ReservationApi.AssemblyInfoInputs.cache
 /ReservationApi/obj/Debug/net8.0/ReservationApi.csproj.AssemblyReference.cache
+/ReservationApi/.vs/ReservationApi/v17/.suo
