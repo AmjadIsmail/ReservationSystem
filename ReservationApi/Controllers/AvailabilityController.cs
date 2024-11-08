@@ -53,16 +53,29 @@ namespace ReservationApi.Controllers
             
             return Ok(res);
 
-        }        
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+
+            ApiResponse res = new ApiResponse();            
+            res.IsSuccessful = true;
+            res.StatusCode = 200;
+            res.Data = "API Service running properly";
+            res.Response = "Success";
+            res.Message = "Success";
+            return Ok(res);
+        }
 
         [HttpGet("clearCache")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetClearCache()
         {
            
             ApiResponse res = new ApiResponse();
             await _availability.ClearCache();
             res.IsSuccessful = true;
-            res.StatusCode = 200;
+            res.StatusCode = 200;           
             res.Data = "Clear Success"; 
             return Ok(res);
         }
