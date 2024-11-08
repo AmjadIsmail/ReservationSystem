@@ -118,7 +118,7 @@ namespace ReservationSystem.Infrastructure.Service
 
         public async Task<DataTable> SetAirlineDataTableFromExcelToCache()
         {
-            string filePath = Path.Combine(AppContext.BaseDirectory.Replace("Debug\\net8.0\\",""), "Airlines.xlsx");
+            string filePath = Path.Combine("SupportFiles\\Airlines.xlsx");
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             DataTable dataTable = new DataTable();
@@ -147,7 +147,9 @@ namespace ReservationSystem.Infrastructure.Service
 
         public async Task<DataTable> SetAirportToCache()
         {
-            string filePath = Path.Combine(AppContext.BaseDirectory.Replace("Debug\\net8.0\\", ""), "Airports.xlsx");
+         
+            string filePath = Path.Combine("SupportFiles\\Airports.xlsx");
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             DataTable dataTable = new DataTable();
