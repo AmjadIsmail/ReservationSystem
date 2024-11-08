@@ -548,8 +548,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             if (pricingGroupLevelGroup != null)
             {
 
-                var AirlineCache = _cacheService.GetAirlines();
-                var AirportCache = _cacheService.GetAirports();
+               // var AirlineCache = _cacheService.GetAirlines();
+               // var AirportCache = _cacheService.GetAirports();
                 foreach (var item in pricingGroupLevelGroup)
                 {
                     FlightOfferForFlightPrice offer = new FlightOfferForFlightPrice();
@@ -631,15 +631,15 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var itemNumber = seg?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
                             var fromlocation = seg?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
                             journy.departure.iataCode = fromlocation != null ? fromlocation : "";
-                            DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == fromlocation);
-                            var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
-                            journy.departure.iataName = depAirportName;
+                         //   DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == fromlocation);
+                         //   var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
+                          //  journy.departure.iataName = depAirportName;
                             var toLocation = seg?.Descendants(amadeus + "offpointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
                             journy.arrival = new Arrival();
                             journy.arrival.iataCode = toLocation;
-                            DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == toLocation);
-                            var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
-                            journy.arrival.iataName = arrAirportName;
+                         //   DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == toLocation);
+                          //  var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+                           // journy.arrival.iataName = arrAirportName;
                             var Addinfo = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "additionalInformation")?.FirstOrDefault();
                             var arrivalDate = Addinfo?.Descendants(amadeus + "productDateTimeDetails")?.Descendants(amadeus + "arrivalDate")?.FirstOrDefault()?.Value;
                             if (arrivalDate != null)
@@ -651,9 +651,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var bookingClass = seg?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "bookingClass")?.FirstOrDefault()?.Value;
                             var itemnumber = seg?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
                             journy.marketingCarrierCode = marketingCompany;
-                            DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCompany);
-                            var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
-                            journy.marketingCarrierName = marketingcarriername;
+                          //  DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCompany);
+                          //  var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
+                          //  journy.marketingCarrierName = marketingcarriername;
                             journy.number = flightNumber;
                             journy.aircraft = new Aircraft { code = flightNumber };
                             var numberOfStops = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "segmentInformation")?.Where(e => e.Element(amadeus + "itemNumber")?.Value == "1")?.ToList().Count() - 1;
@@ -699,16 +699,16 @@ namespace ReservationSystem.Infrastructure.Repositories
                             }
                             var fromlocation = arrival?.Descendants(amadeus + "boardPointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
                             inbound.departure.iataCode = fromlocation != null ? fromlocation : "";
-                            DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == fromlocation);
-                            var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
-                            inbound.departure.iataName = depAirportName;
+                          //  DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == fromlocation);
+                           // var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
+                            //inbound.departure.iataName = depAirportName;
 
                             var toLocation = arrival?.Descendants(amadeus + "offpointDetails")?.Elements(amadeus + "trueLocationId")?.FirstOrDefault()?.Value;
                             inbound.arrival = new Arrival();
                             inbound.arrival.iataCode = toLocation;
-                            DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == toLocation);
-                            var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
-                            inbound.arrival.iataName = arrAirportName;
+                        //    DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == toLocation);
+                         //   var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+                          //  inbound.arrival.iataName = arrAirportName;
 
                             var Addinfo = item?.Descendants(amadeus + "fareInfoGroup")?.Descendants(amadeus + "segmentLevelGroup")?.Descendants(amadeus + "additionalInformation")?.FirstOrDefault();
                             var arrivalDate = Addinfo?.Descendants(amadeus + "productDateTimeDetails")?.Descendants(amadeus + "arrivalDate")?.FirstOrDefault()?.Value;
@@ -721,9 +721,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var bookingClass = arrival?.Descendants(amadeus + "flightIdentification")?.Elements(amadeus + "bookingClass")?.FirstOrDefault()?.Value;
                             var itemnumber = arrival?.Descendants(amadeus + "itemNumber")?.FirstOrDefault()?.Value;
                             inbound.marketingCarrierCode = marketingCompany;
-                            DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCompany);
-                            var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
-                            inbound.marketingCarrierName = marketingcarriername;
+                           // DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCompany);
+                           // var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
+                            //inbound.marketingCarrierName = marketingcarriername;
                             inbound.number = flightNumber;
                             inbound.aircraft = new Aircraft { code = flightNumber };
                             //inbound.operating = new Operating { carrierCode = marketingCompany };

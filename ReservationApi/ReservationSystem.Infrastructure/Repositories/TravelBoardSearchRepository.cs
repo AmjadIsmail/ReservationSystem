@@ -343,8 +343,8 @@ namespace ReservationSystem.Infrastructure.Repositories
             XDocument doc = response;
             XNamespace soapenv = "http://schemas.xmlsoap.org/soap/envelope/";
             XNamespace amadeus = "http://xml.amadeus.com/FMPTBR_24_1_1A";
-            var AirlineCache = _cacheService.GetAirlines();
-            var AirportCache = _cacheService.GetAirports();
+           // var AirlineCache = _cacheService.GetAirlines();
+           // var AirportCache = _cacheService.GetAirports();
 
             List<Itinerary>  itinerariesList = new List<Itinerary>();
             List<string> timeduration = new List<string>();
@@ -385,34 +385,36 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-                        DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
-                        var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
+                       // DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
+                       // var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
                         var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-                        DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
-                        var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+                     //   DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
+                     //   var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
 
                         var arrivalTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
 
                         var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
                         var operatingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "operatingCarrier")?.Value;
-                        DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
-                        var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
+                      //  DataRow carrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
+                      //  var marketingcarriername = carrier != null ? carrier[1].ToString() : "";
                         var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
                         Segment segment = new Segment();
                         segment.segmentRef = segRef;
                         string dateTimeStr = departureDate + departureTime;
                         string format = "ddMMyyHHmm";
                         DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
-                        segment.departure = new Departure { at = departureD, iataCode = departureLocation , terminal = departureTerminal , iataName = depAirportName  };
+                        segment.departure = new Departure { at = departureD, iataCode = departureLocation, terminal = departureTerminal };
+                        //   segment.departure = new Departure { at = departureD, iataCode = departureLocation , terminal = departureTerminal , iataName = depAirportName  };
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
-                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal ,  iataName=arrAirportName };
+                        //segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal ,  iataName=arrAirportName };
+                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal  };
                         segment.marketingCarrierCode = marketingCarrier;
-                        segment.marketingCarrierName = marketingcarriername;
+                       // segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
@@ -435,9 +437,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                             segment.rateClass = fareBasis;
                             segment.cabinStatus = availStatus;
                         }
-                        DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
-                        var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
-                        segment.operating = new Operating {  operatingCarrierCode = operatingCarrier , operatingCarrierName = operatingCarrierName };
+                        // DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
+                        // var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
+                        //segment.operating = new Operating { operatingCarrierCode = operatingCarrier, operatingCarrierName = operatingCarrierName };
+                        segment.operating = new Operating {  operatingCarrierCode = operatingCarrier };
                         segment.numberOfStops = numberOfStops;
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
@@ -484,14 +487,14 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-                        DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
-                        var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
+                      //  DataRow depatureAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation);
+                      //  var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
                         var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
-                        DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
-                        var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
+                      //  DataRow arrivalAirport = AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == arrivalLocation);
+                      //  var arrAirportName = arrivalAirport != null ? arrivalAirport[2].ToString() + " , " + arrivalAirport[4].ToString() : "";
 
 
                         var arrivalTerminal = flightDetails.Element(amadeus + "flightInformation")?
@@ -499,8 +502,8 @@ namespace ReservationSystem.Infrastructure.Repositories
 
                         var marketingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "marketingCarrier")?.Value;
                         var operatingCarrier = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "companyId")?.Element(amadeus + "operatingCarrier")?.Value;
-                        DataRow drmarketingcarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
-                        var marketingcarriername = drmarketingcarrier != null ? drmarketingcarrier[1].ToString() : "";
+                     //   DataRow drmarketingcarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == marketingCarrier);
+                     //   var marketingcarriername = drmarketingcarrier != null ? drmarketingcarrier[1].ToString() : "";
 
 
                         var flightNumber = flightDetails.Element(amadeus + "flightInformation")?.Element(amadeus + "flightOrtrainNumber")?.Value;
@@ -508,12 +511,14 @@ namespace ReservationSystem.Infrastructure.Repositories
                         string dateTimeStr = departureDate + departureTime;
                         string format = "ddMMyyHHmm";
                         DateTime departureD = DateTime.ParseExact(dateTimeStr, format, CultureInfo.InvariantCulture);
-                        segment.departure = new Departure { at = departureD, iataCode = departureLocation, iataName = depAirportName, terminal = departureTerminal };
+                        segment.departure = new Departure { at = departureD, iataCode = departureLocation, terminal = departureTerminal };
+                        //  segment.departure = new Departure { at = departureD, iataCode = departureLocation, iataName = depAirportName, terminal = departureTerminal };
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
-                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation, iataName = arrAirportName, terminal = arrivalTerminal };
+                        // segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation, iataName = arrAirportName, terminal = arrivalTerminal };
+                        segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation,  terminal = arrivalTerminal };
                         segment.marketingCarrierCode = marketingCarrier;
-                        segment.marketingCarrierName = marketingcarriername;
+                       // segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
                         segment.duration = FlightDuration;
                         segment.number = FlightNumber;
@@ -536,9 +541,9 @@ namespace ReservationSystem.Infrastructure.Repositories
                             segment.rateClass = fareBasis;
                             segment.cabinStatus = availStatus;
                         }
-                        DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
-                        var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
-                        segment.operating = new Operating { operatingCarrierCode = operatingCarrier, operatingCarrierName = operatingCarrierName };
+                      //  DataRow droperatingCarrier = AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier);
+                       // var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
+                        segment.operating = new Operating { operatingCarrierCode = operatingCarrier };
                         segment.numberOfStops = numberOfStops;                         
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
