@@ -29,5 +29,7 @@ namespace ReservationSystem.Domain.Service
         public Task<DataTable> SetAirportToCache();
 
         public DataTable GetAirports();
+
+        public Task<dynamic> CheckAirlines();
     }
 }

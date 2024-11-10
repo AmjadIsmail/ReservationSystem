@@ -235,5 +235,37 @@ namespace ReservationSystem.Infrastructure.Service
          
            
         }
+
+        public async Task<dynamic> CheckAirlines()
+        {
+            try
+            {
+                var filePath = Path.Combine(_environment.ContentRootPath, "SupportFiles", "Airlines.xlsx");
+                DataTable dataTable = new DataTable();
+                using (var workbook = new XLWorkbook(filePath))
+                {
+                    var worksheet = workbook.Worksheet(1);
+                    dataTable.Columns.Add("AirlineID", typeof(string));
+                    dataTable.Columns.Add("AirlineName", typeof(string));
+                    dataTable.Columns.Add("AirlineCode", typeof(string));
+                    for (int row = 2; row <= worksheet.RowCount(); row++)
+                    {
+                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
+                        dataTable.Rows.Add(airlineID, airlineName, airlineCode);
+                    }
+                }
+                _AirlineDT = dataTable;              
+               
+                return _AirlineDT;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while set airline cache {ex.Message.ToString()}");
+                return ex.Message.ToString() + " " +ex.StackTrace.ToString() ;
+
+            }
+        }
     }
 }

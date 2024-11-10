@@ -68,6 +68,20 @@ namespace ReservationApi.Controllers
             return Ok(res);
         }
 
+        [HttpGet("GetAirlines")]
+        public async Task<IActionResult> GetAirlines()
+        {
+
+            ApiResponse res = new ApiResponse();
+            var res2 = await _cacheService.CheckAirlines();
+            res.IsSuccessful = true;
+            res.StatusCode = 200;
+            res.Data = res2;
+            res.Response = "Success";
+            res.Message = "Success";
+            return Ok(res);
+        }
+
         [HttpGet("clearCache")]
         public async Task<IActionResult> GetClearCache()
         {
