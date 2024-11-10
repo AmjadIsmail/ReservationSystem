@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ReservationSystem.Infrastructure.Service
 {
+    using ClosedXML.Excel;
+    using DocumentFormat.OpenXml.Spreadsheet;
+    using Microsoft.AspNetCore.Hosting;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.DependencyInjection;
@@ -32,12 +35,14 @@ namespace ReservationSystem.Infrastructure.Service
         private static DataTable _AirlineDT;
         private static DataTable _AirportDT;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IWebHostEnvironment _environment;
 
 
-        public CacheService(IMemoryCache cache, IServiceProvider serviceProvider)
+        public CacheService(IMemoryCache cache, IServiceProvider serviceProvider, IWebHostEnvironment environment)
         {
             _Markupcache = cache;
             _serviceProvider = serviceProvider;
+            _environment = environment;
 
         }
 
@@ -116,68 +121,119 @@ namespace ReservationSystem.Infrastructure.Service
             return _AirportDT;
         }
 
-        public async Task<DataTable> SetAirlineDataTableFromExcelToCache()
+        public void SetAirlineDataTable(string filePath)
         {
-            string filePath = Path.Combine("SupportFiles\\Airlines.xlsx");
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             DataTable dataTable = new DataTable();
             try
             {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                using (var workbook = new XLWorkbook(filePath))
                 {
-                    var worksheet = package.Workbook.Worksheets[0]; 
-                    
-                    dataTable.Columns.Add("AirlineID", typeof(int));
+                    var worksheet = workbook.Worksheet(1); 
+                    dataTable.Columns.Add("AirlineID", typeof(string));
                     dataTable.Columns.Add("AirlineName", typeof(string));
                     dataTable.Columns.Add("AirlineCode", typeof(string));
-                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++) 
+                    for (int row = 2; row <= worksheet.RowCount(); row++)
                     {
-                        var airlineID = Convert.ToInt32(worksheet.Cells[row, 1].Value);
-                        var airlineName = worksheet.Cells[row, 2].Value.ToString();
-                        var airlineCode = worksheet.Cells[row, 3].Value.ToString();
+                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
                         dataTable.Rows.Add(airlineID, airlineName, airlineCode);
                     }
                     _AirlineDT = dataTable;
                 }
             }
-            catch{ }  
-            return dataTable;
+            catch (Exception ex)
+            {
+                dataTable.Columns.Add("AirlineID", typeof(string));
+                dataTable.Columns.Add("AirlineName", typeof(string));
+                dataTable.Columns.Add("AirlineCode", typeof(string));
+                var airlineID = "1";
+                var airlineName = "British airlines";
+                var airlineCode = "BA";
+                dataTable.Rows.Add(airlineID, airlineName, airlineCode);
+                _AirlineDT = dataTable;
+                Console.Write($"Error while reading Airline.xlsx file {ex.Message}");
+            }
+        }
+        public async Task<DataTable> SetAirlineDataTableFromExcelToCache()
+        {
+            try
+            {
+                var filePath = Path.Combine(_environment.ContentRootPath, "SupportFiles", "Airlines.xlsx");
+                SetAirlineDataTable(filePath);
+                return _AirlineDT;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Error while set airline cache {ex.Message.ToString()}");
+                return _AirlineDT;
+
+            }
+                     
         }
 
-        public async Task<DataTable> SetAirportToCache()
+        public void SetAirPortDataTable(string filePath)
         {
-         
-            string filePath = Path.Combine("SupportFiles\\Airports.xlsx");
-
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             DataTable dataTable = new DataTable();
             try
             {
-                using (var package = new ExcelPackage(new FileInfo(filePath)))
+                using (var workbook = new XLWorkbook(filePath))
                 {
-                    var worksheet = package.Workbook.Worksheets[0];
-
+                    var worksheet = workbook.Worksheet(1); 
                     dataTable.Columns.Add("AirportID", typeof(string));
                     dataTable.Columns.Add("AirportCode", typeof(string));
                     dataTable.Columns.Add("AirportName", typeof(string));
                     dataTable.Columns.Add("AirportCity", typeof(string));
                     dataTable.Columns.Add("AirportCountry", typeof(string));
-                    for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                    for (int row = 2; row <= worksheet.RowCount(); row++)
                     {
-                        var AirportID = worksheet.Cells[row, 1].Value != null ? worksheet.Cells[row, 1].Value : "";
-                        var AirportCode = worksheet.Cells[row, 2].Value != null ? worksheet.Cells[row, 2].Value.ToString() : "";
-                        var AirportName = worksheet.Cells[row, 3].Value != null ? worksheet.Cells[row, 3].Value.ToString() : "";
-                        var AirportCity = worksheet.Cells[row, 4].Value != null ? worksheet.Cells[row, 4].Value.ToString() : "";
-                        var AirportCountry = worksheet.Cells[row, 5].Value != null ? worksheet.Cells[row, 5].Value.ToString():"";
-                        dataTable.Rows.Add(AirportID, AirportCode, AirportName,AirportCity,AirportCountry);
+                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
+                        var AirportID = worksheet.Row(row).Cell(1).Value ;
+                        var AirportCode = worksheet.Row(row).Cell(2).Value;
+                        var AirportName = worksheet.Row(row).Cell(3).Value;
+                        var AirportCity = worksheet.Row(row).Cell(4).Value;
+                        var AirportCountry = worksheet.Row(row).Cell(5).Value;
+                        dataTable.Rows.Add(AirportID, AirportCode, AirportName, AirportCity, AirportCountry);
+
                     }
                     _AirportDT = dataTable;
                 }
             }
-            catch { }
-            return dataTable;
+            catch (Exception ex)
+            {
+                dataTable.Columns.Add("AirportID", typeof(string));
+                dataTable.Columns.Add("AirportCode", typeof(string));
+                dataTable.Columns.Add("AirportName", typeof(string));
+                dataTable.Columns.Add("AirportCity", typeof(string));
+                dataTable.Columns.Add("AirportCountry", typeof(string));
+                var AirportID = "1";
+                var AirportCode = "LHR";
+                var AirportName = "London Airport";
+                var AirportCity = "London";
+                var AirportCountry = "United Kingdom";
+                dataTable.Rows.Add(AirportID, AirportCode, AirportName, AirportCity, AirportCountry);
+                _AirportDT = dataTable;
+                Console.Write($"Error while reading Airport.xlsx file {ex.Message}");
+            }
+        }
+
+        public async Task<DataTable> SetAirportToCache()
+        {
+            try
+            {
+                var filePath = Path.Combine(_environment.ContentRootPath, "SupportFiles", "Airports.xlsx");
+                SetAirPortDataTable(filePath);
+                return _AirportDT;
+            }
+            catch( Exception ex)
+            {
+                Console.WriteLine($"Error while set Airport cache {ex.Message.ToString()}");
+                return _AirportDT;
+            }
+         
+           
         }
     }
 }

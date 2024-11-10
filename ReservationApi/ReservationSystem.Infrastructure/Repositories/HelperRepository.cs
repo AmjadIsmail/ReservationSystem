@@ -33,8 +33,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         {
             try
             {
-                var logsPath = configuration.GetSection("Logspath").Value;
-                await System.IO.File.WriteAllTextAsync(logsPath + filename + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".json", jsonText);                
+                var Allowlogs = configuration.GetSection("writelogs")?.Value;
+                if (Allowlogs == "true")
+                {
+                    var logsPath = configuration.GetSection("Logspath").Value;
+                    await System.IO.File.WriteAllTextAsync(logsPath + filename + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".json", jsonText);
+                }
+                              
             }
             catch (Exception ex)
             {
@@ -44,25 +49,34 @@ namespace ReservationSystem.Infrastructure.Repositories
 
         public async Task SaveXmlResponse(string filename, string response)
         {
-            XDocument xmlDoc = XDocument.Parse(response);
-            XmlWriterSettings settings = new XmlWriterSettings
-            {
-                Indent = true,
-                OmitXmlDeclaration = false,
-                Encoding = System.Text.Encoding.UTF8
-            };
             try
             {
-                var logsPath = configuration.GetSection("Logspath").Value;
-                using (XmlWriter writer = XmlWriter.Create(logsPath + filename + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
+                var Allowlogs = configuration.GetSection("writelogs")?.Value;
+                if (Allowlogs == "true")
                 {
-                    xmlDoc.Save(writer);
+                    XDocument xmlDoc = XDocument.Parse(response);
+                    XmlWriterSettings settings = new XmlWriterSettings
+                    {
+                        Indent = true,
+                        OmitXmlDeclaration = false,
+                        Encoding = System.Text.Encoding.UTF8
+                    };
+
+                    var logsPath = configuration.GetSection("Logspath").Value;
+                    using (XmlWriter writer = XmlWriter.Create(logsPath + filename + DateTime.UtcNow.ToString("yyyyMMddHHmmss") + ".xml", settings))
+                    {
+                        xmlDoc.Save(writer);
+                    }
+
                 }
-            }
-            catch
-            {
 
             }
+            catch ( Exception ex)
+            {
+                Console.WriteLine($"Error while save xml response {ex.Message.ToString()}");
+            }
+          
+          
         }
 
         public async Task<string> generatePassword()
