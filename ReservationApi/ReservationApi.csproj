@@ -50,6 +50,11 @@
     <Folder Include="SupportFiles\" />
   </ItemGroup>
 
+	<ItemGroup>
+      <None Update="SupportFiles\Airlines.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+</ItemGroup>
   <ItemGroup>
     <None Include="bin\Airlines.xlsx" />
     <None Include="bin\Airports.xlsx" />
