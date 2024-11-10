@@ -124,21 +124,43 @@ namespace ReservationSystem.Infrastructure.Service
         public void SetAirlineDataTable(string filePath)
         {
             DataTable dataTable = new DataTable();
+            var data = new Dictionary<string, List<string>>();
             try
             {
                 using (var workbook = new XLWorkbook(filePath))
                 {
-                    var worksheet = workbook.Worksheet(1); 
+                    var worksheet = workbook.Worksheet(1);                   
+                    int rows = worksheet.LastRowUsed().RowNumber();
+                    var colAirlineID = worksheet.Column("A").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirlineName = worksheet.Column("B").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirlineCode = worksheet.Column("C").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+
+                    data["AirlineID"] = colAirlineID;
+                    data["AirlineName"] = colAirlineName;
+                    data["AirlineCode"] = colAirlineCode;
+
                     dataTable.Columns.Add("AirlineID", typeof(string));
                     dataTable.Columns.Add("AirlineName", typeof(string));
                     dataTable.Columns.Add("AirlineCode", typeof(string));
-                    for (int row = 2; row <= worksheet.RowCount(); row++)
+
+                    int rowCount = data.Values.FirstOrDefault()?.Count ?? 0;
+
+                    for (int i = 0; i < rowCount; i++)
                     {
-                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
-                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
-                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
-                        dataTable.Rows.Add(airlineID, airlineName, airlineCode);
+                        var row = dataTable.NewRow();
+                        row["AirlineId"] = data["AirlineID"][i];
+                        row["AirlineName"] = data["AirlineName"][i];
+                        row["AirlineCode"] = data["AirlineCode"][i];
+                        dataTable.Rows.Add(row);
                     }
+
+                    //for (int row = 2; row <= worksheet.RowCount(); row++)
+                    //{
+                    //    var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                    //    var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                    //    var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
+                    //    dataTable.Rows.Add(airlineID, airlineName, airlineCode);
+                    //}
                     _AirlineDT = dataTable;
                 }
             }
@@ -175,29 +197,57 @@ namespace ReservationSystem.Infrastructure.Service
         public void SetAirPortDataTable(string filePath)
         {
             DataTable dataTable = new DataTable();
+            var data = new Dictionary<string, List<string>>();
             try
             {
                 using (var workbook = new XLWorkbook(filePath))
                 {
-                    var worksheet = workbook.Worksheet(1); 
                     dataTable.Columns.Add("AirportID", typeof(string));
                     dataTable.Columns.Add("AirportCode", typeof(string));
                     dataTable.Columns.Add("AirportName", typeof(string));
                     dataTable.Columns.Add("AirportCity", typeof(string));
                     dataTable.Columns.Add("AirportCountry", typeof(string));
-                    for (int row = 2; row <= worksheet.RowCount(); row++)
-                    {
-                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
-                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
-                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
-                        var AirportID = worksheet.Row(row).Cell(1).Value ;
-                        var AirportCode = worksheet.Row(row).Cell(2).Value;
-                        var AirportName = worksheet.Row(row).Cell(3).Value;
-                        var AirportCity = worksheet.Row(row).Cell(4).Value;
-                        var AirportCountry = worksheet.Row(row).Cell(5).Value;
-                        dataTable.Rows.Add(AirportID, AirportCode, AirportName, AirportCity, AirportCountry);
+                   
+                    var worksheet = workbook.Worksheet(1);
+                    int rows = worksheet.LastRowUsed().RowNumber();
+                    var colAirportID = worksheet.Column("A").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirportCode = worksheet.Column("B").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirportName = worksheet.Column("C").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirportCity = worksheet.Column("D").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
+                    var colAirportCountry = worksheet.Column("E").Cells(1, rows).Select(cell => cell.GetValue<string>() ?? string.Empty).ToList();
 
+                    data["AirportID"] = colAirportID;
+                    data["AirportCode"] = colAirportCode;
+                    data["AirportName"] = colAirportName;
+                    data["AirportCity"] = colAirportCity;
+                    data["AirportCountry"] = colAirportCountry;
+
+                    int rowCount = data.Values.FirstOrDefault()?.Count ?? 0;
+
+                    for (int i = 0; i < rowCount; i++)
+                    {
+                        var row = dataTable.NewRow();                       
+                        row["AirportID"] = data["AirportID"][i];
+                        row["AirportCode"] = data["AirportCode"][i];
+                        row["AirportName"] = data["AirportName"][i];
+                        row["AirportCity"] = data["AirportCity"][i];
+                        row["AirportCountry"] = data["AirportCountry"][i];
+                        dataTable.Rows.Add(row);
                     }
+
+                    //for (int row = 2; row <= worksheet.RowCount(); row++)
+                    //{
+                    //    var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                    //    var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                    //    var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
+                    //    var AirportID = worksheet.Row(row).Cell(1).Value ;
+                    //    var AirportCode = worksheet.Row(row).Cell(2).Value;
+                    //    var AirportName = worksheet.Row(row).Cell(3).Value;
+                    //    var AirportCity = worksheet.Row(row).Cell(4).Value;
+                    //    var AirportCountry = worksheet.Row(row).Cell(5).Value;
+                    //    dataTable.Rows.Add(AirportID, AirportCode, AirportName, AirportCity, AirportCountry);
+
+                    //}
                     _AirportDT = dataTable;
                 }
             }
@@ -240,23 +290,23 @@ namespace ReservationSystem.Infrastructure.Service
         {
             try
             {
-                var filePath = Path.Combine(_environment.ContentRootPath, "SupportFiles", "Airlines.xlsx");
-                DataTable dataTable = new DataTable();
-                using (var workbook = new XLWorkbook(filePath))
-                {
-                    var worksheet = workbook.Worksheet(1);
-                    dataTable.Columns.Add("AirlineID", typeof(string));
-                    dataTable.Columns.Add("AirlineName", typeof(string));
-                    dataTable.Columns.Add("AirlineCode", typeof(string));
-                    for (int row = 2; row <= worksheet.RowCount(); row++)
-                    {
-                        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
-                        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
-                        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
-                        dataTable.Rows.Add(airlineID, airlineName, airlineCode);
-                    }
-                }
-                _AirlineDT = dataTable;              
+                //var filePath = Path.Combine(_environment.ContentRootPath, "SupportFiles", "Airlines.xlsx");
+                //DataTable dataTable = new DataTable();
+                //using (var workbook = new XLWorkbook(filePath))
+                //{
+                //    var worksheet = workbook.Worksheet(1);
+                //    dataTable.Columns.Add("AirlineID", typeof(string));
+                //    dataTable.Columns.Add("AirlineName", typeof(string));
+                //    dataTable.Columns.Add("AirlineCode", typeof(string));
+                //    for (int row = 2; row <= worksheet.RowCount(); row++)
+                //    {
+                //        var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
+                //        var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
+                //        var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
+                //        dataTable.Rows.Add(airlineID, airlineName, airlineCode);
+                //    }
+                //}
+                //_AirlineDT = dataTable;              
                
                 return _AirlineDT;
             }
