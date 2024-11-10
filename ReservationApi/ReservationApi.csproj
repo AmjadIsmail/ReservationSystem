@@ -54,6 +54,9 @@
       <None Update="SupportFiles\Airlines.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+	  <None Update="SupportFiles\Airports.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
 </ItemGroup>
   <ItemGroup>
     <None Include="bin\Airlines.xlsx" />
