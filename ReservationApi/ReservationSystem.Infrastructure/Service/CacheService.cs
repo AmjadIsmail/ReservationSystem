@@ -154,13 +154,6 @@ namespace ReservationSystem.Infrastructure.Service
                         dataTable.Rows.Add(row);
                     }
 
-                    //for (int row = 2; row <= worksheet.RowCount(); row++)
-                    //{
-                    //    var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
-                    //    var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
-                    //    var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
-                    //    dataTable.Rows.Add(airlineID, airlineName, airlineCode);
-                    //}
                     _AirlineDT = dataTable;
                 }
             }
@@ -235,19 +228,7 @@ namespace ReservationSystem.Infrastructure.Service
                         dataTable.Rows.Add(row);
                     }
 
-                    //for (int row = 2; row <= worksheet.RowCount(); row++)
-                    //{
-                    //    var airlineID = worksheet.Row(row).Cell(1).Value.ToString();
-                    //    var airlineName = worksheet.Row(row).Cell(2).Value.ToString();
-                    //    var airlineCode = worksheet.Row(row).Cell(3).Value.ToString();
-                    //    var AirportID = worksheet.Row(row).Cell(1).Value ;
-                    //    var AirportCode = worksheet.Row(row).Cell(2).Value;
-                    //    var AirportName = worksheet.Row(row).Cell(3).Value;
-                    //    var AirportCity = worksheet.Row(row).Cell(4).Value;
-                    //    var AirportCountry = worksheet.Row(row).Cell(5).Value;
-                    //    dataTable.Rows.Add(AirportID, AirportCode, AirportName, AirportCity, AirportCountry);
-
-                    //}
+                    
                     _AirportDT = dataTable;
                 }
             }

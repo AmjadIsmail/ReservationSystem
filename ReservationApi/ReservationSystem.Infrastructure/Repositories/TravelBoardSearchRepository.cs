@@ -74,13 +74,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                         {
                             var result2 = rd.ReadToEnd();
                             XDocument xmlDoc = XDocument.Parse(result2);
-                            await _helperRepository.SaveXmlResponse("TbSearch_Request", Envelope);
-                             await _helperRepository.SaveXmlResponse("TbSearch_Response", result2);
+                             _helperRepository.SaveXmlResponse("TbSearch_Request", Envelope);
+                             _helperRepository.SaveXmlResponse("TbSearch_Response", result2);
                             
                             XmlDocument xmlDoc2 = new XmlDocument();
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
-                            await _helperRepository.SaveJson(jsonText, "TbSearchResponseJson");
+                             _helperRepository.SaveJson(jsonText, "TbSearchResponseJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if ( errorInfo != null)
                             {
@@ -410,7 +410,6 @@ namespace ReservationSystem.Infrastructure.Repositories
                         string arrival = arrivalDate + arrivalTime;
                         DateTime arrivalD = DateTime.ParseExact(arrival, format, CultureInfo.InvariantCulture);
                         segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal ,  iataName=arrAirportName };
-                       // segment.arrival = new Arrival { at = arrivalD, iataCode = arrivalLocation , terminal = arrivalTerminal  };
                         segment.marketingCarrierCode = marketingCarrier;
                         segment.marketingCarrierName = marketingcarriername;
                         segment.aircraft = new Aircraft { code = flightNumber };
@@ -438,7 +437,6 @@ namespace ReservationSystem.Infrastructure.Repositories
                         DataRow droperatingCarrier = AirlineCache != null ?  AirlineCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirlineCode") == operatingCarrier): null;
                         var operatingCarrierName = droperatingCarrier != null ? droperatingCarrier[1].ToString() : "";
                         segment.operating = new Operating { operatingCarrierCode = operatingCarrier, operatingCarrierName = operatingCarrierName };
-                       // segment.operating = new Operating {  operatingCarrierCode = operatingCarrier };
                         segment.numberOfStops = numberOfStops;
                         itinerary.segments.Add(segment);
                         itinerary.flightProposal_ref = FlightProposal;
