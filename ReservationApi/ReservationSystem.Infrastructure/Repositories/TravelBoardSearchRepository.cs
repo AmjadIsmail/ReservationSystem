@@ -46,11 +46,11 @@ namespace ReservationSystem.Infrastructure.Repositories
           
             try
             {
-               
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                string action = amadeusSettings["travelBoardSearchAction"];                 
-                var _url = amadeusSettings["ApiUrl"]; 
-                var _action = amadeusSettings["travelBoardSearchAction"];
+
+                var amadeusSettings = configuration; //.GetSection("AmadeusSoap");
+                string action = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:travelBoardSearchAction"]);                 
+                var _url = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:ApiUrl"]); 
+                var _action = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:travelBoardSearchAction"]);
                 string Result = string.Empty;
                 string Envelope = await CreateSoapEnvelopeSimple(requestModel);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -60,6 +60,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                 request.Method = "POST";
                 XNamespace fareNS = "http://xml.amadeus.com/FMPTBR_24_1_1A";
 
+                #region Temp Region for read response from xml file
+                //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "SupportFiles", "TbSearch_Response.xml");
+                //var xDocumentTemp = XDocument.Load(filePath);
+                //var restemp = ConvertXmlToModel(xDocumentTemp);
+                //returnModel.data = restemp.data;
+                //return returnModel;
+                #endregion
                 using (Stream stream = request.GetRequestStream())
                 {
                     byte[] content = Encoding.UTF8.GetBytes(Envelope);
@@ -169,14 +176,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async  Task<string> CreateSoapEnvelopeSimple(AvailabilityRequest requestModel)
         {                      
             string pwdDigest =  await _helperRepository.generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap");
-            string action = amadeusSettings["travelBoardSearchAction"];
-            string to = amadeusSettings["ApiUrl"];
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+            var amadeusSettings = configuration;//.GetSection("AmadeusSoap");
+            string action = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:travelBoardSearchAction"]);
+            string to = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:ApiUrl"]);
+            string username = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:POS_Type"]);
             requestModel.children = requestModel.children != null ? requestModel.children : 0;
             requestModel.infant = requestModel.infant != null ? requestModel.infant : 0;
             if(requestModel.departureDate != null && requestModel.departureDate != "")
@@ -191,6 +198,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 DateTime retdate = DateTime.Parse(inputDate);
                 requestModel.returnDate = retdate.ToString("ddMMyy");
             }
+            requestModel.maxFlights = requestModel.maxFlights != null ? requestModel.maxFlights : 250;
             string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
    <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
       <add:MessageID>{System.Guid.NewGuid()}</add:MessageID>
@@ -216,7 +224,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                <typeOfUnit>PX</typeOfUnit>
             </unitNumberDetail>
             <unitNumberDetail>
-               <numberOfUnits>{requestModel.maxFlights}</numberOfUnits>
+               <numberOfUnits>{requestModel.maxFlights }</numberOfUnits>
                <typeOfUnit>RC</typeOfUnit>
             </unitNumberDetail>
          </numberOfUnit>"

@@ -37,9 +37,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"];
-                var _action = amadeusSettings["Queue_PlacePNR"];
+               // var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:Queue_PlacePNR"]);
                 string Result = string.Empty;
                 string Envelope = await CreateSoapRequest(requestModel);
                 string ns = "http://xml.amadeus.com/QUQPCR_03_1_1A";
@@ -120,15 +120,15 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateSoapRequest(PnrQueueRequest requestModel)
         {
 
-            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
-            var action = amadeusSettings["Queue_PlacePNR"];
-            string to = amadeusSettings["ApiUrl"];
+           // var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            var action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:Queue_PlacePNR"]);
+            string to = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
             string pwdDigest = await _helperRepository.generatePassword();
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+            string username = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:POS_Type"]);
 
             string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
      <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">

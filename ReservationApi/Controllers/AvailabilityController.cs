@@ -21,11 +21,13 @@ namespace ReservationApi.Controllers
         private ITravelBoardSearchRepository  _availability;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
-        public AvailabilityController(ITravelBoardSearchRepository availability,IMemoryCache memoryCache,ICacheService cacheService)
+        private readonly IConfiguration _configuration;
+        public AvailabilityController(ITravelBoardSearchRepository availability,IMemoryCache memoryCache,ICacheService cacheService ,IConfiguration configuration)
         {
             _availability = availability;
             _cache = memoryCache;
             _cacheService = cacheService;
+            _configuration = configuration;
         }
               
         //[Authorize]
@@ -58,11 +60,12 @@ namespace ReservationApi.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-
+           
+            string action = Environment.GetEnvironmentVariable(_configuration["AmadeusSoap:travelBoardSearchAction"]);
             ApiResponse res = new ApiResponse();            
             res.IsSuccessful = true;
             res.StatusCode = 200;
-            res.Data = "API Service running properly";
+            res.Data = "API Service running properly , TravelboardSearch Url From EnvoirementVariable = " + action;
             res.Response = "Success";
             res.Message = "Success";
             return Ok(res);

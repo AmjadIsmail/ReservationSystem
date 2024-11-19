@@ -84,7 +84,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                string password = amadeusSettings["clearPassword"];
+                string password = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:clearPassword"]);               
                 string passSHA;
                 byte[] nonce = new byte[32];
                 using (var rng = new RNGCryptoServiceProvider())
@@ -93,7 +93,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 }
                 DateTime utcNow = DateTime.UtcNow;
                 string TIMESTAMP = utcNow.ToString("o");
-                string nonceBase64 = Convert.ToBase64String(nonce);
+                string nonceBase64 = Convert.ToBase64String(nonce);               
                 using (SHA1 sha1 = SHA1.Create())
                 {
                     byte[] passwordSha = sha1.ComputeHash(Encoding.UTF8.GetBytes(password));

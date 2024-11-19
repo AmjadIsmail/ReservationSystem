@@ -48,9 +48,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"]; 
-                var _action = amadeusSettings["fareInformativePricingWithoutPNRAction"];
+               // var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]); 
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:fareInformativePricingWithoutPNRAction"]);
                 string Result = string.Empty;
                 string Envelope = await CreateFlightPriceRequest(requestModel);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -319,14 +319,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateFlightPriceRequest(FlightPriceMoelSoap requestModel)
         {
             string pwdDigest = await _helperRepository.generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
-            string action = amadeusSettings["fareInformativePricingWithoutPNRAction"];
-            string to = amadeusSettings["ApiUrl"];
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+           // var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            string action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:fareInformativePricingWithoutPNRAction"]);
+            string to = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+            string username = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:POS_Type"]);
             requestModel.child = requestModel?.child != null ? requestModel.child : 0;
             requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
 
@@ -365,14 +365,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateFlightPriceRequestWithBestPrice(FlightPriceMoelSoap requestModel , string _action)
         {
             string pwdDigest = await _helperRepository.generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            //var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
             string action = _action;
-            string to = amadeusSettings["ApiUrl"];
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+            string to = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+            string username = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:POS_Type"]);
             requestModel.child = requestModel?.child != null ? requestModel.child : 0;
             requestModel.infant = requestModel?.infant != null ? requestModel.infant : 0;
 
@@ -778,9 +778,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"];
-                var _action = amadeusSettings["fareInformativeBestPricingWithoutPNRAction"];
+              //  var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:fareInformativeBestPricingWithoutPNRAction"]);
                 string Result = string.Empty;
                 string Envelope = await CreateFlightPriceRequestWithBestPrice(requestModel,_action);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);

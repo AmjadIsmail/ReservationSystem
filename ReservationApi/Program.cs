@@ -67,7 +67,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigin",
         builder => builder
-            .WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5273")
+            .WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5273").WithOrigins("http://localhost:3000")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -99,6 +99,15 @@ builder.Services.AddControllers()
                 });
 
 builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Configuration
+   // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+  //  .AddEnvironmentVariables();
+var configuration = new ConfigurationBuilder()
+   .SetBasePath(Directory.GetCurrentDirectory())
+   .AddJsonFile("appsettings.json", false)
+   .AddEnvironmentVariables()
+   .Build();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

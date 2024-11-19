@@ -37,10 +37,10 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
+              //  var amadeusSettings = configuration.GetSection("AmadeusSoap");
                 var logsPath = configuration.GetSection("Logspath");
-                var _url = amadeusSettings["ApiUrl"]; 
-                var _action = amadeusSettings["FOP_CreateFormOfPayment"];
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]); 
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:FOP_CreateFormOfPayment"]);
                 string Result = string.Empty;
                 string Envelope = await CreateSoapRequest(requestModel);
                 string ns = "http://xml.amadeus.com/TFOPCR_19_2_1A";
@@ -116,9 +116,9 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateSoapRequest(FopRequest requestModel)
         {
 
-            var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
-            string action = amadeusSettings["FOP_CreateFormOfPayment"];
-            string to = amadeusSettings["ApiUrl"];
+          //  var amadeusSettings = configuration.GetSection("AmadeusSoap") != null ? configuration.GetSection("AmadeusSoap") : null;
+            string action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:FOP_CreateFormOfPayment"]);
+            string to = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
            string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
       <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
       <ses:Session TransactionStatusCode=""InSeries"">

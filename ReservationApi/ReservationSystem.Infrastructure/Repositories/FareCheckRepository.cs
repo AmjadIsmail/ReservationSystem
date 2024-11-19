@@ -38,9 +38,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"];
-                var _action = amadeusSettings["Fare_CheckRules"];
+                //var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:Fare_CheckRules"]);
                 string Result = string.Empty;
                 string Envelope = await CreateSoapEnvelope(fareCheckRequest);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -232,14 +232,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateSoapEnvelope(FareCheckModel requestModel)
         {
             string pwdDigest = await _helperRepository.generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap");
-            string action = amadeusSettings["Fare_CheckRules"];
-            string to = amadeusSettings["ApiUrl"];
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+           // var amadeusSettings = configuration.GetSection("AmadeusSoap");
+            string action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:Fare_CheckRules"]);
+            string to = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+            string username = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:POS_Type"]);
 
             //string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:fare=""{action}"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
             string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
@@ -319,14 +319,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> CreateSingout_Request()
         {
             string pwdDigest = await _helperRepository.generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap");
-            string action = amadeusSettings["Fare_CheckRules"];
-            string to = amadeusSettings["ApiUrl"];
-            string username = amadeusSettings["webUserId"];
-            string dutyCode = amadeusSettings["dutyCode"];
-            string requesterType = amadeusSettings["requestorType"];
-            string PseudoCityCode = amadeusSettings["PseudoCityCode"]?.ToString();
-            string pos_type = amadeusSettings["POS_Type"];
+           // var amadeusSettings = configuration.GetSection("AmadeusSoap");
+            string action = Environment.GetEnvironmentVariable(configuration["Fare_CheckRules"]);
+            string to = Environment.GetEnvironmentVariable(configuration["ApiUrl"]);
+            string username = Environment.GetEnvironmentVariable(configuration["webUserId"]);
+            string dutyCode = Environment.GetEnvironmentVariable(configuration["dutyCode"]);
+            string requesterType = Environment.GetEnvironmentVariable(configuration["requestorType"]);
+            string PseudoCityCode = Environment.GetEnvironmentVariable(configuration["PseudoCityCode"]?.ToString());
+            string pos_type = Environment.GetEnvironmentVariable(configuration["POS_Type"]);
 
             string Request = $@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:sec=""http://xml.amadeus.com/2010/06/Security_v1"" xmlns:typ=""http://xml.amadeus.com/2010/06/Types_v1"" xmlns:iat=""http://www.iata.org/IATA/2007/00/IATA2010.1"" xmlns:app=""http://xml.amadeus.com/2010/06/AppMdw_CommonTypes_v3"" xmlns:link=""http://wsdl.amadeus.com/2010/06/ws/Link_v1"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
    <soapenv:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
@@ -359,9 +359,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
 
-                var amadeusSettings = configuration.GetSection("AmadeusSoap");
-                var _url = amadeusSettings["ApiUrl"];
-                var _action = amadeusSettings["Security_SignOut"];
+                //var amadeusSettings = configuration.GetSection("AmadeusSoap");
+                var _url = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:ApiUrl"]);
+                var _action = Environment.GetEnvironmentVariable(configuration["AmadeusSoap:Security_SignOut"]);
                 string Result = string.Empty;
                 string Envelope = await Signout_Request(header);
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
@@ -427,9 +427,9 @@ namespace ReservationSystem.Infrastructure.Repositories
         public async Task<string> Signout_Request(HeaderSession requestModel)
         {
             //string pwdDigest = await generatePassword();
-            var amadeusSettings = configuration.GetSection("AmadeusSoap");
-            string action = amadeusSettings["Security_SignOut"];
-            string to = amadeusSettings["ApiUrl"];                        
+           // var amadeusSettings = configuration.GetSection("AmadeusSoap");
+            string action = Environment.GetEnvironmentVariable(configuration["Security_SignOut"]);
+            string to = Environment.GetEnvironmentVariable(configuration["ApiUrl"]);                        
             string Request = $@"<soap:Envelope xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:ses=""http://xml.amadeus.com/2010/06/Session_v3"">
    <soap:Header xmlns:add=""http://www.w3.org/2005/08/addressing"">
       <ses:Session TransactionStatusCode=""End"">
