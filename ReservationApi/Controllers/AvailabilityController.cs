@@ -22,12 +22,14 @@ namespace ReservationApi.Controllers
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
         private readonly IConfiguration _configuration;
-        public AvailabilityController(ITravelBoardSearchRepository availability,IMemoryCache memoryCache,ICacheService cacheService ,IConfiguration configuration)
+        private readonly IHelperRepository _helperRepository;
+        public AvailabilityController(ITravelBoardSearchRepository availability,IMemoryCache memoryCache,ICacheService cacheService ,IConfiguration configuration , IHelperRepository helperRepository)
         {
             _availability = availability;
             _cache = memoryCache;
             _cacheService = cacheService;
             _configuration = configuration;
+            _helperRepository = helperRepository;
         }
               
         //[Authorize]
@@ -57,6 +59,20 @@ namespace ReservationApi.Controllers
 
         }
 
+        [HttpPost("signout")]
+        public async Task<IActionResult> PostSignout([FromBody] HeaderSession request)
+        {
+
+            ApiResponse res = new ApiResponse();
+
+             await _helperRepository.Security_Signout(request);
+            res.IsSuccessful = true;
+            res.StatusCode = 200;
+            res.Message = "SingOut Success:";
+            res.Response = "Success";
+            res.Data = "SignOut Success";
+            return Ok(res);
+        }
         [HttpGet]
         public async Task<IActionResult> Get()
         {
