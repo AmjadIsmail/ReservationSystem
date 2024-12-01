@@ -375,6 +375,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     numberOfStops = numberOfStops - 1;
                     int segmentRef = 1;
                     timeduration = new List<string>();
+                    string airport_city = string.Empty;
                     foreach (var flightDetails in (groupOfFlights.Descendants(amadeus + "flightDetails").ToList()))
                     {
                         
@@ -393,7 +394,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?.Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
                         DataRow depatureAirport = AirportCache!= null ? AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation) : null;
-                        var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
+                        var depAirportName = depatureAirport != null ? depatureAirport[2]?.ToString() + " , " + depatureAirport[4].ToString() : "";
+                        airport_city = airport_city == string.Empty ?  depatureAirport != null ? depatureAirport[3]?.ToString() : "" : airport_city;
                         var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
@@ -450,6 +452,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         itinerary.flightProposal_ref = FlightProposal;
                         itinerary.duration = CalculateDuration(timeduration); 
                         itinerary.segment_type = "OutBound";
+                        itinerary.airport_city = airport_city;
                       
                     }
                     itinerariesList.Add(itinerary);
@@ -465,6 +468,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 var flightDetails1 = flightIndexInbound.Descendants(amadeus + "groupOfFlights").ToList();
 
                 var segRef = "2";
+                string airport_city = string.Empty;
                 foreach (var groupOfFlights in flightDetails1)
                 {
                     Itinerary itinerary = new Itinerary();
@@ -491,8 +495,10 @@ namespace ReservationSystem.Infrastructure.Repositories
                         }
                         var departureLocation = flightDetails.Element(amadeus + "flightInformation")?.Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
                          DataRow depatureAirport = AirportCache != null ? AirportCache.AsEnumerable().FirstOrDefault(r => r.Field<string>("AirportCode") == departureLocation) : null;
-                         var depAirportName = depatureAirport != null ? depatureAirport[2].ToString() + " , " + depatureAirport[4].ToString() : "";
-                        var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
+                         var depAirportName = depatureAirport != null ? depatureAirport[2]?.ToString() + " , " + depatureAirport[4]?.ToString() : "";
+                        airport_city = airport_city == string.Empty ? depatureAirport != null ? depatureAirport[3]?.ToString() : "" : airport_city;
+
+                       var departureTerminal = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.FirstOrDefault()?.Element(amadeus + "terminal")?.Value;
                         var arrivalLocation = flightDetails.Element(amadeus + "flightInformation")?
                             .Elements(amadeus + "location")?.Skip(1).FirstOrDefault()?.Element(amadeus + "locationId")?.Value;
@@ -550,6 +556,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         itinerary.flightProposal_ref = FlightProposal;
                         itinerary.duration = CalculateDuration(timeduration); 
                         itinerary.segment_type = "InBound";
+                        itinerary.airport_city = airport_city;
                         
                     }
 

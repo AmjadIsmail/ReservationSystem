@@ -12,5 +12,6 @@ namespace ReservationSystem.Domain.Models
         public string? duration { get; set; }
         public List<Segment>? segments { get; set; }
         public string? segment_type { get; set; }
+        public string? airport_city { get; set; }
     }
 }

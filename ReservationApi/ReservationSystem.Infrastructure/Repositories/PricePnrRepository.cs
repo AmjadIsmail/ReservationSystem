@@ -127,7 +127,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             try
             {
                 string result = $@"";
-                foreach (var option in pricingOptions.Split(','))
+                foreach (var option in pricingOptions?.Split(','))
                 {
                     result += " <pricingOptionGroup>" +
                         "<pricingOptionKey>" +
@@ -164,14 +164,14 @@ namespace ReservationSystem.Infrastructure.Repositories
    </soap:Header>
    <soap:Body>
     <Fare_PricePNRWithBookingClass>
-     { GeneratePricingOptionsGroup(requestModel.pricingOptionKey)}
+     { GeneratePricingOptionsGroup(requestModel?.pricingOptionKey)}
       <pricingOptionGroup>
         <pricingOptionKey>
           <pricingOptionKey>VC</pricingOptionKey>
         </pricingOptionKey>
         <carrierInformation>
           <companyIdentification>
-            <otherCompany>{requestModel.carrierCode}</otherCompany>
+            <otherCompany>{requestModel?.carrierCode}</otherCompany>
           </companyIdentification>
         </carrierInformation>
       </pricingOptionGroup>
