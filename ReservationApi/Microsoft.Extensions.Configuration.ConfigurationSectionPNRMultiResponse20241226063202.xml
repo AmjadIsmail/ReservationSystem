@@ -6,12 +6,12 @@
       <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
     </wsa:From>
     <wsa:Action>http://webservices.amadeus.com/TAUTCQ_04_1_1A</wsa:Action>
-    <wsa:MessageID>urn:uuid:b799a364-dd95-8d84-fddc-1c78963e3888</wsa:MessageID>
-    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">7042dfaf-8c2d-4a03-a72c-3ad702df99c4</wsa:RelatesTo>
+    <wsa:MessageID>urn:uuid:4f91656e-dc6e-d254-7d87-dd2444f04645</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">60ea5886-a238-4a31-87b7-cd804bdbde0f</wsa:RelatesTo>
     <awsse:Session TransactionStatusCode="InSeries">
-      <awsse:SessionId>00652XAKYQ</awsse:SessionId>
+      <awsse:SessionId>01AJF42FR4</awsse:SessionId>
       <awsse:SequenceNumber>5</awsse:SequenceNumber>
-      <awsse:SecurityToken>X8VVBLWI122Y3DZFIV9M2SNJX</awsse:SecurityToken>
+      <awsse:SecurityToken>3EQ0YU8VJRZ7639KJXVYQA5TFR</awsse:SecurityToken>
     </awsse:Session>
   </soap:Header>
   <soap:Body>

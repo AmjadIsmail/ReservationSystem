@@ -17,10 +17,113 @@ namespace ReservationSystem.Domain.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ReservationApi.ReservationSystem.Domain.DB_Models.BookingInfo", b =>
+                {
+                    b.Property<int>("AutoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("auto_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AutoId"));
+
+                    b.Property<string>("BookingRef")
+                        .HasColumnType("text")
+                        .HasColumnName("booking_ref");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<string>("Error")
+                        .HasColumnType("text")
+                        .HasColumnName("error");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("PaymentStatus")
+                        .HasColumnType("text")
+                        .HasColumnName("payment_status");
+
+                    b.Property<string>("PnrNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("pnr_number");
+
+                    b.Property<bool?>("SentEmail")
+                        .HasColumnType("boolean")
+                        .HasColumnName("sent_email");
+
+                    b.Property<string>("SessionId")
+                        .HasColumnType("text")
+                        .HasColumnName("session_id");
+
+                    b.Property<decimal?>("TotalAmount")
+                        .HasColumnType("numeric")
+                        .HasColumnName("total_amount");
+
+                    b.HasKey("AutoId");
+
+                    b.ToTable("booking_info");
+                });
+
+            modelBuilder.Entity("ReservationSystem.Domain.DB_Models.FlightInfo", b =>
+                {
+                    b.Property<int>("FlightId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FlightId"));
+
+                    b.Property<string>("AmadeusSessionId")
+                        .HasColumnType("text")
+                        .HasColumnName("amadeus_session_id");
+
+                    b.Property<DateTime?>("ArrivalTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("arrival_time");
+
+                    b.Property<string>("CabinClass")
+                        .HasColumnType("text")
+                        .HasColumnName("cabin_class");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<string>("Departure")
+                        .HasColumnType("text")
+                        .HasColumnName("departure");
+
+                    b.Property<DateTime?>("DepartureTime")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("departure_time");
+
+                    b.Property<string>("Destination")
+                        .HasColumnType("text")
+                        .HasColumnName("destination");
+
+                    b.Property<string>("FlightNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("flight_number");
+
+                    b.Property<string>("FlightOffer")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("flight_offer");
+
+                    b.HasKey("FlightId");
+
+                    b.ToTable("flight_info");
+                });
 
             modelBuilder.Entity("ReservationSystem.Domain.DB_Models.FlightMarkup", b =>
                 {
@@ -46,7 +149,7 @@ namespace ReservationSystem.Domain.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<DateTime>("created_on")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<decimal?>("discount_on_airline")
                         .HasColumnType("numeric");
@@ -65,6 +168,100 @@ namespace ReservationSystem.Domain.Migrations
                     b.ToTable("flight_markup");
                 });
 
+            modelBuilder.Entity("ReservationSystem.Domain.DB_Models.PassengerInfo", b =>
+                {
+                    b.Property<int>("PassengerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PassengerId"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("DOB")
+                        .HasColumnType("text")
+                        .HasColumnName("dob");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text")
+                        .HasColumnName("email");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<int>("FlightId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("IsLead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("text")
+                        .HasColumnName("last_name");
+
+                    b.Property<string>("PassengerType")
+                        .HasColumnType("text")
+                        .HasColumnName("passenger_type");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("phone_number");
+
+                    b.Property<string>("SessionId")
+                        .HasColumnType("text")
+                        .HasColumnName("session_id");
+
+                    b.HasKey("PassengerId");
+
+                    b.HasIndex("FlightId");
+
+                    b.ToTable("passenger_info");
+                });
+
+            modelBuilder.Entity("ReservationSystem.Domain.DB_Models.ReservationFlow", b =>
+                {
+                    b.Property<long>("AutoId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("auto_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("AutoId"));
+
+                    b.Property<string>("AmadeusSessionId")
+                        .HasColumnType("text")
+                        .HasColumnName("amadeus_session_id");
+
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<bool?>("IsError")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_error");
+
+                    b.Property<string>("Request")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("request");
+
+                    b.Property<string>("RequestName")
+                        .HasColumnType("text")
+                        .HasColumnName("request_name");
+
+                    b.Property<string>("Response")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("response");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("AutoId");
+
+                    b.ToTable("reservation_flow");
+                });
+
             modelBuilder.Entity("ReservationSystem.Domain.DB_Models.SearchAvailabilityResults", b =>
                 {
                     b.Property<long>("result_id")
@@ -74,7 +271,7 @@ namespace ReservationSystem.Domain.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("result_id"));
 
                     b.Property<DateTime?>("created_on")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("request")
                         .HasColumnType("jsonb");
@@ -91,6 +288,17 @@ namespace ReservationSystem.Domain.Migrations
                     b.HasKey("result_id");
 
                     b.ToTable("availibility_results");
+                });
+
+            modelBuilder.Entity("ReservationSystem.Domain.DB_Models.PassengerInfo", b =>
+                {
+                    b.HasOne("ReservationSystem.Domain.DB_Models.FlightInfo", "Flight")
+                        .WithMany()
+                        .HasForeignKey("FlightId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Flight");
                 });
 #pragma warning restore 612, 618
         }

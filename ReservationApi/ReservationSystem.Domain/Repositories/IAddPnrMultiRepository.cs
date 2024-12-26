@@ -15,7 +15,7 @@ namespace ReservationSystem.Domain.Repositories
 
         public Task<PnrCommitResponse?> CommitPNR(PnrCommitRequest requestModel);
         public Task Security_Signout(HeaderSession header);
-       
 
+        public Task<bool> UpdatePaymentStatusInBookingInfo(UpdatePaymentStatus requestModel);
     }
 }

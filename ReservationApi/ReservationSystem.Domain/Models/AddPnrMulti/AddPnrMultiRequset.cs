@@ -11,6 +11,7 @@ namespace ReservationSystem.Domain.Models.AddPnrMulti
     {
         public HeaderSession sessionDetails { get; set; }
         public List<PassengerDetails> passengerDetails { get; set; }
+        public string? selectedFlightOffer { get; set; }
     }
     public class PassengerDetails
     {

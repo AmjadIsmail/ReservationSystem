@@ -6,12 +6,12 @@
       <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
     </wsa:From>
     <wsa:Action>http://webservices.amadeus.com/TAUTCQ_04_1_1A</wsa:Action>
-    <wsa:MessageID>urn:uuid:07c58f6d-2ef7-f194-298b-575c795aee3c</wsa:MessageID>
-    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">dc79502e-7e90-41fb-bf11-b93f85e90ad3</wsa:RelatesTo>
+    <wsa:MessageID>urn:uuid:bafe90b0-8294-da94-8d38-89f681b8d10c</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">a667bb25-88a4-4417-b02d-3cc9715c6cc0</wsa:RelatesTo>
     <awsse:Session TransactionStatusCode="InSeries">
-      <awsse:SessionId>01FLOMUQ13</awsse:SessionId>
-      <awsse:SequenceNumber>10</awsse:SequenceNumber>
-      <awsse:SecurityToken>2OCB4DIHGCTDZ28MBY5GY0FTA3</awsse:SecurityToken>
+      <awsse:SessionId>00ROI11S7U</awsse:SessionId>
+      <awsse:SequenceNumber>5</awsse:SequenceNumber>
+      <awsse:SecurityToken>22WG5UCBU33351CCPBCM0QQQV3</awsse:SecurityToken>
     </awsse:Session>
   </soap:Header>
   <soap:Body>
@@ -19,13 +19,13 @@
       <applicationError>
         <applicationErrorInfo>
           <applicationErrorDetail>
-            <applicationErrorCode>339</applicationErrorCode>
+            <applicationErrorCode>4819</applicationErrorCode>
             <codeListQualifier>EC</codeListQualifier>
             <codeListResponsibleAgency>1A</codeListResponsibleAgency>
           </applicationErrorDetail>
         </applicationErrorInfo>
         <errorText>
-          <errorFreeText>NEED NAMES</errorFreeText>
+          <errorFreeText>RBD OVERRIDE NOT PERMITTED</errorFreeText>
         </errorText>
       </applicationError>
     </Ticket_CreateTSTFromPricingReply>

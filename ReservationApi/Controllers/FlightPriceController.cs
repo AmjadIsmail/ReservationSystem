@@ -18,6 +18,7 @@ namespace ReservationApi.Controllers
         private IFlightPriceRepository _flightprice;
         private IAvailabilityRepository _availability;
         private readonly IMemoryCache _cache;
+
         public FlightPriceController(IFlightPriceRepository flightprice, IMemoryCache memoryCache, IAvailabilityRepository availability)
         {
             _flightprice = flightprice;

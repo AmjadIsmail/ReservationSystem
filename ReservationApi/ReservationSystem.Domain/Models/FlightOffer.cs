@@ -11,10 +11,9 @@ namespace ReservationSystem.Domain.Models
         public string? type { get; set; }
         public string? id { get; set; }
         public string? source { get; set; }
-        public bool? oneWay { get; set; }
-       // public bool? isUpsellOffer { get; set; }
+        public bool? oneWay { get; set; }      
         public string? lastTicketingDate { get; set; }
-       public List<Itinerary>? itineraries { get; set; }
+        public List<Itinerary>? itineraries { get; set; }
         public Price? price { get; set; }
         public PriceOption? pricingOptions { get; set; }
         public List<string>? validatingAirlineCodes { get; set; }
@@ -26,6 +25,7 @@ namespace ReservationSystem.Domain.Models
         public string? passengerType { get; set; }
         public string? fareType { get; set; }
         public string? breakPoint { get; set; }
+        public BaggageDetails? baggageDetails { get; set; }
     }
 
     public class FlightOfferForOrder
@@ -42,5 +42,13 @@ namespace ReservationSystem.Domain.Models
         public PriceOption? pricingOptions { get; set; }
         public List<string>? validatingAirlineCodes { get; set; }
         public List<TravelerPricing>? travelerPricings { get; set; }
+    }
+
+    public class BaggageDetails
+    {
+        public string? itemNumber { get; set; }
+        public string? freeAllowance { get; set; }
+        public string? quantityCode { get; set; }
+        public string? unitQualifier { get; set; }
     }
 }

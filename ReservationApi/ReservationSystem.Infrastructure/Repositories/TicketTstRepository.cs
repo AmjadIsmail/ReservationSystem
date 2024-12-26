@@ -14,6 +14,7 @@ using System.Xml.Linq;
 using System.Xml;
 using ReservationSystem.Domain.Models.TicketTst;
 using ReservationSystem.Domain.Models;
+using ReservationSystem.Domain.Models.DBLogs;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -22,11 +23,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public TicketTstRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
+        private readonly IDBRepository _dbRepository;
+        public TicketTstRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository , IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _dbRepository = dBRepository;
         }
         public async Task<TicketTstResponse> CreateTicketTst(TicketTstRequest requestModel)
         {
@@ -86,6 +89,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             XNamespace fareNS = ns;
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.CreateTst.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "applicationError").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -95,11 +103,36 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 fopResponse.amadeusError = new AmadeusResponseError();
                                 fopResponse.amadeusError.error = errorText;
                                 fopResponse.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = "";
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return fopResponse;
 
                             }
 
                             var res = ConvertXmlToModel(xmlDoc, ns);
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
                             fopResponse = res;
 
                         }

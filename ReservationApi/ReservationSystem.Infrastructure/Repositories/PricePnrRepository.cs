@@ -18,6 +18,8 @@ using ReservationSystem.Domain.Models;
 using System.Security.Cryptography.Xml;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
+using DocumentFormat.OpenXml.InkML;
+using ReservationSystem.Domain.Models.DBLogs;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -26,11 +28,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public PricePnrRepository(IConfiguration _configuration, IMemoryCache cache , IHelperRepository helperRepository)
+        private readonly IDBRepository _dbRepository;
+        public PricePnrRepository(IConfiguration _configuration, IMemoryCache cache , IHelperRepository helperRepository , IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _dbRepository = dBRepository;
         }
         public async Task<PricePnrResponse> CreatePricePNRWithBookingClass(PricePnrRequest requestModel)
         {
@@ -46,6 +50,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 string Result = string.Empty;
                 string Envelope = await CreateSoapRequest(requestModel);
                 string ns = "http://xml.amadeus.com/TPCBRR_23_2_1A";
+                
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_url);
                 request.Headers.Add("SOAPAction", _action);
                 request.ContentType = "text/xml;charset=\"utf-8\"";
@@ -74,6 +79,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "PNRMultiResponseJson");
                             XNamespace fareNS = ns;
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.FarePricePNR.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "applicationError").FirstOrDefault();
                             var warningError = new AmadeusResponseError();
                             if (errorInfo != null)
@@ -86,6 +96,18 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 fopResponse.amadeusError.errorCode = Convert.ToInt16(errorCode);
                                 warningError = fopResponse.amadeusError;
                                 //return fopResponse;
+                                //#region DB Logs
+                                //try
+                                //{
+                                //    saveReservationLog.IsError = true;
+                                //    saveReservationLog.AmadeusSessionId = "";
+                                //    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                //}
+                                //catch (Exception ex)
+                                //{
+                                //    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                //}
+                                //#endregion
 
                             }
 
@@ -94,7 +116,23 @@ namespace ReservationSystem.Infrastructure.Repositories
                             if (warningError.error != null)
                             {
                                 fopResponse.warningDetails = warningError.error;
+                                saveReservationLog.IsError = true;
                             }
+                            else
+                            {
+                                saveReservationLog.IsError = false;
+                            }
+                            #region DB Logs
+                            try
+                            {                               
+                                saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
 
 
                         }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
+using ReservationApi.Model;
 using ReservationSystem.Domain.DBContext;
 using ReservationSystem.Domain.Models;
 using ReservationSystem.Domain.Repositories;
@@ -40,19 +41,11 @@ builder.Services.AddScoped<IPnrQueueRepository, PnrQueueRepository>();
 builder.Services.AddScoped<IDocIssueTicketRepository, DocIssueTicketRepository>();
 builder.Services.AddScoped<IPnrCancelRepository, PnrCancelRepository>();
 builder.Services.AddScoped<ITicketCancelRepository, TicketCancelRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Services.AddResponseCompression();
-
-builder.Services.AddScoped<IEmailService,EmailService>(provider =>
-{
-    var configuration = builder.Configuration.GetSection("EmailSettings");
-    var smtpServer = builder.Configuration["EmailSettings:SmtpServer"];
-    var smtpPort = int.Parse(builder.Configuration["EmailSettings:SmtpPort"]);
-    var smtpUser = builder.Configuration["EmailSettings:SmtpUser"];
-    var smtpPass = "";//builder.Configuration["EmailSettings:SmtpPass"];
-    return new EmailService(smtpServer, smtpPort, smtpUser, smtpPass);
-});
+builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -67,7 +60,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowOrigin",
         builder => builder
-            .WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5273").WithOrigins("http://localhost:3000")
+            .WithOrigins("http://localhost:5173").WithOrigins("http://localhost:5273")
+            .WithOrigins("http://localhost:3000")
+            .WithOrigins("https://jays-travels-front.azurewebsites.net").WithOrigins("http://jays-travels-front.azurewebsites.net/")
+            .WithOrigins("https://jays-travels-front.azurewebsites.net/")
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials());
@@ -98,13 +94,16 @@ builder.Services.AddControllers()
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                 });
 
-builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DB_Context>(o => o.UseNpgsql(Environment.GetEnvironmentVariable("DefaultConnectionJays")));
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 //builder.Configuration
-   // .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-  //  .AddEnvironmentVariables();
+// .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+//  .AddEnvironmentVariables();
 var configuration = new ConfigurationBuilder()
    .SetBasePath(Directory.GetCurrentDirectory())
-   .AddJsonFile("appsettings.json", false)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true) 
    .AddEnvironmentVariables()
    .Build();
 
@@ -116,9 +115,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.MapPost("/security/createToken",
+app.MapPost("/api/security/createToken",
 [AllowAnonymous] (User user) =>
 {
+    ApiResponse res = new ApiResponse();
     if (user.UserName == builder.Configuration["Security:UserName"] && user.Password == builder.Configuration["Security:Password"])
     {
         var issuer = builder.Configuration["Jwt:Issuer"];
@@ -146,8 +146,16 @@ app.MapPost("/security/createToken",
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var jwtToken = tokenHandler.WriteToken(token);
         var stringToken = tokenHandler.WriteToken(token);
-        return Results.Ok(stringToken);
+        
+        res.IsSuccessful = true;
+        res.Response = stringToken;
+        res.Data = stringToken;
+        return Results.Ok(res);
     }
+    //ApiResponse res = new ApiResponse();
+    res.IsSuccessful = false;
+    res.Data = "Invalid credentials";
+    res.Response = "Invalid user name or password";
     return Results.Unauthorized();
 });
 app.UseAuthentication();

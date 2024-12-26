@@ -16,5 +16,7 @@ namespace ReservationSystem.Domain.Repositories
 
         public Task<string> generatePassword();
         public Task Security_Signout(HeaderSession header);
+
+        public string GenerateReferenceNumber();
     }
 }

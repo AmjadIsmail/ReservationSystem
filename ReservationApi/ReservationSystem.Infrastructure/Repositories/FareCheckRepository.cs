@@ -18,6 +18,8 @@ using System.Xml.Serialization;
 using ReservationSystem.Domain.Models;
 using System.Globalization;
 using System.Runtime.Intrinsics.X86;
+using ReservationSystem.Domain.Migrations;
+using ReservationSystem.Domain.Models.DBLogs;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -26,11 +28,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public FareCheckRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
+        private readonly IDBRepository _dbRepository;
+        public FareCheckRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository,IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _dbRepository = dBRepository;
         }
         public async Task<FareCheckReturnModel> FareCheckRequest(FareCheckModel fareCheckRequest)
         {
@@ -70,6 +74,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "FareCheckResponseJson");
                             XNamespace fareNS = "http://xml.amadeus.com/FARQNR_07_1_1A";
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.FareCheck.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -79,6 +88,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 fareCheck.amadeusError = new AmadeusResponseError();
                                 fareCheck.amadeusError.error = errorText;
                                 fareCheck.amadeusError.errorCode = Convert.ToInt16(errorCode);
+
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = fareCheckRequest?.sessionDetails?.SessionId;
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return fareCheck;
 
                             }
@@ -88,6 +110,20 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 var res = ConvertXmlToModel(xmlDoc, fareNS.NamespaceName);
 
                                 fareCheck.data = res;
+
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = false;
+                                    saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                             }
 
 

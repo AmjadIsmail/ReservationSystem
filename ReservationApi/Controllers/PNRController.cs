@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using ReservationApi.Model;
 using ReservationSystem.Domain.Models.AddPnrMulti;
 using ReservationSystem.Domain.Models.AirSellFromRecommendation;
+using ReservationSystem.Domain.Models.Email;
 using ReservationSystem.Domain.Repositories;
 using ReservationSystem.Domain.Service;
 
@@ -18,12 +19,16 @@ namespace ReservationApi.Controllers
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public PNRController(IAddPnrMultiRepository Repo, IMemoryCache memoryCache, ICacheService cacheService , IHelperRepository helperRepository)
+        private readonly IDBRepository _dBRepository;
+        private readonly IEmailService _emailService;
+        public PNRController(IAddPnrMultiRepository Repo, IMemoryCache memoryCache, ICacheService cacheService , IHelperRepository helperRepository , IDBRepository dBRepository , IEmailService emailService)
         {
             _Repo = Repo;
             _cache = memoryCache;
             _cacheService = cacheService;
             _helperRepository = helperRepository;
+            _dBRepository = dBRepository;
+            _emailService = emailService;
         }
         //[Authorize]
         [HttpPost]
@@ -75,6 +80,44 @@ namespace ReservationApi.Controllers
                 await _helperRepository.Security_Signout(request.sessionDetails);
             }
 
+            return Ok(res);
+
+        }
+
+        [HttpPost("UpdatePaymentStatus")]
+        public async Task<IActionResult> UpdatePaymentStatus([FromBody] UpdatePaymentStatus request)
+        {
+
+            #region Email Region
+            try
+            {
+                var emailSent = await _dBRepository.GetEmailStatus(request?.SessionId);
+                if (!emailSent)
+                {
+                    var emailBody = await _emailService.GetBookingSuccessTemplate(request?.SessionId, "Success", request.PaymentStatus);
+                    string subject = request?.PaymentStatus == "Success" ? "Reservation Success" : "Reservation Success with Payment Failed";
+                    var pinfo = await _dBRepository.GetPassengerInfo(request?.SessionId);
+                    string ToemailAddress = pinfo.Where(e => e.IsLead == true).FirstOrDefault()?.Email;
+                    await _dBRepository.UpdateEmailStatus(request?.SessionId, true);
+                    await _emailService.SendEmailAsync3(ToemailAddress, subject, emailBody);
+                }
+               
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            #endregion
+            ApiResponse res = new ApiResponse();
+
+             var data = await _Repo.UpdatePaymentStatusInBookingInfo(request);
+
+            res.IsSuccessful = data ;
+            res.StatusCode = 200;
+            res.Message = data ? " Success:" : "Failed";
+            res.Response = data ? "Success" : "Failed";           
             return Ok(res);
 
         }

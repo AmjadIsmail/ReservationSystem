@@ -25,6 +25,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.AspNetCore.Http;
 using ReservationSystem.Domain.Service;
 using System.Data;
+using ReservationSystem.Domain.Models.DBLogs;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -34,12 +35,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
         private readonly ICacheService _cacheService;
-        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository , ICacheService cacheService)
+        private readonly IDBRepository _dbRepository;
+        public FlightPriceRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository , ICacheService cacheService,IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
             _cacheService = cacheService;
+            _dbRepository = dBRepository;
         }
 
         public async Task<FlightPriceReturnModel> GetFlightPrice(FlightPriceMoelSoap requestModel)
@@ -80,6 +83,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             xmlDoc2.LoadXml(result2);
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "Fare_InformativePricingWithoutPNRJson");
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.FlightPrice.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -88,14 +96,37 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 flightPrice.amadeusError = new AmadeusResponseError();
                                 flightPrice.amadeusError.error = errorText;
                                 flightPrice.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = "";
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return flightPrice;
 
                             }
                             
                             var res = ConvertXmlToModel(xmlDoc, fareNS);
                             flightPrice = res;
-                           
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.Session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
 
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
                         }
                     }
                 }
@@ -811,6 +842,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "Fare_InformativeBestPricingWithoutPNRJson");
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorMessage").FirstOrDefault();
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.FlightPriceBest.ToString();
+                            saveReservationLog.UserId = 0;
                             if (errorInfo != null)
                             {
                                 var errorText = xmlDoc.Descendants(fareNS + "errorMessage").Descendants(fareNS + "errorMessageText").Descendants(fareNS + "description")?.FirstOrDefault()?.Value;
@@ -818,6 +854,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 flightPrice.amadeusError = new AmadeusResponseError();
                                 flightPrice.amadeusError.error = errorText;
                                 flightPrice.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = "";
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return flightPrice;
 
                             }
@@ -825,7 +874,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                             var res = ConvertXmlToModel(xmlDoc, fareNS);
                             flightPrice = res;
 
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.Session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
 
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
                         }
                     }
                 }

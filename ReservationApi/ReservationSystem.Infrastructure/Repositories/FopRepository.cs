@@ -16,6 +16,7 @@ using ReservationSystem.Domain.Models.FOP;
 using ReservationSystem.Domain.Models.FlightPrice;
 using ReservationSystem.Domain.Models;
 using System.Globalization;
+using ReservationSystem.Domain.Models.DBLogs;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -24,11 +25,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public FopRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
+        private readonly IDBRepository _dbRepository;
+        public FopRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository , IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _dbRepository = dBRepository;
         }
         public async Task<FopResponse> CreateFOP(FopRequest requestModel)
         {
@@ -71,6 +74,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "FopResponseJson");
                             XNamespace fareNS = ns;
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.Fop.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "transmissionError").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -80,12 +88,37 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 fopResponse.amadeusError = new AmadeusResponseError();
                                 fopResponse.amadeusError.error = errorText + " " + errorFreeText;
                                 fopResponse.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = requestModel?.sessionDetails?.SessionId;
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return fopResponse;
 
                             }
 
                             var res = ConvertXmlToModel(xmlDoc, ns);
-                             fopResponse  = res;
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);                              
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
+                            fopResponse = res;
 
                         }
                     }

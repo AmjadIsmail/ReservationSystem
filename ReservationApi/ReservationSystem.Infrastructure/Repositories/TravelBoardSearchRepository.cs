@@ -20,6 +20,8 @@ using ReservationSystem.Domain.DB_Models;
 using Newtonsoft.Json;
 using System.Data;
 using ReservationSystem.Domain.Models.FlightPrice;
+using DocumentFormat.OpenXml.Office.CustomUI;
+
 
 
 namespace ReservationSystem.Infrastructure.Repositories
@@ -46,7 +48,13 @@ namespace ReservationSystem.Infrastructure.Repositories
           
             try
             {
-
+                #region Checking Results from Error
+                //var availabilityModel = _cacheService.Get<AvailabilityModel>("amadeusRequest" + requestModel.ToString());
+                //if(availabilityModel != null)
+                //{
+                //    return availabilityModel;
+                //}
+                #endregion
                 var amadeusSettings = configuration; //.GetSection("AmadeusSoap");
                 string action = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:travelBoardSearchAction"]);                 
                 var _url = Environment.GetEnvironmentVariable(amadeusSettings["AmadeusSoap:ApiUrl"]); 
@@ -96,11 +104,37 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 returnModel.amadeusError = new AmadeusResponseError();
                                 returnModel.amadeusError.error = errorText;
                                 returnModel.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region Save Results To dB
+                                try
+                                {
+                                    await _dbRepository.SaveAvailabilityResult(System.Text.Json.JsonSerializer.Serialize(requestModel), System.Text.Json.JsonSerializer.Serialize(returnModel), 0);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.Write($"Error while saving Availibilty log{ex.Message.ToString()}");
+                                }
+
+                                #endregion
                                 return returnModel;
 
                             }
-                            var res = ConvertXmlToModel(xmlDoc);
+                            var res = ConvertXmlToModel(xmlDoc);                          
                             returnModel.data = res.data;
+                            if(res?.data.Count > 0)
+                            {
+                                #region Save Results To dB
+                                try
+                                {
+                                    await _dbRepository.SaveAvailabilityResult(System.Text.Json.JsonSerializer.Serialize(requestModel), System.Text.Json.JsonSerializer.Serialize(returnModel), res.data.Count());
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.Write($"Error while saving Availibilty log{ex.Message.ToString()}");
+                                }
+                                #endregion
+                               // _cacheService.Set("amadeusRequest" + requestModel.ToString(), returnModel, TimeSpan.FromMinutes(15));
+                            }
+                           
 
                         }
                     }
@@ -116,6 +150,14 @@ namespace ReservationSystem.Infrastructure.Repositories
                         returnModel.amadeusError = new AmadeusResponseError();
                         returnModel.amadeusError.error = errorInfo;
                         returnModel.amadeusError.errorCode = 0;
+                        try
+                        {
+                            await _dbRepository.SaveAvailabilityResult(System.Text.Json.JsonSerializer.Serialize(requestModel), System.Text.Json.JsonSerializer.Serialize(returnModel), 0);
+                        }
+                        catch (Exception ex2)
+                        {
+                            Console.Write($"Error while saving Availibilty log{ex2.Message.ToString()}");
+                        }
                         return returnModel;
 
                     }
@@ -459,6 +501,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                 }
             }
 
+            
+
             var flightIndexInbound = doc.Descendants(amadeus + "flightIndex").Where(f => f.Element(amadeus + "requestedSegmentRef").Element(amadeus + "segRef").Value == "2")
                             .ToList();
 
@@ -567,7 +611,27 @@ namespace ReservationSystem.Infrastructure.Repositories
 
 
             }
-                          
+       
+            List<BaggageDetails> baggageDetails = new List<BaggageDetails>();
+            #region Working For Baggagel Allowence
+            try
+            {
+                var baggageList = doc.Descendants(amadeus + "serviceFeesGrp")?.Descendants(amadeus + "freeBagAllowanceGrp")?.ToList();
+               
+                foreach (var bitem in baggageList)
+                {
+                    var itemNumber = bitem.Descendants(amadeus + "itemNumberInfo")?.Descendants(amadeus + "itemNumberDetails")?.Descendants(amadeus + "number")?.FirstOrDefault()?.Value;
+                    var freeAllowence = bitem.Descendants(amadeus + "freeBagAllownceInfo")?.Descendants(amadeus + "baggageDetails")?.Descendants(amadeus + "freeAllowance")?.FirstOrDefault()?.Value;
+                    var quantityCode = bitem.Descendants(amadeus + "freeBagAllownceInfo")?.Descendants(amadeus + "baggageDetails")?.Descendants(amadeus + "quantityCode")?.FirstOrDefault()?.Value;
+                    var unitQualifier = bitem.Descendants(amadeus + "freeBagAllownceInfo")?.Descendants(amadeus + "baggageDetails")?.Descendants(amadeus + "unitQualifier")?.FirstOrDefault()?.Value;
+                    baggageDetails.Add(new BaggageDetails { itemNumber = itemNumber, freeAllowance = freeAllowence, quantityCode = quantityCode, unitQualifier = unitQualifier });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while Generate baggage details {ex.Message.ToString()}");
+            }
+            #endregion
 
             #region Working For Recemondations
             string id = string.Empty, price = string.Empty, refnumenr = string.Empty, totalFareAmount = string.Empty;
@@ -800,12 +864,14 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.itineraries.AddRange(_outbounItineraries);
                     offer.itineraries.AddRange(_inbounItineraries);
                     #endregion
+                    offer.baggageDetails = baggageDetails.Where(e => e.itemNumber == offer.id).FirstOrDefault();
                     ReturnModel.data.Add(offer);
                 }
 
             }
             #endregion
-             
+
+            
 
             return ReturnModel;
         }

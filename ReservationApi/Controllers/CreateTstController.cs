@@ -17,11 +17,12 @@ namespace ReservationApi.Controllers
         private ITicketTstRepository _Repo;
         private ICacheService _cacheService;
         private readonly IMemoryCache _cache;
+       
         public CreateTstController(ITicketTstRepository Repo, IMemoryCache memoryCache, ICacheService cacheService)
         {
             _Repo = Repo;
             _cache = memoryCache;
-            _cacheService = cacheService;
+            _cacheService = cacheService;           
         }
         //[Authorize]
         [HttpPost]

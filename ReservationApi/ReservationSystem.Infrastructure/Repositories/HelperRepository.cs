@@ -217,5 +217,15 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             return Request;
         }
+
+        public string GenerateReferenceNumber()
+        {
+            string prefix = "JAYS-";
+            int remainingLength = 13 - prefix.Length;
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            var randomString = new string(Enumerable.Repeat(chars, remainingLength)
+                .Select(s => s[new Random().Next(s.Length)]).ToArray());
+            return prefix + randomString;
+        }
     }
 }

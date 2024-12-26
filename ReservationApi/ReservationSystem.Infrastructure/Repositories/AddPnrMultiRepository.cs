@@ -19,6 +19,8 @@ using System.Globalization;
 using ReservationSystem.Domain.Repositories;
 using Microsoft.EntityFrameworkCore.Metadata;
 using ReservationSystem.Domain.Models.FareCheck;
+using ReservationSystem.Domain.Models.DBLogs;
+using ReservationApi.ReservationSystem.Domain.DB_Models;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -27,11 +29,14 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public AddPnrMultiRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository)
+        private readonly IDBRepository _dbRepository;
+        public AddPnrMultiRepository(IConfiguration _configuration, IMemoryCache cache,IHelperRepository helperRepository,IDBRepository dBRepository)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _dbRepository = dBRepository;
+
         }
         public async Task<PnrCommitResponse?> CommitPNR(PnrCommitRequest requestModel)
         {
@@ -72,6 +77,12 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "CommitPNRResponseJson");
                             XNamespace fareNS = ns;
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.GeneratePNR.ToString();
+                            saveReservationLog.UserId = 0;                          
+
                             var errorInfo = xmlDoc.Descendants(fareNS + "generalErrorInfo").FirstOrDefault();
                             if (errorInfo != null)
                             {                                
@@ -80,16 +91,43 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 string errorText = string.Empty;
                                 foreach(var error in errorTextList)
                                 {
-                                    errorText += error + " ";
+                                    errorText += error?.Value?.Trim() + " ";
                                 }
                                 pnrCommit.amadeusError = new AmadeusResponseError();
                                 pnrCommit.amadeusError.error = errorText;
                                 pnrCommit.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = requestModel?.sessionDetails?.SessionId;
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
+                                await _dbRepository.SaveBookingInfo(requestModel, errorText,"");
                                 return pnrCommit;
 
                             }
 
                            var res = ConvertXmlToModelCommitPnr(xmlDoc, ns);
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                await _dbRepository.SaveBookingInfo(requestModel, "", res.PNRHeader.Reservation.PNR);
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
                             pnrCommit = res;
 
                         }
@@ -117,6 +155,9 @@ namespace ReservationSystem.Infrastructure.Repositories
             }
             return pnrCommit;
         }
+
+       
+
         public async Task<AddPnrMultiResponse> AddPnrMulti(AddPnrMultiRequset requestModel)
         {
             AddPnrMultiResponse AirSell = new AddPnrMultiResponse();
@@ -157,6 +198,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                             string jsonText = JsonConvert.SerializeXmlNode(xmlDoc2, Newtonsoft.Json.Formatting.Indented);
                             await _helperRepository.SaveJson(jsonText, "PNRMultiResponseJson");
                             XNamespace fareNS = ns;
+                            SaveReservationLog saveReservationLog = new SaveReservationLog();
+                            saveReservationLog.Request = Envelope;
+                            saveReservationLog.Response = jsonText;
+                            saveReservationLog.RequestName = RequestName.PNRMulti.ToString();
+                            saveReservationLog.UserId = 0;
                             var errorInfo = xmlDoc.Descendants(fareNS + "errorInfo").FirstOrDefault();
                             if (errorInfo != null)
                             {
@@ -166,11 +212,37 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 AirSell.amadeusError = new AmadeusResponseError();
                                 AirSell.amadeusError.error = errorText;
                                 AirSell.amadeusError.errorCode = Convert.ToInt16(errorCode);
+                                #region DB Logs
+                                try
+                                {
+                                    saveReservationLog.IsError = true;
+                                    saveReservationLog.AmadeusSessionId = "";
+                                    await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                                }
+                                #endregion
                                 return AirSell;
 
                             }
                             
                            var res = ConvertXmlToModel(xmlDoc, ns);
+                            #region DB Logs
+                            try
+                            {
+                                saveReservationLog.IsError = false;
+                                saveReservationLog.AmadeusSessionId = res?.session?.SessionId;
+                                await _dbRepository.SaveReservationFlow(saveReservationLog);
+                                await _dbRepository.SavePassengerInfo(requestModel);
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error while save db logs {ex.Message.ToString()}");
+                            }
+                            #endregion
                             AirSell = res;
 
                         }
@@ -962,6 +1034,20 @@ namespace ReservationSystem.Infrastructure.Repositories
 
             return Request;
         }
-       
+
+        public async Task<bool> UpdatePaymentStatusInBookingInfo(UpdatePaymentStatus requestModel)
+        {
+           
+            try
+            {
+             await _dbRepository.UpdatePaymentStatus(requestModel?.SessionId, requestModel?.PaymentStatus);
+             return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while update status of payment in booking info {ex.Message.ToString()}");
+            return false;
+            }
+        }
     }
 }

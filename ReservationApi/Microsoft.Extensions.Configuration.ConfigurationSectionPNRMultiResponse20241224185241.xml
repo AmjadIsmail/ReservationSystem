@@ -6,12 +6,12 @@
       <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
     </wsa:From>
     <wsa:Action>http://webservices.amadeus.com/TAUTCQ_04_1_1A</wsa:Action>
-    <wsa:MessageID>urn:uuid:446edee5-498d-2c74-1ddc-f317e3900f1e</wsa:MessageID>
-    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">bf87e52a-97b7-4a04-b62d-a39d746fa775</wsa:RelatesTo>
+    <wsa:MessageID>urn:uuid:50fa2a46-96a2-7da4-01e0-ca565bba5f11</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">868763f5-6c16-4127-9f41-e9768aaf5d4a</wsa:RelatesTo>
     <awsse:Session TransactionStatusCode="InSeries">
-      <awsse:SessionId>01EQ4522ZO</awsse:SessionId>
-      <awsse:SequenceNumber>6</awsse:SequenceNumber>
-      <awsse:SecurityToken>1D2R5EU8DRC602ZDO4TR0A1ZGI</awsse:SecurityToken>
+      <awsse:SessionId>00RF4MRI8V</awsse:SessionId>
+      <awsse:SequenceNumber>4</awsse:SequenceNumber>
+      <awsse:SecurityToken>3AW0PODX9ZR9Z8QW1OMOTK3C</awsse:SecurityToken>
     </awsse:Session>
   </soap:Header>
   <soap:Body>
@@ -19,13 +19,13 @@
       <applicationError>
         <applicationErrorInfo>
           <applicationErrorDetail>
-            <applicationErrorCode>2063</applicationErrorCode>
+            <applicationErrorCode>339</applicationErrorCode>
             <codeListQualifier>EC</codeListQualifier>
             <codeListResponsibleAgency>1A</codeListResponsibleAgency>
           </applicationErrorDetail>
         </applicationErrorInfo>
         <errorText>
-          <errorFreeText>INVALID FARE</errorFreeText>
+          <errorFreeText>NEED NAMES</errorFreeText>
         </errorText>
       </applicationError>
     </Ticket_CreateTSTFromPricingReply>

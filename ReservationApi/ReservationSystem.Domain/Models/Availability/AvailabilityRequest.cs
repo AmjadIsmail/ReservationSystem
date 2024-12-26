@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Text.Json;
 namespace ReservationSystem.Domain.Models.Availability
 {
     public class AvailabilityRequest
@@ -29,5 +29,10 @@ namespace ReservationSystem.Domain.Models.Availability
         public string? currencyCode { get; set; }
         public int? maxPrice { get; set; }
         public int? maxFlights { get; set; }
+
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }
