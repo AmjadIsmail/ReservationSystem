@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:awsse="http://xml.amadeus.com/2010/06/Session_v3" xmlns:wsa="http://www.w3.org/2005/08/addressing">
+  <soap:Header>
+    <wsa:To>http://www.w3.org/2005/08/addressing/anonymous</wsa:To>
+    <wsa:From>
+      <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
+    </wsa:From>
+    <wsa:Action>http://webservices.amadeus.com/TAUTCQ_04_1_1A</wsa:Action>
+    <wsa:MessageID>urn:uuid:a164dd47-c9d7-fb64-d5f4-dc03a3b61cdc</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">abd531b0-15ae-4ded-8254-390b4d1f20b8</wsa:RelatesTo>
+    <awsse:Session TransactionStatusCode="InSeries">
+      <awsse:SessionId>00RSXUKAQ3</awsse:SessionId>
+      <awsse:SequenceNumber>5</awsse:SequenceNumber>
+      <awsse:SecurityToken>2FZ76S39VVZDA3A9ZGMFMZ76F4</awsse:SecurityToken>
+    </awsse:Session>
+  </soap:Header>
+  <soap:Body>
+    <Ticket_CreateTSTFromPricingReply xmlns="http://xml.amadeus.com/TAUTCR_04_1_1A">
+      <applicationError>
+        <applicationErrorInfo>
+          <applicationErrorDetail>
+            <applicationErrorCode>4819</applicationErrorCode>
+            <codeListQualifier>EC</codeListQualifier>
+            <codeListResponsibleAgency>1A</codeListResponsibleAgency>
+          </applicationErrorDetail>
+        </applicationErrorInfo>
+        <errorText>
+          <errorFreeText>RBD OVERRIDE NOT PERMITTED</errorFreeText>
+        </errorText>
+      </applicationError>
+    </Ticket_CreateTSTFromPricingReply>
+  </soap:Body>
+</soap:Envelope>

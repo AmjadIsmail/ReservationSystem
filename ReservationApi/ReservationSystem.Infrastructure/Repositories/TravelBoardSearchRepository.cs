@@ -118,7 +118,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 return returnModel;
 
                             }
-                            var res = ConvertXmlToModel(xmlDoc);                          
+                            var res = ConvertXmlToModel(xmlDoc);                             
                             returnModel.data = res.data;
                             if(res?.data.Count > 0)
                             {
@@ -865,14 +865,17 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.itineraries.AddRange(_inbounItineraries);
                     #endregion
                     offer.baggageDetails = baggageDetails.Where(e => e.itemNumber == offer.id).FirstOrDefault();
-                    ReturnModel.data.Add(offer);
+                    if (itineary != null)
+                    {
+                        ReturnModel.data.Add(offer);
+                    }
+                        
                 }
 
             }
             #endregion
 
-            
-
+            ReturnModel.data = ReturnModel?.data?.Where(e => e?.itineraries?.Count > 1).ToList();
             return ReturnModel;
         }
         private string CalculateDuration(List<string> timestring)

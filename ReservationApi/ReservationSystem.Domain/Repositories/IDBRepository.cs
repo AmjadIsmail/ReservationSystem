@@ -1,4 +1,5 @@
-﻿using ReservationSystem.Domain.DB_Models;
+﻿using ReservationApi.ReservationSystem.Domain.DB_Models;
+using ReservationSystem.Domain.DB_Models;
 using ReservationSystem.Domain.Models.AddPnrMulti;
 using ReservationSystem.Domain.Models.DBLogs;
 using System;
@@ -30,6 +31,9 @@ namespace ReservationSystem.Domain.Repositories
         public Task<bool> UpdateEmailStatus(string sessionId, bool status);
 
         public Task<bool> GetEmailStatus(string sessionId);
+        public Task<BookingInfo>? GetBookingInfo(string sessionId);
+
+        public Task<string> GetLastSessionId();
 
 
     }

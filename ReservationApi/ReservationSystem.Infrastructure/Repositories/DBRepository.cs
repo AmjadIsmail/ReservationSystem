@@ -39,7 +39,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 Res.response = response;
                 Res.total_results = totlResults;
                 Res.user_id = 0;
-                await _context.availabilityResults.AddAsync(Res);
+                await _context.AvailabilityResults.AddAsync(Res);
                 await _context.SaveChangesAsync();
             }
             catch(Exception ex)
@@ -75,7 +75,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 Res.RequestName = requset.RequestName;
                 Res.AmadeusSessionId = requset.AmadeusSessionId;
                 Res.UserId = 0;                
-                await _context.reservation_flow.AddAsync(Res);
+                await _context.ReservationFlow.AddAsync(Res);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -179,12 +179,29 @@ namespace ReservationSystem.Infrastructure.Repositories
 
 
         }
+
+        public async Task<BookingInfo>? GetBookingInfo(string sessionId)
+        {
+            try
+            {
+
+                var pInfo = await _context.BookingInfo.Where(e => e.SessionId == sessionId).FirstOrDefaultAsync();
+                return pInfo;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while Get booking info Details {ex.Message.ToString()}");
+                return null;
+            }
+
+
+        }
         public async Task<List<FlightMarkup>?> GetFlightMarkup()
         {
             try
             {
 
-                return await _context.flightMarkups.ToListAsync();
+                return await _context.FlightMarkups.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -276,7 +293,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                 if (binfo != null)
                 {
                     Res = binfo.SentEmail != null ? binfo.SentEmail.Value  : false;
-                    return true;
+                    return Res;
                 }
                 else { return false; }
 
@@ -285,6 +302,28 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
                 _logger.LogError($"Error while Update Email Status to bookinginfo {ex.Message.ToString()}");
                 return false;
+            }
+        }
+
+        public async Task<string> GetLastSessionId()
+        {
+
+            try
+            {
+                string Res = string.Empty;
+                var binfo = await _context.BookingInfo.OrderByDescending(e => e.AutoId).FirstOrDefaultAsync();
+                if (binfo != null)
+                {
+                    Res = binfo?.SessionId?.ToString();
+                    return Res;
+                }
+                else { return Res; }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error while Get SessionID {ex.Message.ToString()}");
+                return "";
             }
         }
     }

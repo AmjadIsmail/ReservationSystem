@@ -25,14 +25,16 @@ namespace ReservationSystem.Domain.DBContext
         //    return new DB_Context(optionsBuilder.Options);
         //}
 
-        public DbSet<SearchAvailabilityResults> availabilityResults { get; set; }
-        public DbSet<FlightMarkup> flightMarkups { get; set; }
+        public DbSet<SearchAvailabilityResults> AvailabilityResults { get; set; }
+        public DbSet<FlightMarkup> FlightMarkups { get; set; }
 
-        public DbSet<ReservationFlow> reservation_flow { get; set; }
+        public DbSet<ReservationFlow> ReservationFlow { get; set; }
 
         public DbSet<FlightInfo> FlightsInfo { get; set; }
         public DbSet<PassengerInfo> PassengersInfo { get; set; }
 
         public DbSet<BookingInfo> BookingInfo { get; set; }
+
+        public DbSet<Users> Users { get; set; }
     }
 }

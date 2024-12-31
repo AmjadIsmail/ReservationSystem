@@ -17,6 +17,7 @@ using ReservationSystem.Domain.Models.Availability;
 using ReservationSystem.Domain.Models.FareCheck;
 using ReservationSystem.Domain.Models;
 using System.Net;
+using ReservationSystem.Domain.DBContext;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -24,10 +25,12 @@ namespace ReservationSystem.Infrastructure.Repositories
     {
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
-        public HelperRepository(IConfiguration _configuration, IMemoryCache cache)
+        private readonly DB_Context dB_Context;
+        public HelperRepository(IConfiguration _configuration, IMemoryCache cache , DB_Context _db_Context)
         {
             configuration = _configuration;
             _cache = cache;
+            dB_Context = _db_Context;
         }
         public async Task SaveJson( string jsonText , string filename)
         {
@@ -221,11 +224,23 @@ namespace ReservationSystem.Infrastructure.Repositories
         public string GenerateReferenceNumber()
         {
             string prefix = "JAYS-";
-            int remainingLength = 13 - prefix.Length;
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var randomString = new string(Enumerable.Repeat(chars, remainingLength)
-                .Select(s => s[new Random().Next(s.Length)]).ToArray());
-            return prefix + randomString;
+            //int remainingLength = 11 - prefix.Length;
+            //  const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            int seed = DateTime.Today.GetHashCode();
+            Random random = new Random(seed);
+            HashSet<int> randomNumbers = new HashSet<int>();
+            while (randomNumbers.Count < 5)
+            {
+                randomNumbers.Add(random.Next(1, 100)); // Random numbers between 1 and 100
+            }
+            StringBuilder randomString = new StringBuilder();
+            foreach (int number in randomNumbers)
+            {
+               // Console.WriteLine(number);
+                randomString.Append(number.ToString());
+            }
+           // var randomString = new string(Enumerable.Repeat(chars, remainingLength).Select(s => s[new Random().Next(s.Length)]).ToArray());
+            return prefix + randomString.ToString().Substring(0,5);
         }
     }
 }

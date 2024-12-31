@@ -446,3 +446,4 @@ D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\MimeKit.dll
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\System.Formats.Asn1.dll
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\appsettings.Production.json
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\EmailTemplates\FlightConfirmation.html
