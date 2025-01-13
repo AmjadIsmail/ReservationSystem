@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ReservationApi.ReservationSystem.Domain.DB_Models;
 using ReservationSystem.Domain.DB_Models;
 using ReservationSystem.Domain.Models.AddPnrMulti;
+using ReservationSystem.Domain.Models.Enquiry;
 
 namespace ReservationSystem.Domain.DBContext
 {
@@ -36,5 +37,8 @@ namespace ReservationSystem.Domain.DBContext
         public DbSet<BookingInfo> BookingInfo { get; set; }
 
         public DbSet<Users> Users { get; set; }
+        public DbSet<Enquiry> Enquiries { get; set; }
+
+        public DbSet<ManualPayment> ManulPayments { get; set; }
     }
 }

@@ -10,6 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
+using ReservationSystem.Domain.Models.ManualPayment;
+using ReservationSystem.Domain.DBContext;
+using ReservationApi.ReservationSystem.Domain.DB_Models;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -18,11 +21,13 @@ namespace ReservationSystem.Infrastructure.Repositories
         private readonly IConfiguration configuration;
         private readonly IMemoryCache _cache;
         private readonly IHelperRepository _helperRepository;
-        public PaymentRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository)
+        private readonly DB_Context _Context;
+        public PaymentRepository(IConfiguration _configuration, IMemoryCache cache, IHelperRepository helperRepository , DB_Context Context)
         {
             configuration = _configuration;
             _cache = cache;
             _helperRepository = helperRepository;
+            _Context = Context;
         }
 
         public async Task<PaymentResponse> GeneratePaymentRequest(PaymentRequest request)
@@ -133,6 +138,84 @@ namespace ReservationSystem.Infrastructure.Repositories
                 return false;
             }
             
+        }
+
+        public async Task<PaymentResponse> GenerateManualPaymentRequest(PaymentRequest request)
+        {
+            PaymentResponse response = new PaymentResponse();
+            try
+            {
+                var _settings = configuration.GetSection("EpdqSettings");
+                string OrderId = Guid.NewGuid().ToString().Substring(0, 13);
+                string strPw = _settings["ShaInPassphrase"]?.ToString();
+                var parameters = new Dictionary<string, string>
+            {
+                    { "ACCEPTURL", _settings["AcceptUrlManual"] },
+                    { "AMOUNT", ((int)(request.Amount * 100)).ToString() },
+                    { "CANCELURL", _settings["CancelUrlManual"] },
+                    { "CURRENCY", request.Currency },
+                    { "DECLINEURL", _settings["DeclineUrlManual"] },
+                    { "EXCEPTIONURL", _settings["ExceptionUrlManual"] },
+                    { "LANGUAGE", request.Language },
+                    { "ORDERID",OrderId},
+                    { "PSPID", _settings["PSPID"] },
+
+            };
+                string shaSignature = GenerateShaSignature(parameters, _settings["ShaInPassphrase"]);
+
+                parameters = new Dictionary<string, string>
+                {
+                    { "ACCEPTURL", _settings["AcceptUrlManual"] },
+                    { "AMOUNT", ((int)(request.Amount * 100)).ToString() },
+                    { "CANCELURL", _settings["CancelUrlManual"] },
+                    { "CURRENCY", request.Currency },
+                    { "DECLINEURL", _settings["DeclineUrlManual"] },
+                    { "EXCEPTIONURL", _settings["ExceptionUrlManual"] },
+                    { "LANGUAGE", request.Language },
+                    { "ORDERID",OrderId},
+                    { "PSPID", _settings["PSPID"] },
+                    { "SHASIGN", shaSignature },
+
+
+                };
+                response.Parameters = parameters;
+                response.Url = _settings["PaymentUrl"];
+                response.BookingRefNo = _helperRepository.GenerateReferenceNumber();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in Create Payment Request {ex.Message.ToString()}");
+            }
+            return response;
+        }
+
+        public async Task<bool> UpdateManualPaymentDetails(ManualPaymentCustomerDetails request)
+        {
+            bool response;
+            try
+            {
+                ManualPayment payment = new ManualPayment();
+                payment.Address = request.Address;
+                payment.Amount = request?.Address != null ? Convert.ToDecimal(request.Address) : 0;
+                payment.City = request.City;
+                payment.Country = request.Country;
+                payment.CreatedOn = DateTime.Now;
+                payment.Email = request.Email;
+                payment.FirstName = request.FirstName;
+                payment.LastName = request.LastName;
+                payment.PhoneNumber = request.Phone;
+                payment.PostalCode = request.Postal;
+                payment.PaymentStatus = request?.PaymentStatus;
+                await _Context.ManulPayments.AddAsync(payment);
+                await _Context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($" Error in Save Manual Payment Request {ex.Message.ToString()}");
+                return false;
+            }
+            return true;
         }
 
     }

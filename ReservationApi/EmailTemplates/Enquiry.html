@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Confirmation</title>
+    <title>Enquiry</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -72,24 +72,16 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>Flight Confirmation</h1>
-            <p>Booking {{BookingStatus}} - Payment {{PaymentStatus}}</p>
-            <p>Flight Price {{FlightPrice}}</p>
+            <h1>Enquiry</h1>
+           
         </div>
         <div class="content">
             <p>Dear <strong>{{CustomerName}}</strong>,</p>
-            <p>Thank you for booking your flight with us! Your payment has been successfully processed, and your flight details are as follows:</p>
-
+            <p>Thank you for enquiry! We have recived your enquiry with below details:</p>
+                       
             <div class="details">
-                {{BookingRef}}
-            </div>
-            <div class="details">
-                {{FlightSegments}}
-            </div>
-
-            <div class="details">
-                {{PassengerList}}
-            </div>
+                {{Enquiry}}
+            </div>           
             <p>If you have any questions or need assistance, please contact us at <a href="mailto:reservations@jaystravels.co.uk">reservations@jaystravels.co.uk</a>.</p>
         </div>
         <div class="footer">

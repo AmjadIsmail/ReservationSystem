@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using ReservationApi.Model;
+using ReservationSystem.Domain.Models.AddPnrMulti;
 using ReservationSystem.Domain.Models.Availability;
+using ReservationSystem.Domain.Models.ManualPayment;
 using ReservationSystem.Domain.Models.Payment;
 using ReservationSystem.Domain.Repositories;
 using ReservationSystem.Domain.Service;
+using ReservationSystem.Infrastructure.Repositories;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,18 +18,20 @@ namespace ReservationApi.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
-        private IPaymentRepository _repo;
-        private ICacheService _cacheService;
+        private readonly IPaymentRepository _repo;
+        private readonly ICacheService _cacheService;
         private readonly IMemoryCache _cache;
         private readonly IConfiguration _configuration;
         private readonly IHelperRepository _helperRepository;
-        public PaymentController(IPaymentRepository repository, IMemoryCache memoryCache, ICacheService cacheService, IConfiguration configuration, IHelperRepository helperRepository)
+        private readonly IEmailService _emailService;
+        public PaymentController(IPaymentRepository repository, IMemoryCache memoryCache, ICacheService cacheService, IConfiguration configuration, IHelperRepository helperRepository , IEmailService emailservice)
         {
             _repo = repository;
             _cache = memoryCache;
             _cacheService = cacheService;
             _configuration = configuration;
             _helperRepository = helperRepository;
+            _emailService = emailservice;
         }
         [HttpPost("generate")]
         public async Task<IActionResult> GeneratePaymentRequest([FromBody] PaymentRequest request)          
@@ -49,6 +54,59 @@ namespace ReservationApi.Controllers
             return Ok(res);
 
         }
+
+        [HttpPost("generatemanualpayment")]
+        public async Task<IActionResult> GeneratePaymentRequestManual([FromBody] PaymentRequest request)
+        {
+            ApiResponse res = new ApiResponse();
+            var data = await _repo.GenerateManualPaymentRequest(request);
+            res.IsSuccessful = data?.Error == null ? true : false;
+            res.StatusCode = data?.Error == null ? 200 : 500;
+            res.Message = data?.Error == null ? "Found Success:" : "Error";
+            res.Response = data?.Error == null ? "Success" : "Failed";
+            if (data?.Error != null)
+            {
+                res.Data = data?.Error;
+                res.StatusCode = 500;
+            }
+            else
+            {
+                res.Data = data;
+            }
+            return Ok(res);
+
+        }
+
+        [HttpPost("UpdateManualPayment")]
+        public async Task<IActionResult> UpdateManualPayment([FromBody] ManualPaymentCustomerDetails request)
+        {
+
+            #region
+            bool update = await _repo.UpdateManualPaymentDetails(request);
+            #endregion
+            #region Email Region
+            try
+            {
+            // var emailBody = await _emailService.GetBookingSuccessTemplate(request?.SessionId, "Confirmed", request.PaymentStatus);
+            //string subject = request?.PaymentStatus == "Success" ? "Reservation Success" : "Reservation Success with Payment Failed";
+            //var pinfo = await _dBRepository.GetPassengerInfo(request?.SessionId);
+            //string ToemailAddress = pinfo.Where(e => e.IsLead == true).FirstOrDefault()?.Email;
+            //await _emailService.SendEmailAsync3(ToemailAddress, subject, emailBody);             
+            }
+            catch (Exception ex)
+            {
+
+            }
+            #endregion
+            ApiResponse res = new ApiResponse();
+            res.IsSuccessful = update;
+            res.StatusCode = 200;
+            res.Message = update ? " Success:" : "Failed";
+            res.Response = update ? "Success" : "Failed";
+            return Ok(res);
+
+        }
+
 
         [HttpGet("callback")]
         public async Task<IActionResult> PaymentCallback([FromForm] Dictionary<string, string> form)

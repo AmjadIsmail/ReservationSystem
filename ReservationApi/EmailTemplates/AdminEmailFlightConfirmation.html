@@ -72,25 +72,63 @@
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>Flight Confirmation</h1>
-            <p>Booking {{BookingStatus}} - Payment {{PaymentStatus}}</p>
-            <p>Flight Price {{FlightPrice}}</p>
+            <h1>Reservation Details</h1>
+            <p>Booking No {{BookingNo}} - Booking Date {{BookingDate}}</p>
+            <p>Ticket DeadLine {{TiicketDeadLine}}</p>
         </div>
         <div class="content">
-            <p>Dear <strong>{{CustomerName}}</strong>,</p>
-            <p>Thank you for booking your flight with us! Your payment has been successfully processed, and your flight details are as follows:</p>
-
-            <div class="details">
-                {{BookingRef}}
-            </div>
+            <h1>Flight Details</h1>
             <div class="details">
                 {{FlightSegments}}
             </div>
 
+            <h1>Search Details</h1>
+            <div class="details">
+                {{SearchDetails}}
+            </div>
+
+            <h1>Passenger Information</h1>
+            <div class="details">
+                {{PassengerInformation}}
+            </div>
+
+            <h1>Fare Information</h1>
+            <div class="details">
+                {{FareInformation}}
+            </div>
+
+            <h1>Hotel Information</h1>
+            <div class="details">
+                {{HotelInformation}}
+            </div>
+
+            <h1>Transfer Information</h1>
+            <div class="details">
+                {{TransferInformation}}
+            </div>
+
+            <h1>Tour Information</h1>
+            <div class="details">
+                {{TourInformation}}
+            </div>
+
+            <h1>Car Information</h1>
+            <div class="details">
+                {{CarInformation}}
+            </div>
+            <h1>Insurance Information</h1>
+            <div class="details">
+                {{InsuranceInformation}}
+            </div>
+            <h1>Parking Information</h1>
+            <div class="details">
+                {{ParkingInformation}}
+            </div>
+            <h1>Price Information</h1>
             <div class="details">
                 {{PassengerList}}
             </div>
-            <p>If you have any questions or need assistance, please contact us at <a href="mailto:reservations@jaystravels.co.uk">reservations@jaystravels.co.uk</a>.</p>
+           
         </div>
         <div class="footer">
             <p>&copy; 2025 Jays Travels. All rights reserved.</p>

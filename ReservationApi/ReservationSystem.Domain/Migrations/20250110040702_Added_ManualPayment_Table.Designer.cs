@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReservationSystem.Domain.DBContext;
@@ -11,9 +12,11 @@ using ReservationSystem.Domain.DBContext;
 namespace ReservationSystem.Domain.Migrations
 {
     [DbContext(typeof(DB_Context))]
-    partial class DB_ContextModelSnapshot : ModelSnapshot
+    [Migration("20250110040702_Added_ManualPayment_Table")]
+    partial class Added_ManualPayment_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,10 +118,6 @@ namespace ReservationSystem.Domain.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("text")
                         .HasColumnName("last_name");
-
-                    b.Property<bool?>("PaymentStatus")
-                        .HasColumnType("boolean")
-                        .HasColumnName("payment_status");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text")
