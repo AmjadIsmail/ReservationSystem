@@ -9,6 +9,7 @@ namespace ReservationSystem.Domain.Models.ManualPayment
     public class ManualPaymentCustomerDetails
     {
         public string? BookingRef { get; set; }
+        public decimal? Amount { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Email { get; set; }

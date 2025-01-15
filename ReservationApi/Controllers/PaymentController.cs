@@ -87,11 +87,16 @@ namespace ReservationApi.Controllers
             #region Email Region
             try
             {
-            // var emailBody = await _emailService.GetBookingSuccessTemplate(request?.SessionId, "Confirmed", request.PaymentStatus);
-            //string subject = request?.PaymentStatus == "Success" ? "Reservation Success" : "Reservation Success with Payment Failed";
-            //var pinfo = await _dBRepository.GetPassengerInfo(request?.SessionId);
-            //string ToemailAddress = pinfo.Where(e => e.IsLead == true).FirstOrDefault()?.Email;
-            //await _emailService.SendEmailAsync3(ToemailAddress, subject, emailBody);             
+                if (update)
+                {
+                    var emailBody = await _emailService.GetManualPaymentTemplate(request);
+                    string subject = request?.PaymentStatus.Value == true ? "Payment Success" : "Payment Failed";
+                    string ToemailAddress = request?.Email;
+                    await _emailService.SendEmailAsync3(ToemailAddress, subject, emailBody);
+                    var AdminEmail = _configuration["EmailSettings:AdminEmail"];
+                    await _emailService.SendEmailAsync3(AdminEmail, "Admin-Email Customer" + subject, emailBody);
+                }
+                      
             }
             catch (Exception ex)
             {

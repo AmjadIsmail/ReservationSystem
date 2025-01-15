@@ -326,6 +326,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Azure.Communication.Email": {
+              "target": "Package",
+              "version": "[1.0.1, )"
+            },
             "Codaxy.Xsd2": {
               "target": "Package",
               "version": "[0.10.0, )"

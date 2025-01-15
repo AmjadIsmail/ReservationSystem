@@ -43,5 +43,8 @@ namespace ReservationApi.ReservationSystem.Domain.DB_Models
 
         [Column("payment_status")]
         public bool? PaymentStatus { get; set; }
+
+        [Column("booking_ref")]
+        public string? BookingRef { get; set; }
     }
 }

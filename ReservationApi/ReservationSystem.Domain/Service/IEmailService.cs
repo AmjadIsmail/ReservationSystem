@@ -1,4 +1,5 @@
 ﻿using ReservationSystem.Domain.Models.Enquiry;
+using ReservationSystem.Domain.Models.ManualPayment;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,7 @@ namespace ReservationSystem.Domain.Service
         public Task<string> GetEnquiryTemplate(EnquiryRequest enquiry);
 
          public Task<string> GetBookingSuccessTemplateForAdmin(string sessionId = "", string bookingStatus = "", string paymentStatus = "");
+
+        public Task<string> GetManualPaymentTemplate(ManualPaymentCustomerDetails enquiry);
     }
 }

@@ -447,3 +447,9 @@ D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\System.Formats.Asn1.dll
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\appsettings.Production.json
 D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\EmailTemplates\FlightConfirmation.html
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\EmailTemplates\Enquiry.html
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\Azure.Communication.Email.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\Azure.Core.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\System.Memory.Data.dll
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\EmailTemplates\ManualPayment.html
+D:\work\git-ReservationSystem\ReservationSystem\ReservationSystem\ReservationApi\bin\Debug\net8.0\EmailTemplates\AdminEmailFlightConfirmation.html

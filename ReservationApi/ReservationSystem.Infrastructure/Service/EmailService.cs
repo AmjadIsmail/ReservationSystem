@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Hosting;
 using ReservationSystem.Domain.Models.Enquiry;
 using Azure;
 using Azure.Communication.Email;
+using ReservationSystem.Domain.Models.ManualPayment;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 
 namespace ReservationSystem.Infrastructure.Service
@@ -358,6 +360,15 @@ namespace ReservationSystem.Infrastructure.Service
                    
                     placeholders.TryAdd("BookingStatus", bookingStatus);
                     placeholders.TryAdd("PaymentStatus", paymentStatus);
+                    placeholders.TryAdd("HotelInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("TransferInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("TourInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("CarInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("InsuranceInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("ParkingInformation", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("PassengerList", "<div class='segment'><span>None</span></div>");
+                    placeholders.TryAdd("FareInformation", "<div class='segment'><span>None</span></div>");
+
                     placeholders.TryAdd("FlightPrice", offer?.price?.currency + " " + offer?.price?.total);
                     var emailBody = GenerateFlightConfirmationEmail(template, placeholders);
                     return emailBody;
@@ -375,6 +386,44 @@ namespace ReservationSystem.Infrastructure.Service
             {
                 Console.WriteLine($"Error While Sending Success booking email {ex.Message.ToString()}");
                 return "Flights Booking Error in sending Email " + ex.Message.ToString() + " " + ex.StackTrace.ToString();
+            }
+        }
+
+        public async Task<string> GetManualPaymentTemplate(ManualPaymentCustomerDetails enquiry)
+        {
+            try
+            {
+                var filePath = Path.Combine(_environment.ContentRootPath, "EmailTemplates", "ManualPayment.html");
+                var template = File.ReadAllText(filePath);
+                var placeholders = new Dictionary<string, string>{
+                  { "CustomerName", enquiry.FirstName + " " + enquiry.LastName  },                  
+                };
+                placeholders.Add("PaymentStatus", enquiry?.PaymentStatus.ToString());
+                var segmentHtml = new StringBuilder();
+                segmentHtml.Append($@"
+            <div class='segment'>
+                 <table>
+                    <tr><th>Booking Ref:</th><td>{enquiry.BookingRef}</td></tr>
+                    <tr><th>Name:</th><td>{enquiry.FirstName + " " + enquiry.LastName}</td></tr>
+                    <tr><th>Email:</th><td>{enquiry.Email}</td></tr>
+                    <tr><th>Phone:</th><td>{enquiry.Phone}</td></tr>
+                    <tr><th>Address:</th><td>{enquiry.Address}</td></tr>
+                    <tr><th>City:</th><td>{enquiry.City}</td></tr>
+                    <tr><th>Country:</th><td>{enquiry.Country}</td></tr>
+                    <tr><th>Postal:</th><td>{enquiry.Postal}</td></tr>
+                </table>
+            </div>");
+
+                // Replace the placeholder with the actual segments
+                template = template.Replace("{{PaymentDetails}}", segmentHtml.ToString());
+                var emailBody = GenerateFlightConfirmationEmail(template, placeholders);
+                return emailBody;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error While Sending Enquiry email {ex.Message.ToString()}");
+                return "Enquiry Email Error in sending Email " + ex.Message.ToString() + " " + ex.StackTrace.ToString();
             }
         }
     }
