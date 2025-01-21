@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReservationSystem.Domain.DBContext;
@@ -11,9 +12,11 @@ using ReservationSystem.Domain.DBContext;
 namespace ReservationSystem.Domain.Migrations
 {
     [DbContext(typeof(DB_Context))]
-    partial class DB_ContextModelSnapshot : ModelSnapshot
+    [Migration("20250118161350_UpdateMarkupTable")]
+    partial class UpdateMarkupTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,10 +234,6 @@ namespace ReservationSystem.Domain.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_on");
 
-                    b.Property<decimal?>("DateMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("date_markup");
-
                     b.Property<decimal?>("DiscountOnAirline")
                         .HasColumnType("numeric")
                         .HasColumnName("discount_on_airline");
@@ -258,10 +257,6 @@ namespace ReservationSystem.Domain.Migrations
                     b.Property<decimal?>("FareTypeMarkup")
                         .HasColumnType("numeric")
                         .HasColumnName("fare_type_markup");
-
-                    b.Property<DateOnly?>("FromDate")
-                        .HasColumnType("date")
-                        .HasColumnName("from_date");
 
                     b.Property<string>("Gds")
                         .HasColumnType("text")
@@ -310,10 +305,6 @@ namespace ReservationSystem.Domain.Migrations
                     b.Property<decimal?>("StartAirportMarkup")
                         .HasColumnType("numeric")
                         .HasColumnName("start_airport_markup");
-
-                    b.Property<DateOnly?>("ToDate")
-                        .HasColumnType("date")
-                        .HasColumnName("to_date");
 
                     b.HasKey("MarkupId");
 

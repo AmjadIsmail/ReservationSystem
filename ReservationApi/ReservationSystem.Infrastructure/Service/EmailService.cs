@@ -398,12 +398,13 @@ namespace ReservationSystem.Infrastructure.Service
                 var placeholders = new Dictionary<string, string>{
                   { "CustomerName", enquiry.FirstName + " " + enquiry.LastName  },                  
                 };
-                placeholders.Add("PaymentStatus", enquiry?.PaymentStatus.ToString());
+                placeholders.Add("PaymentStatus", enquiry?.PaymentStatus.ToString() == "True" ? "Success" : "Faild");
                 var segmentHtml = new StringBuilder();
                 segmentHtml.Append($@"
             <div class='segment'>
                  <table>
                     <tr><th>Booking Ref:</th><td>{enquiry.BookingRef}</td></tr>
+                    <tr><th>Amount:</th><td>{enquiry.Amount}</td></tr>
                     <tr><th>Name:</th><td>{enquiry.FirstName + " " + enquiry.LastName}</td></tr>
                     <tr><th>Email:</th><td>{enquiry.Email}</td></tr>
                     <tr><th>Phone:</th><td>{enquiry.Phone}</td></tr>

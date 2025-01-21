@@ -87,15 +87,14 @@ namespace ReservationApi.Controllers
             #region Email Region
             try
             {
-                if (update)
-                {
+                
                     var emailBody = await _emailService.GetManualPaymentTemplate(request);
                     string subject = request?.PaymentStatus.Value == true ? "Payment Success" : "Payment Failed";
                     string ToemailAddress = request?.Email;
                     await _emailService.SendEmailAsync3(ToemailAddress, subject, emailBody);
                     var AdminEmail = _configuration["EmailSettings:AdminEmail"];
                     await _emailService.SendEmailAsync3(AdminEmail, "Admin-Email Customer" + subject, emailBody);
-                }
+               
                       
             }
             catch (Exception ex)

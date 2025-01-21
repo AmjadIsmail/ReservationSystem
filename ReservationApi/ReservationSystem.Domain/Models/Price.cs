@@ -15,14 +15,25 @@ namespace ReservationSystem.Domain.Models
         public string? adultPP { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? adultTax { get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? adulMarkup { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? childPp { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? childTax{ get; set; }
+
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? childMarkup { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? infantPp { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? infantTax { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string? infantMarkup { get; set; }
+
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string? total { get; set; }
         [JsonProperty("base",NullValueHandling = NullValueHandling.Ignore)]

@@ -14,6 +14,7 @@ using ReservationSystem.Domain.Models.ManualPayment;
 using ReservationSystem.Domain.DBContext;
 using ReservationApi.ReservationSystem.Domain.DB_Models;
 using Microsoft.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Math;
 
 namespace ReservationSystem.Infrastructure.Repositories
 {
@@ -38,9 +39,26 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
                 var _settings = configuration.GetSection("EpdqSettings");
                 string OrderId = Guid.NewGuid().ToString().Substring(0, 13);
-                string strPw = _settings["ShaInPassphrase"]?.ToString();            
+                string strPw = string.Empty;    //_settings["ShaInPassphrase"]?.ToString();
+                string pspid = string.Empty;
+               if( Environment.GetEnvironmentVariable("PSPID") != null)                   
+                {
+                    pspid = Environment.GetEnvironmentVariable("PSPID").ToString();
+                }
+                else
+                {
+                    pspid = "jaystravelstest";
+                }
+               if (Environment.GetEnvironmentVariable("ShaInPassphrase") != null)
+                {
+                    strPw = Environment.GetEnvironmentVariable("ShaInPassphrase").ToString();
+                }
+                else
+                {
+                    strPw = "f3d1f70c-b1a0-48ba-816c-88fcccf72bf3";
+                }
                 var parameters = new Dictionary<string, string>
-            {
+                {
                     { "ACCEPTURL", _settings["AcceptUrl"] },
                     { "AMOUNT", ((int)(request.Amount * 100)).ToString() },
                     { "CANCELURL", _settings["CancelUrl"] },                  
@@ -49,11 +67,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                     { "EXCEPTIONURL", _settings["ExceptionUrl"] },
                     { "LANGUAGE", request.Language },
                     { "ORDERID",OrderId},
-                    { "PSPID", _settings["PSPID"] },
+                    { "PSPID", pspid },
                  
-            };
-             string shaSignature = GenerateShaSignature(parameters, _settings["ShaInPassphrase"]);
-               
+                };
+                string shaSignature = GenerateShaSignature(parameters,strPw);
+                string paymentUrl = string.Empty;
+                if(Environment.GetEnvironmentVariable("PaymentUrl") != null)
+                {
+                    paymentUrl = Environment.GetEnvironmentVariable("PaymentUrl")?.ToString();
+                }
+                else
+                {
+                    paymentUrl = "https://mdepayments.epdq.co.uk/ncol/test/orderstandard.asp";
+                }
                 parameters = new Dictionary<string, string>
                 {
                     { "ACCEPTURL", _settings["AcceptUrl"] },
@@ -64,13 +90,11 @@ namespace ReservationSystem.Infrastructure.Repositories
                     { "EXCEPTIONURL", _settings["ExceptionUrl"] },
                     { "LANGUAGE", request.Language },
                     { "ORDERID",OrderId},
-                    { "PSPID", _settings["PSPID"] },
+                    { "PSPID", pspid },
                     { "SHASIGN", shaSignature },
-                    
-                        
                 };
                 response.Parameters = parameters;
-                response.Url = _settings["PaymentUrl"];
+                response.Url = paymentUrl; //_settings["PaymentUrl"];
                 response.BookingRefNo = _helperRepository.GenerateReferenceNumber();
             }
             catch(Exception ex)
@@ -148,7 +172,25 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
                 var _settings = configuration.GetSection("EpdqSettings");
                 string OrderId = Guid.NewGuid().ToString().Substring(0, 13);
-                string strPw = _settings["ShaInPassphrase"]?.ToString();
+                string strPw = string.Empty;//_settings["ShaInPassphrase"]?.ToString();
+                string pspid = string.Empty;
+                if (Environment.GetEnvironmentVariable("PSPID") != null)
+                {
+                    pspid = Environment.GetEnvironmentVariable("PSPID").ToString();
+                }
+                else
+                {
+                    pspid = "jaystravelstest";
+                }
+                if (Environment.GetEnvironmentVariable("ShaInPassphrase") != null)
+                {
+                    strPw = Environment.GetEnvironmentVariable("ShaInPassphrase").ToString();
+                }
+                else
+                {
+                    strPw = "f3d1f70c-b1a0-48ba-816c-88fcccf72bf3";
+                }
+
                 var parameters = new Dictionary<string, string>
             {
                     { "ACCEPTURL", _settings["AcceptUrlManual"] },
@@ -159,11 +201,19 @@ namespace ReservationSystem.Infrastructure.Repositories
                     { "EXCEPTIONURL", _settings["ExceptionUrlManual"] },
                     { "LANGUAGE", request.Language },
                     { "ORDERID",OrderId},
-                    { "PSPID", _settings["PSPID"] },
+                    { "PSPID", pspid },
 
             };
-                string shaSignature = GenerateShaSignature(parameters, _settings["ShaInPassphrase"]);
-
+                string shaSignature = GenerateShaSignature(parameters, strPw);
+                string paymentUrl = string.Empty;
+                if (Environment.GetEnvironmentVariable("PaymentUrl") != null)
+                {
+                    paymentUrl = Environment.GetEnvironmentVariable("PaymentUrl")?.ToString();
+                }
+                else
+                {
+                    paymentUrl = "https://mdepayments.epdq.co.uk/ncol/test/orderstandard.asp";
+                }
                 parameters = new Dictionary<string, string>
                 {
                     { "ACCEPTURL", _settings["AcceptUrlManual"] },
@@ -174,13 +224,13 @@ namespace ReservationSystem.Infrastructure.Repositories
                     { "EXCEPTIONURL", _settings["ExceptionUrlManual"] },
                     { "LANGUAGE", request.Language },
                     { "ORDERID",OrderId},
-                    { "PSPID", _settings["PSPID"] },
+                    { "PSPID", pspid },
                     { "SHASIGN", shaSignature },
 
 
                 };
                 response.Parameters = parameters;
-                response.Url = _settings["PaymentUrl"];
+                response.Url = paymentUrl;// _settings["PaymentUrl"];
                 response.BookingRefNo = _helperRepository.GenerateReferenceNumber();
             }
             catch (Exception ex)
@@ -192,13 +242,10 @@ namespace ReservationSystem.Infrastructure.Repositories
 
         public async Task<bool> UpdateManualPaymentDetails(ManualPaymentCustomerDetails request)
         {
-            bool response;
+          
             try
             {
-                var checkpayment = await _Context.ManulPayments.Where(e => e.Email == request.Email && e.BookingRef == request.BookingRef && e.PaymentStatus == request.PaymentStatus && e.Amount == request.Amount && e.CreatedOn.Value.Date == DateTime.Now.Date).FirstOrDefaultAsync();
-               
-                if (checkpayment == null)
-                {
+                 
                     ManualPayment payment = new ManualPayment();
                     payment.Address = request.Address;
                     payment.Amount = request?.Amount != null ? Convert.ToDecimal(request.Amount) : 0;
@@ -213,8 +260,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                     payment.PaymentStatus = request?.PaymentStatus;
                     await _Context.ManulPayments.AddAsync(payment);
                     await _Context.SaveChangesAsync();
-                }
-                else { return false; }
+                
                 
                 return true;
             }

@@ -118,7 +118,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                                 return returnModel;
 
                             }
-                            var res = ConvertXmlToModel(xmlDoc);                             
+                            var res = ConvertXmlToModel(xmlDoc);
+
                             returnModel.data = res.data;
                             if(res?.data.Count > 0)
                             {
@@ -395,7 +396,7 @@ namespace ReservationSystem.Infrastructure.Repositories
             XNamespace amadeus = "http://xml.amadeus.com/FMPTBR_24_1_1A";
             var AirlineCache = _cacheService.GetAirlines();
             var AirportCache = _cacheService.GetAirports();
-
+            List<FlightMarkup> flightsDictionary = _cacheService.GetFlightsMarkup();
             List<Itinerary>  itinerariesList = new List<Itinerary>();
             List<string> timeduration = new List<string>();
 
@@ -789,20 +790,56 @@ namespace ReservationSystem.Infrastructure.Repositories
                     offer.price = new Price
                     {
                         adultPP = adultpp,
-                        adultTax = adulttax ,
+                        adultTax = adulttax ,                       
                         childPp = childpp,
                         childTax = childtax,
                         infantPp = infantpp,
                         infantTax = infanttax,
                         baseAmount = "",
                         currency = currency,
-                        grandTotal = totalPrice.ToString(),
+                        grandTotal = (totalPrice).ToString(),
                         taxes = taxes,
-                        total = totalPrice.ToString(),
+                        total = (totalPrice).ToString(),
                         discount = 0,
                         billingCurrency = currency,
                         markup = 0
                     };
+                    #region Apply Markups
+                    try
+                    {
+                        if(flightsDictionary != null)
+                        {
+                            bool? applyMarkup = flightsDictionary.FirstOrDefault().ApplyMarkup != null ? flightsDictionary?.FirstOrDefault()?.ApplyMarkup : false;
+                            if (applyMarkup.Value == true)
+                            {
+                                decimal? AdtMarkup = flightsDictionary.FirstOrDefault()?.AdultMarkup != null ? flightsDictionary.FirstOrDefault()?.AdultMarkup.Value : 0;
+                                decimal? ChdMarkup = flightsDictionary.FirstOrDefault()?.ChildMarkup != null ? flightsDictionary.FirstOrDefault()?.ChildMarkup.Value : 0;
+                                decimal? InfMarkup = flightsDictionary.FirstOrDefault()?.InfantMarkup != null ? flightsDictionary.FirstOrDefault()?.InfantMarkup.Value : 0;
+                                offer.price.adulMarkup = AdtMarkup.ToString();
+                                offer.price.total = (Convert.ToDecimal(offer.price.total) + AdtMarkup).ToString();
+                                offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + AdtMarkup).ToString();
+                                if (!string.IsNullOrEmpty(offer.price.childPp))
+                                {
+                                    offer.price.childMarkup  = ChdMarkup.ToString();
+                                    offer.price.total = (Convert.ToDecimal(offer.price.total) + ChdMarkup).ToString();
+                                    offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + ChdMarkup).ToString();
+                                }
+                                if (!string.IsNullOrEmpty(offer.price.infantPp))
+                                {
+                                    offer.price.infantMarkup = InfMarkup.ToString();
+                                    offer.price.total = (Convert.ToDecimal(offer.price.total) + InfMarkup).ToString();
+                                    offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + InfMarkup).ToString();
+                                }
+                            }
+                            
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error while apply markup {ex.Message.ToString()}");
+                    }
+                    #endregion
 
                     offer.id = itemNumberId;
                     offer.type = "Availability";
@@ -900,9 +937,9 @@ namespace ReservationSystem.Infrastructure.Repositories
         {
             try
             {
-                var adultpp = dictionary.FirstOrDefault()?.adult_markup != null ? dictionary.FirstOrDefault()?.adult_markup : 0;
-                var childpp = dictionary.FirstOrDefault()?.child_markup != null ? dictionary.FirstOrDefault()?.child_markup : 0;
-                var infantpp = dictionary.FirstOrDefault()?.infant_markup != null ? dictionary.FirstOrDefault()?.infant_markup : 0;
+                var adultpp = dictionary.FirstOrDefault()?.AdultMarkup != null ? dictionary.FirstOrDefault()?.AdultMarkup : 0;
+                var childpp = dictionary.FirstOrDefault()?.ChildMarkup != null ? dictionary.FirstOrDefault()?.ChildMarkup : 0;
+                var infantpp = dictionary.FirstOrDefault()?.InfantMarkup != null ? dictionary.FirstOrDefault()?.InfantMarkup : 0;
 
 
 
@@ -956,12 +993,12 @@ namespace ReservationSystem.Infrastructure.Repositories
             {
 
                 #region Apply Airline Discount
-                var applyAirlineDis = dictionary.FirstOrDefault().apply_airline_discount;
+                var applyAirlineDis = dictionary?.FirstOrDefault()?.ApplyAirlineDiscount;
                 if (applyAirlineDis != null && applyAirlineDis == true)
                 {
-                    var airline = dictionary.FirstOrDefault().airline;
-                    var airlineDiscount = dictionary.FirstOrDefault().discount_on_airline;
-                    string[] stringArray = airline.Split(',');
+                    var airline = dictionary?.FirstOrDefault()?.Airline;
+                    var airlineDiscount = dictionary?.FirstOrDefault()?.DiscountOnAirline;
+                    string[] stringArray = airline?.Split(',');
                     foreach (var item in stringArray)
                     {
                         var offer = offers.Where(o => o.itineraries.Any(i => i.segments.Any(s => s.marketingCarrierCode == item))).ToList();

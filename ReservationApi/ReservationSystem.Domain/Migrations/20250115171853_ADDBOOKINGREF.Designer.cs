@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReservationSystem.Domain.DBContext;
@@ -11,9 +12,11 @@ using ReservationSystem.Domain.DBContext;
 namespace ReservationSystem.Domain.Migrations
 {
     [DbContext(typeof(DB_Context))]
-    partial class DB_ContextModelSnapshot : ModelSnapshot
+    [Migration("20250115171853_ADDBOOKINGREF")]
+    partial class ADDBOOKINGREF
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -188,134 +191,43 @@ namespace ReservationSystem.Domain.Migrations
 
             modelBuilder.Entity("ReservationSystem.Domain.DB_Models.FlightMarkup", b =>
                 {
-                    b.Property<long>("MarkupId")
+                    b.Property<long>("markup_id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("markup_id");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("MarkupId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("markup_id"));
 
-                    b.Property<decimal?>("AdultMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("adult_markup");
+                    b.Property<decimal?>("adult_markup")
+                        .HasColumnType("numeric");
 
-                    b.Property<string>("Airline")
-                        .HasColumnType("text")
-                        .HasColumnName("airline");
+                    b.Property<string>("airline")
+                        .HasColumnType("text");
 
-                    b.Property<decimal?>("AirlineMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("airline_markup");
+                    b.Property<bool?>("apply_airline_discount")
+                        .HasColumnType("boolean");
 
-                    b.Property<bool?>("ApplyAirlineDiscount")
-                        .HasColumnType("boolean")
-                        .HasColumnName("apply_airline_discount");
+                    b.Property<bool?>("apply_markup")
+                        .HasColumnType("boolean");
 
-                    b.Property<bool?>("ApplyMarkup")
-                        .HasColumnType("boolean")
-                        .HasColumnName("apply_markup");
+                    b.Property<decimal?>("child_markup")
+                        .HasColumnType("numeric");
 
-                    b.Property<string>("BetweenHours")
-                        .HasColumnType("text")
-                        .HasColumnName("between_hours");
+                    b.Property<DateTime>("created_on")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<decimal?>("BetweenHoursMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("between_hours_markup");
+                    b.Property<decimal?>("discount_on_airline")
+                        .HasColumnType("numeric");
 
-                    b.Property<decimal?>("ChildMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("child_markup");
+                    b.Property<decimal?>("discount_on_meta")
+                        .HasColumnType("numeric");
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_on");
+                    b.Property<decimal?>("infant_markup")
+                        .HasColumnType("numeric");
 
-                    b.Property<decimal?>("DateMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("date_markup");
+                    b.Property<string>("meta")
+                        .HasColumnType("text");
 
-                    b.Property<decimal?>("DiscountOnAirline")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount_on_airline");
-
-                    b.Property<decimal?>("DiscountOnMeta")
-                        .HasColumnType("numeric")
-                        .HasColumnName("discount_on_meta");
-
-                    b.Property<string>("EndAirport")
-                        .HasColumnType("text")
-                        .HasColumnName("end_airport");
-
-                    b.Property<decimal?>("EndAirportMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("end_airport_markup");
-
-                    b.Property<string>("FareType")
-                        .HasColumnType("text")
-                        .HasColumnName("fare_type");
-
-                    b.Property<decimal?>("FareTypeMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("fare_type_markup");
-
-                    b.Property<DateOnly?>("FromDate")
-                        .HasColumnType("date")
-                        .HasColumnName("from_date");
-
-                    b.Property<string>("Gds")
-                        .HasColumnType("text")
-                        .HasColumnName("gds");
-
-                    b.Property<decimal?>("GdsMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("gds_markup");
-
-                    b.Property<decimal?>("InfantMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("infant_markup");
-
-                    b.Property<bool?>("IsPercentage")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_percentage");
-
-                    b.Property<string>("JournyType")
-                        .HasColumnType("text")
-                        .HasColumnName("journy_type");
-
-                    b.Property<decimal?>("JournyTypeMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("journy_type_markup");
-
-                    b.Property<string>("MarketingSource")
-                        .HasColumnType("text")
-                        .HasColumnName("marketing_source");
-
-                    b.Property<decimal?>("MarketingSourceMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("marketing_source_markup");
-
-                    b.Property<string>("Meta")
-                        .HasColumnType("text")
-                        .HasColumnName("meta");
-
-                    b.Property<decimal?>("MetaMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("meta_markup");
-
-                    b.Property<string>("StartAirport")
-                        .HasColumnType("text")
-                        .HasColumnName("start_airport");
-
-                    b.Property<decimal?>("StartAirportMarkup")
-                        .HasColumnType("numeric")
-                        .HasColumnName("start_airport_markup");
-
-                    b.Property<DateOnly?>("ToDate")
-                        .HasColumnType("date")
-                        .HasColumnName("to_date");
-
-                    b.HasKey("MarkupId");
+                    b.HasKey("markup_id");
 
                     b.ToTable("flight_markup");
                 });

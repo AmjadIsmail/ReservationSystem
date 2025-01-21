@@ -52,9 +52,9 @@ namespace ReservationSystem.Infrastructure.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<DB_Context>();
-               // var data = dbContext.flightMarkups.ToDictionary(e => e.markup_id, e => e);
-               //// _markup = await dbContext.flightMarkups.ToListAsync();
-             //   _Markupcache.Set(FlightMarkupKey, data);
+                var data = dbContext.FlightMarkups.ToDictionary(e => e.MarkupId, e => e);
+                _markup = await dbContext.FlightMarkups.ToListAsync();
+                _Markupcache.Set(FlightMarkupKey, data);
             }
         }
         public void ResetCacheData()

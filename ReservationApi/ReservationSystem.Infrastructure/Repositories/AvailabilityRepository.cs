@@ -113,16 +113,16 @@ namespace ReservationSystem.Infrastructure.Repositories
                         availabilities.data = result.data;
                         if (result.data.Count > 0)
                         {
-                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault().apply_markup == true)
+                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault()?.ApplyMarkup == true)
                             {
                                 result.data = applyMarkup(result.data, flightsDictionary);
                             }
-                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault().apply_airline_discount == true)
+                            if (flightsDictionary != null && flightsDictionary.FirstOrDefault()?.ApplyAirlineDiscount == true)
                             {
                                 result.data = applyDiscount(result.data, flightsDictionary);
                             }
                             _cacheService.Set("amadeusRequest" + amadeusRequest, availabilities, TimeSpan.FromMinutes(15));
-                            _dbRepository.SaveAvailabilityResult(amadeusRequest, ResToSave.ToString(), result.data.Count);
+                            _dbRepository.SaveAvailabilityResult(amadeusRequest, ResToSave?.ToString(), result.data.Count);
                         }
 
                         Console.WriteLine("Response: " + responseContent);
@@ -207,9 +207,9 @@ namespace ReservationSystem.Infrastructure.Repositories
         {
             try
             {
-                var adultpp = dictionary.FirstOrDefault()?.adult_markup != null ? dictionary.FirstOrDefault()?.adult_markup : 0;
-                var childpp = dictionary.FirstOrDefault()?.child_markup != null ? dictionary.FirstOrDefault()?.child_markup : 0;
-                var infantpp = dictionary.FirstOrDefault()?.infant_markup != null ? dictionary.FirstOrDefault()?.infant_markup : 0;
+                var adultpp = dictionary.FirstOrDefault()?.AdultMarkup != null ? dictionary.FirstOrDefault()?.AdultMarkup : 0;
+                var childpp = dictionary.FirstOrDefault()?.ChildMarkup != null ? dictionary.FirstOrDefault()?.ChildMarkup : 0;
+                var infantpp = dictionary.FirstOrDefault()?.InfantMarkup != null ? dictionary.FirstOrDefault()?.InfantMarkup : 0;
 
                 
 
@@ -263,11 +263,11 @@ namespace ReservationSystem.Infrastructure.Repositories
             {            
 
                 #region Apply Airline Discount
-                var applyAirlineDis = dictionary.FirstOrDefault().apply_airline_discount;
+                var applyAirlineDis = dictionary.FirstOrDefault().ApplyAirlineDiscount;
                 if (applyAirlineDis != null && applyAirlineDis == true)
                 {
-                    var airline = dictionary.FirstOrDefault().airline;
-                    var airlineDiscount = dictionary.FirstOrDefault().discount_on_airline;
+                    var airline = dictionary.FirstOrDefault().Airline;
+                    var airlineDiscount = dictionary.FirstOrDefault().DiscountOnAirline;
                     string[] stringArray = airline.Split(',');
                     foreach (var item in stringArray)
                     {
