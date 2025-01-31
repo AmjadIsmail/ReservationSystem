@@ -137,6 +137,7 @@ namespace ReservationSystem.Domain.Migrations
                     b.ToTable("manual_payment");
                 });
 
+                        .HasColumnType("numeric")
             modelBuilder.Entity("ReservationSystem.Domain.DB_Models.FlightInfo", b =>
                 {
                     b.Property<int>("FlightId")
