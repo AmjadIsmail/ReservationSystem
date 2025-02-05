@@ -53,7 +53,8 @@ namespace ReservationSystem.Domain.Models
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public decimal? markup { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public decimal? discount { get; set;
+        public decimal? discount { get; set; }
+        public int? MarkupID { get; set; }
         }
     }
-}
+

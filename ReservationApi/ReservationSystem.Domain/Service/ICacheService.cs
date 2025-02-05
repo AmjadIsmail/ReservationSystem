@@ -23,6 +23,27 @@ namespace ReservationSystem.Domain.Service
 
         public List<FlightMarkup> GetFlightsMarkup();
 
+        public List<ApplyMarkup> GetMarkup();
+
+        public List<FareType> GetFareType();
+       
+        public List<MarkupFareType> GetMarkupFareTypes();
+
+        public List<GDS> GetGds();
+
+        public List<MarkupGDS> GetMarkupGds();
+
+        public List<JourneyType> GetJournyType();
+
+        public List<MarkupJournyType> GetMarkupJournyType();
+
+        public List<MarketingSource> GetMarketingSource();
+        public List<MarkupMarketingSource> GetMarkupMarketingSource();
+
+        public List<DayName> GetDayName();
+
+        public List<MarkupDay> GetMarkupDayName();       
+
         public DataTable GetAirlines();
         public Task<DataTable> SetAirlineDataTableFromExcelToCache();
 

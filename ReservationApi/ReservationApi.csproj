@@ -71,6 +71,10 @@
 		<Content Include="EmailTemplates\FlightConfirmation.html">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
+		<Content Include="EmailTemplates\PassengerSelectedFlight.html">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+		
 	</ItemGroup>
 	<ItemGroup>
 		<Content Include="EmailTemplates\AdminEmailFlightConfirmation.html">

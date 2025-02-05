@@ -31,7 +31,33 @@ namespace ReservationSystem.Infrastructure.Service
 
         private readonly IMemoryCache _Markupcache;
         private const string FlightMarkupKey = "FlightsMarkup";
+        private const string ApplyMarkup = "ApplyMarkup";
+        private const string MarkupFareType = "MarkupFareType";
+        private const string MarkupGds = "MarkupGds";
+        private const string MarkupJournyType = "MarkupJournyType";
+        private const string MarkupMarketingSources = "MarkupMarketingSources";
+        private const string day_name = "day_name";
+        private const string fare_type = "fare_type";
+        private const string gds = "gds";
+        private const string journy_type = "journy_type";
+        private const string marketing_source = "marketing_source";
+        private const string markup_day = "markup_day";
+
+
+
         private static List<FlightMarkup> _markup;
+        private static List<ApplyMarkup> _applymarkup;
+        private static List<FareType> _FareType;
+        private static List<MarkupFareType> _MarkupFareType;
+        private static List<GDS> _Gds;
+        private static List<MarkupGDS> _MarkupGds;
+        private static List<JourneyType> _JournyType;
+        private static List<MarkupJournyType> _MarkupJournyType;
+        private static List<MarketingSource> _MarketingSource;
+        private static List<MarkupMarketingSource> _MarkupMarketingSource;
+        private static List<DayName> _DayName; 
+        private static List<MarkupDay> _MarkupDay;
+
         private static DataTable _AirlineDT;
         private static DataTable _AirportDT;
         private readonly IServiceProvider _serviceProvider;
@@ -52,14 +78,35 @@ namespace ReservationSystem.Infrastructure.Service
             using (var scope = _serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<DB_Context>();
-                var data = dbContext.FlightMarkups.ToDictionary(e => e.MarkupId, e => e);
-                _markup = await dbContext.FlightMarkups.ToListAsync();
-                _Markupcache.Set(FlightMarkupKey, data);
+                var data = await dbContext.FlightMarkups.ToDictionaryAsync(e => e.MarkupId, e => e);
+                _markup = await dbContext.FlightMarkups.ToListAsync();                
+                _applymarkup = await dbContext.Markups.Where(e => e.IsActive == true).ToListAsync();
+                _MarkupFareType = await dbContext.MarkupFareTypes.ToListAsync();
+                _FareType = await dbContext.FareTypes.Where(e=>e.IsActive == true).ToListAsync();
+                _MarkupGds = await dbContext.MarkupGds.ToListAsync();
+                _Gds = await dbContext.GDS.Where(e => e.IsActive == true)?.ToListAsync();
+                _MarkupJournyType = await dbContext.MarkupJournyTypes.ToListAsync();
+                _JournyType = await dbContext.JourneyTypes.Where(e=>e.IsActive == true).ToListAsync();
+                 _MarketingSource  = await dbContext.MarketingSources.Where(e=>e.IsActive == true).ToListAsync();
+                _MarkupMarketingSource  = await dbContext.MarkupMarketingSources.ToListAsync();
+                _DayName = await dbContext.DayName.Where(e => e.IsActive == true)?.ToListAsync();
+                _MarkupDay = await dbContext.MarkupDay.ToListAsync();
+                             
             }
         }
         public void ResetCacheData()
         {
             _Markupcache.Remove(FlightMarkupKey);
+            _Markupcache.Remove(MarkupFareType);
+            _Markupcache.Remove(MarkupGds);
+            _Markupcache.Remove(MarkupJournyType);
+            _Markupcache.Remove(MarkupMarketingSources);
+            _Markupcache.Remove(day_name);
+            _Markupcache.Remove(fare_type);
+            _Markupcache.Remove(gds);
+            _Markupcache.Remove(journy_type);
+            _Markupcache.Remove(marketing_source);
+            _Markupcache.Remove(markup_day);
             LoadDataIntoCache();
         }
         public Dictionary<int, FlightMarkup> GetFlightsMarkupCachedData()
@@ -73,6 +120,56 @@ namespace ReservationSystem.Infrastructure.Service
         {
             return _markup;
         }
+
+        public List<ApplyMarkup> GetMarkup()
+        {
+            return _applymarkup;
+        }
+        public List<FareType> GetFareType()
+        {
+            return _FareType;
+        }
+        public List<MarkupFareType> GetMarkupFareTypes()
+        {
+            return _MarkupFareType;
+        }
+
+        public List<GDS> GetGds()
+        {
+            return _Gds;
+        }
+
+        public List<MarkupGDS> GetMarkupGds()
+        {
+            return _MarkupGds;
+        }
+        public List<JourneyType> GetJournyType()
+        {
+            return _JournyType;
+        }
+        public List<MarkupJournyType> GetMarkupJournyType()
+        {
+            return _MarkupJournyType;
+        }
+
+        public List<MarketingSource> GetMarketingSource()
+        {
+            return _MarketingSource;
+        }
+        public List<MarkupMarketingSource> GetMarkupMarketingSource()
+        {
+            return _MarkupMarketingSource;
+        }
+        public List<DayName> GetDayName()
+        {
+            return _DayName;
+        }
+        public List<MarkupDay> GetMarkupDayName()
+        {
+            return _MarkupDay;
+        }
+
+
         public void Set<T>(string key, T value, TimeSpan duration)
         {
             var expiry = DateTime.Now.Add(duration);

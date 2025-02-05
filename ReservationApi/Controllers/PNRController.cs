@@ -131,5 +131,50 @@ namespace ReservationApi.Controllers
 
         }
 
+        [HttpPost("SendSelectedFlightEmailToAdmin")]
+        public async Task<IActionResult> SendEmailToAdminForSelectedFlight([FromBody] UpdatePaymentStatus request)
+        {
+            ApiResponse res = new ApiResponse();
+
+            #region Email Region
+            try
+            {
+                if (!String.IsNullOrEmpty(request?.SessionId))
+                {
+                    //request.SessionId = await _dBRepository.GetLastSessionId();
+                    var emailBody = await _emailService.GetPassengerSelectedFlightTemplate(request?.SessionId);
+                    string subject = "Passenger Selected Flights details with markup";
+                    var pinfo = await _dBRepository.GetPassengerInfo(request?.SessionId);
+                    var AdminEmail = _configuration["EmailSettings:AdminEmail"];
+                    await _emailService.SendEmailAsync3(AdminEmail, subject, emailBody);
+                    res.IsSuccessful = true;
+                    res.StatusCode = 200;
+                    res.Message = " Success: Email Sent";
+                    res.Response = "Success";
+                    return Ok(res);
+                }
+                else
+                {
+                    res.IsSuccessful = false;
+                    res.StatusCode = 400;
+                    res.Message = " Failed to: Email Sent";
+                    res.Response = "Failed";
+                    return BadRequest(res);
+                }
+              
+                 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(res);
+            }
+            #endregion
+           
+           
+
+           
+
+        }
+
     }
 }

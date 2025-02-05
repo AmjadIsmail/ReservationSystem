@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:awsse="http://xml.amadeus.com/2010/06/Session_v3" xmlns:wsa="http://www.w3.org/2005/08/addressing">
+  <soap:Header>
+    <wsa:To>http://www.w3.org/2005/08/addressing/anonymous</wsa:To>
+    <wsa:From>
+      <wsa:Address>https://nodeD2.test.webservices.amadeus.com/1ASIWJIBJAY</wsa:Address>
+    </wsa:From>
+    <wsa:Action>http://webservices.amadeus.com/TAUTCQ_04_1_1A</wsa:Action>
+    <wsa:MessageID>urn:uuid:698ac2c5-ab6f-5724-99e7-42136b6692b9</wsa:MessageID>
+    <wsa:RelatesTo RelationshipType="http://www.w3.org/2005/08/addressing/reply">9aed1759-f454-4d00-9e84-194fc63ebc62</wsa:RelatesTo>
+    <awsse:Session TransactionStatusCode="InSeries">
+      <awsse:SessionId>0068J5IIXV</awsse:SessionId>
+      <awsse:SequenceNumber>5</awsse:SequenceNumber>
+      <awsse:SecurityToken>3J5SWZB5FUQN825J292RP4EEM8</awsse:SecurityToken>
+    </awsse:Session>
+  </soap:Header>
+  <soap:Body>
+    <Ticket_CreateTSTFromPricingReply xmlns="http://xml.amadeus.com/TAUTCR_04_1_1A">
+      <tstList>
+        <tstReference>
+          <referenceType>TST</referenceType>
+          <uniqueReference>1</uniqueReference>
+          <iDDescription>
+            <iDSequenceNumber>1</iDSequenceNumber>
+          </iDDescription>
+        </tstReference>
+        <paxInformation>
+          <refDetails>
+            <refQualifier>PA</refQualifier>
+            <refNumber>2</refNumber>
+          </refDetails>
+        </paxInformation>
+      </tstList>
+    </Ticket_CreateTSTFromPricingReply>
+  </soap:Body>
+</soap:Envelope>

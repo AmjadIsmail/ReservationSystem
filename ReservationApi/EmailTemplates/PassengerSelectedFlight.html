@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: #4caf50;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+
+            .header h1 {
+                margin: 0;
+            }
+
+        .content {
+            padding: 20px;
+            color: #333;
+        }
+
+            .content p {
+                line-height: 1.6;
+            }
+
+            .content .details {
+                margin: 20px 0;
+                padding: 10px;
+                border: 1px solid #ddd;
+                background-color: #f9f9f9;
+            }
+
+                .content .details table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                    .content .details table th,
+                    .content .details table td {
+                        text-align: left;
+                        padding: 8px;
+                        border-bottom: 1px solid #ddd;
+                    }
+
+        .footer {
+            background-color: #f4f4f9;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>Passenger Selected Flights detiils</h1>
+            <p>Flight Price {{FlightPrice}}</p>
+            <p>Markup ID {{FlightMarkupID}}</p>
+            <p>Adult Markup {{AdultMarkup}}</p>
+            <p>Child Markup {{ChildMarkup}}</p>
+            <p>Infant Markup {{InfantMarkup}}</p>
+        </div>
+        <div class="content">
+           
+            
+            <div class="details">
+                {{FlightSegments}}
+            </div>
+
+            <div class="details">
+                {{PassengerList}}
+            </div>
+            
+        </div>
+        <div class="footer">
+            <p>&copy; 2025 Jays Travels. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

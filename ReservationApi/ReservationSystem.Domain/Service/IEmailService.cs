@@ -23,5 +23,7 @@ namespace ReservationSystem.Domain.Service
          public Task<string> GetBookingSuccessTemplateForAdmin(string sessionId = "", string bookingStatus = "", string paymentStatus = "");
 
         public Task<string> GetManualPaymentTemplate(ManualPaymentCustomerDetails enquiry);
+
+        public Task<string> GetPassengerSelectedFlightTemplate(string sessionId = "");
     }
 }

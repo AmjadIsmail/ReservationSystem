@@ -17,16 +17,14 @@ namespace ReservationSystem.Domain.DBContext
         public DB_Context(DbContextOptions<DB_Context> options) : base(options)
         {
         }
-       
-        //public static DB_Context Create(string connectionString)
-        //{
-        //    var optionsBuilder = new DbContextOptionsBuilder<DB_Context>();
-        //    optionsBuilder.UseNpgsql(connectionString);
 
-        //    return new DB_Context(optionsBuilder.Options);
-        //}
-
-        public DbSet<SearchAvailabilityResults> AvailabilityResults { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+          
+        }
+  
+    public DbSet<SearchAvailabilityResults> AvailabilityResults { get; set; }
         public DbSet<FlightMarkup> FlightMarkups { get; set; }
 
         public DbSet<ReservationFlow> ReservationFlow { get; set; }
@@ -40,5 +38,26 @@ namespace ReservationSystem.Domain.DBContext
         public DbSet<Enquiry> Enquiries { get; set; }
 
         public DbSet<ManualPayment> ManulPayments { get; set; }
+
+        public DbSet<MarketingSource> MarketingSources { get; set; }
+        public DbSet<GDS> GDS { get; set; }
+
+        public DbSet<DayName> DayName { get; set; }
+       
+        public DbSet<FareType> FareTypes { get; set; }
+
+        public DbSet<ApplyMarkup> Markups { get; set; }
+
+        public DbSet<MarkupDay> MarkupDay { get; set; }
+
+        public DbSet<MarkupGDS> MarkupGds { get; set; }
+
+        public DbSet<MarkupFareType> MarkupFareTypes { get; set; }
+
+        public DbSet<MarkupMarketingSource> MarkupMarketingSources { get; set; }
+
+        public DbSet<MarkupJournyType> MarkupJournyTypes { get; set; }
+
+        public DbSet<JourneyType> JourneyTypes { get; set; }
     }
 }

@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using System.Data;
 using ReservationSystem.Domain.Models.FlightPrice;
 using DocumentFormat.OpenXml.Office.CustomUI;
+using Microsoft.IdentityModel.Tokens;
 
 
 
@@ -397,6 +398,19 @@ namespace ReservationSystem.Infrastructure.Repositories
             var AirlineCache = _cacheService.GetAirlines();
             var AirportCache = _cacheService.GetAirports();
             List<FlightMarkup> flightsDictionary = _cacheService.GetFlightsMarkup();
+            List<ApplyMarkup> _ApplyMarkup = _cacheService.GetMarkup();
+            List<FareType> _FareType = _cacheService.GetFareType();
+            List<MarkupFareType> _MarkupFAreType = _cacheService.GetMarkupFareTypes();
+            List<GDS> _GDS = _cacheService.GetGds();
+            List<MarkupGDS> _MarkupGDS = _cacheService.GetMarkupGds();
+            List<JourneyType> _JournyType = _cacheService.GetJournyType();
+            List<MarkupJournyType> _MarkupJournyType = _cacheService.GetMarkupJournyType();
+            List<MarketingSource> _MarketingSource = _cacheService.GetMarketingSource();
+            List<MarkupMarketingSource> _MarkupMarketingSource = _cacheService.GetMarkupMarketingSource();
+            List<DayName> _DayName = _cacheService.GetDayName();
+            List<MarkupDay> _MarkupDay = _cacheService.GetMarkupDayName();
+
+
             List<Itinerary>  itinerariesList = new List<Itinerary>();
             List<string> timeduration = new List<string>();
 
@@ -674,7 +688,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         totalAdult = adultFare.Descendants(amadeus + "paxReference").Elements(amadeus+"traveller").ToList().Count();
                         adultpp = adultFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
                         adulttax = adultFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
-                        decimal _totAdt = (Convert.ToDecimal ( adultpp) + Convert.ToDecimal( adulttax)) * totalAdult;
+                        // decimal _totAdt = (Convert.ToDecimal ( adultpp) + Convert.ToDecimal( adulttax)) * totalAdult;
+                        decimal _totAdt = (Convert.ToDecimal(adultpp)) * totalAdult;
                         totalPrice = _totAdt;
 
                     }
@@ -683,7 +698,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         totalChild = childFare.Descendants(amadeus + "paxReference").Elements(amadeus + "traveller").ToList().Count();
                         childpp = childFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
                         childtax = childFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
-                        decimal _totChd = (Convert.ToDecimal(childpp) + Convert.ToDecimal(childtax)) * totalChild;
+                        //   decimal _totChd = (Convert.ToDecimal(childpp) + Convert.ToDecimal(childtax)) * totalChild;
+                        decimal _totChd = (Convert.ToDecimal(childpp)) * totalChild;
                         totalPrice = totalPrice + _totChd;
                     }
                     if (infFare != null)
@@ -691,7 +707,8 @@ namespace ReservationSystem.Infrastructure.Repositories
                         totalInfant = infFare.Descendants(amadeus + "paxReference").Elements(amadeus + "traveller").ToList().Count();
                         infantpp = infFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalFareAmount")?.FirstOrDefault().Value;
                         infanttax = infFare?.Descendants(amadeus + "paxFareDetail")?.Elements(amadeus + "totalTaxAmount")?.FirstOrDefault().Value;
-                        decimal _totInf = (Convert.ToDecimal(infantpp) + Convert.ToDecimal(infanttax)) * totalInfant;
+                        // decimal _totInf = (Convert.ToDecimal(infantpp) + Convert.ToDecimal(infanttax)) * totalInfant;
+                        decimal _totInf = (Convert.ToDecimal(infantpp)) * totalInfant;
                         totalPrice = totalPrice + _totInf;
                     }
 
@@ -804,42 +821,7 @@ namespace ReservationSystem.Infrastructure.Repositories
                         billingCurrency = currency,
                         markup = 0
                     };
-                    #region Apply Markups
-                    try
-                    {
-                        if(flightsDictionary != null)
-                        {
-                            bool? applyMarkup = flightsDictionary.FirstOrDefault().ApplyMarkup != null ? flightsDictionary?.FirstOrDefault()?.ApplyMarkup : false;
-                            if (applyMarkup.Value == true)
-                            {
-                                decimal? AdtMarkup = flightsDictionary.FirstOrDefault()?.AdultMarkup != null ? flightsDictionary.FirstOrDefault()?.AdultMarkup.Value : 0;
-                                decimal? ChdMarkup = flightsDictionary.FirstOrDefault()?.ChildMarkup != null ? flightsDictionary.FirstOrDefault()?.ChildMarkup.Value : 0;
-                                decimal? InfMarkup = flightsDictionary.FirstOrDefault()?.InfantMarkup != null ? flightsDictionary.FirstOrDefault()?.InfantMarkup.Value : 0;
-                                offer.price.adulMarkup = AdtMarkup.ToString();
-                                offer.price.total = (Convert.ToDecimal(offer.price.total) + AdtMarkup).ToString();
-                                offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + AdtMarkup).ToString();
-                                if (!string.IsNullOrEmpty(offer.price.childPp))
-                                {
-                                    offer.price.childMarkup  = ChdMarkup.ToString();
-                                    offer.price.total = (Convert.ToDecimal(offer.price.total) + ChdMarkup).ToString();
-                                    offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + ChdMarkup).ToString();
-                                }
-                                if (!string.IsNullOrEmpty(offer.price.infantPp))
-                                {
-                                    offer.price.infantMarkup = InfMarkup.ToString();
-                                    offer.price.total = (Convert.ToDecimal(offer.price.total) + InfMarkup).ToString();
-                                    offer.price.grandTotal = (Convert.ToDecimal(offer.price.grandTotal) + InfMarkup).ToString();
-                                }
-                            }
-                            
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Error while apply markup {ex.Message.ToString()}");
-                    }
-                    #endregion
+               
 
                     offer.id = itemNumberId;
                     offer.type = "Availability";
@@ -913,6 +895,180 @@ namespace ReservationSystem.Infrastructure.Repositories
             #endregion
 
             ReturnModel.data = ReturnModel?.data?.Where(e => e?.itineraries?.Count > 1).ToList();
+            var filterList = new List<List<FlightOffer>>();
+            #region Apply Markups
+            try
+            {
+                if (_ApplyMarkup != null)
+                {
+
+                   foreach( var markup in _ApplyMarkup.Where(e=>e.IsActive == true))
+                    {
+                        var filterData = ReturnModel.data;
+                          if(!string.IsNullOrEmpty(markup.Airline))
+                         {
+                            List<string> airlineArray = markup.Airline.Split(',').ToList();
+                            filterData = filterData?
+                            .Where(itinerary => itinerary?.itineraries != null && itinerary.itineraries
+                            .Any(itin => itin?.segments != null && itin.segments
+                            .Any(segment => airlineArray.Contains(segment.marketingCarrierCode))))
+                            .ToList();
+                         }
+                        List<MarkupGDS> _gdsMarkup = _MarkupGDS.Where(e => e?.Markup?.MarkupId == markup.MarkupId && e.Markup != null).ToList();
+                        if(_gdsMarkup.Count() > 0)
+                        {
+                            List <string> gdslist = new List<string>();
+                            foreach(var item in _gdsMarkup)
+                            {
+                                var gds = _GDS.Where(e=>e.GdsId == item.gds.GdsId).FirstOrDefault();
+                                gdslist.Add(gds.GdsName);
+                            }
+                            filterData = filterData?
+                            .Where(itinerary =>gdslist.Contains(itinerary.source)).ToList();
+                        }
+
+                        List<MarkupDay> _markupdays = _MarkupDay.Where(e => e?.Markup?.MarkupId == markup.MarkupId && e.Markup != null).ToList();
+
+                        if (_markupdays.Count() > 0)
+                        {
+                            List<string> markupDays = new List<string>();
+                            foreach (var item in _markupdays)
+                            {
+                                var day = _DayName.Where(e => e.DayId == item?.Day?.DayId).FirstOrDefault();
+                                markupDays.Add(day?.Day_Name);
+                            }
+                            filterData = filterData?
+                                .Where(itinerary =>                                    
+                                    itinerary?.itineraries != null && itinerary.itineraries.Any(itin =>
+                                        itin?.segments != null && itin.segments.Any(segment =>                                          
+                                            markupDays.Contains(segment.departure?.at?.DayOfWeek.ToString())
+                                        )
+                                    )
+                                ).ToList();
+                        }
+
+                        #region For BW Hours
+                        if(!string.IsNullOrEmpty(markup.BetweenHoursFrom) && !string.IsNullOrEmpty(markup.BetweenHoursTo.ToString()))
+                        {
+                            filterData = filterData?
+                                .Where(itinerary =>
+                                           itinerary?.itineraries != null && itinerary.itineraries.Any(itin =>
+                                           itin?.segments != null && itin.segments.Any(segment =>
+                                            segment.departure.at?.Hour >= Convert.ToInt16(markup.BetweenHoursFrom) && segment.departure.at?.Hour <= Convert.ToInt16(markup.BetweenHoursTo)
+                                        )
+                                    )
+                                ).ToList();
+                        }
+                        #endregion
+
+                        #region For Start Airport
+                        if (!string.IsNullOrEmpty(markup.StartAirport))
+                        {
+                            List<string> originAirport = markup.StartAirport.Split(',').ToList();
+
+                            filterData = filterData?
+                            .Where(itinerary =>                                
+                                itinerary?.itineraries != null && itinerary.itineraries.Any(itin =>
+                                    itin?.segments != null && itin.segments.Any(segment =>
+                                    originAirport.Contains(segment.departure.iataCode)
+                                    )
+                                    )
+                                ).ToList();
+                        }
+                        #endregion
+
+                        #region For End Airport
+                        if (!string.IsNullOrEmpty(markup.EndAirport))
+                        {
+                            List<string> destAirport = markup.EndAirport.Split(',').ToList();
+
+                            filterData = filterData?
+                            .Where(itinerary =>
+                                itinerary?.itineraries != null && itinerary.itineraries.Any(itin =>
+                                    itin?.segments != null && itin.segments.Any(segment =>
+                                    destAirport.Contains(segment.arrival.iataCode)
+                                    )
+                                    )
+                                ).ToList();
+                        }
+                        #endregion
+
+                        #region From Date and ToDate
+                        try
+                        {
+                            //if (markup.FromDate.HasValue && markup.ToDate.HasValue)
+                            //{
+                            //    //var filteredData = filterData?
+                            //    //     .Where(flight =>
+                            //    //         flight.itineraries.Any(e => e.segment_type == "OutBound" && e.segments.FirstOrDefault().departure.at.Value.Date == markup.FromDate.Value.ToDateTime) &&
+                            //    //         flight.itineraries.Any(e => e.segment_type == "InBound" && e.departureAt.Date == toDate.Value.Date))
+                            //    //     .ToList();
+                            //}
+                        }
+                        catch
+                        {
+
+                        }
+
+                        #endregion
+                        foreach (var item in filterData)
+                        {
+                            item.price.MarkupID = markup.MarkupId;
+                            item.MarkupId = markup.MarkupId;
+                            if (markup?.IsPercentage != null && markup.IsPercentage.Value == true)
+                            {                                
+                                item.price.adulMarkup = item.price.adultPP != "" ? ((Convert.ToDecimal(item.price.adultPP) * markup.AdultMarkup) / 100).ToString() : "0";
+                                item.price.childMarkup = item.price.childPp != "" ? ((Convert.ToDecimal(item.price.childPp) * markup.ChildMarkup) / 100).ToString() : "0";
+                                item.price.infantMarkup = item.price.infantPp != "" ? ((Convert.ToDecimal(item.price.infantPp) * markup.InfantMarkup) / 100).ToString() : "0";
+                                
+                            }
+                            else
+                            {
+                                item.price.adulMarkup = item.price.adultPP != "" && markup.AdultMarkup != null ? markup?.AdultMarkup.ToString() : "0";
+                                item.price.childMarkup = item.price.childPp != "" && markup.ChildMarkup != null ? markup?.ChildMarkup.ToString() : "0";
+                                item.price.infantMarkup = item.price.infantPp != "" &&  markup.InfantMarkup != null ? markup?.InfantMarkup.ToString() : "0";
+                            }
+                            decimal total = Convert.ToDecimal(item.price.total);
+                            if(item.price.adultPP != "")
+                            {
+                                total = total + Convert.ToDecimal(item.price.adulMarkup);
+                            }
+                            if (item.price.childPp != "")
+                            {
+                                total = total + Convert.ToDecimal(item.price.childMarkup);
+                            }
+                            if (item.price.infantPp != "")
+                            {
+                                total = total + Convert.ToDecimal(item.price.infantMarkup);
+                            }
+
+                            item.price.total = (total).ToString();
+                            item.price.grandTotal = (total).ToString();
+                            item.price.MarkupID = markup.MarkupId;
+                            item.travelerPricings[0].price.MarkupID = markup.MarkupId;
+                            item.travelerPricings[0].price.adulMarkup = item.price.adulMarkup;
+                            item.travelerPricings[0].price.childMarkup = item.price.childMarkup;
+                            item.travelerPricings[0].price.infantMarkup = item.price.infantMarkup;
+                        }
+
+                        HashSet<string> filteredIds = filterData.Select(f => f.id).ToHashSet();
+
+                        // Step 2: Remove existing records with those IDs from the original list
+                        ReturnModel.data = ReturnModel.data.Where(f => !filteredIds.Contains(f.id)).ToList();
+
+                        // Step 3: Add filtered data to the original list
+                        ReturnModel.data.AddRange(filterData);
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while apply markup {ex.Message.ToString()}");
+            }
+            #endregion
+            ReturnModel.data = ReturnModel.data.OrderBy(e => e.price.total).ToList();
             return ReturnModel;
         }
         private string CalculateDuration(List<string> timestring)
